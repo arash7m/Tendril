@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{if(localStorage.getItem("tendril:__lock"))document.documentElement.classList.add("is-locked")}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Daily warm-up · Tendril</title>
+<meta name="description" content="A guided five-minute voice warm-up: breathing, hums, slides, resonance and speaking in your range.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#070A1F">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tendril">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/tendril.css">
+
+<link rel="stylesheet" href="assets/css/voice.css">
+<link rel="stylesheet" href="assets/css/warmup.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Tendril home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 29c0-8 2-13 7-16 4-2.5 7-1 7 2s-3 4-5 2.5" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M15 14c-1-5 2-9 7-10-0.5 5-3 8.5-7 10z" fill="var(--secondary)"/></svg>
+      Tendril
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="timeline.html">Timeline</a>
+      <a class="navlink" href="voice.html" aria-current="page">Voice</a>
+      <a class="navlink" href="doses.html">Health</a>
+      <a class="navlink" href="jar.html">Jar</a>
+      <a class="navlink" href="names.html">Names</a>
+      <a class="navlink" href="guides.html">Guides</a>
+      <a class="navlink" href="data.html">Your data</a>
+    </nav>
+    <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
+  </div>
+</header>
+
+<main class="wrap voice warmup">
+  <section class="intro">
+    <p class="eyebrow">Voice practice</p>
+    <h1>Daily warm-up</h1>
+    <p class="lede">A guided routine that wakes your voice up gently, then helps you find your target. Do it before practising, or on its own as your daily voice time.</p>
+  </section>
+
+  <nav class="voice-tabs" aria-label="Voice practice">
+    <a href="warmup.html" aria-current="page">Warm-up</a>
+    <a href="voice.html">Pitch</a>
+    <a href="resonance.html">Resonance</a>
+    <a href="games.html">Games</a>
+  </nav>
+
+  <!-- Start screen -->
+  <section class="wu-start" id="wu-start">
+    <div class="panel wu-choose">
+      <div class="wu-today" id="wu-today"></div>
+      <div class="segmented wu-length" role="group" aria-label="How long">
+        <button type="button" data-len="full" aria-pressed="true">Full · about 5 min</button>
+        <button type="button" data-len="short" aria-pressed="false">Short · about 2 min</button>
+      </div>
+      <ol class="wu-steps" id="wu-steps"></ol>
+      <button class="btn btn-primary wu-go" type="button" id="wu-go">Start warm-up</button>
+      <p class="notice" id="wu-notice" role="alert" hidden></p>
+      <p class="small muted">Uses your microphone. Nothing is recorded; only a short summary of each warm-up is saved on this device.</p>
+    </div>
+    <div class="panel wu-streak-panel">
+      <div class="wu-streak" id="wu-streak"></div>
+      <div class="wu-cal" id="wu-cal" aria-label="Last four weeks"></div>
+      <p class="wu-legend small muted"><span class="cal-key warm"></span>Warm-up <span class="cal-key other"></span>Other voice practice</p>
+    </div>
+  </section>
+
+  <!-- Running -->
+  <section class="wu-stage" id="wu-stage" hidden>
+    <div class="wu-progress" id="wu-progress" aria-hidden="true"></div>
+    <div class="wu-head">
+      <span class="wu-stepname" id="wu-stepname"></span>
+      <span class="wu-time" id="wu-time"></span>
+    </div>
+    <h2 class="wu-do" id="wu-do" aria-live="polite"></h2>
+    <p class="wu-how" id="wu-how"></p>
+    <div class="wu-canvas-box">
+      <canvas id="wu-canvas" role="img" aria-label="Warm-up guide"></canvas>
+      <div class="wu-ready" id="wu-ready" hidden><span id="wu-ready-n"></span></div>
+      <div class="wu-pause" id="wu-pause" hidden>
+        <h3>Paused</h3>
+        <div class="row">
+          <button class="btn btn-primary" type="button" id="wu-resume">Resume</button>
+          <button class="btn btn-soft" type="button" id="wu-quit">End warm-up</button>
+        </div>
+      </div>
+    </div>
+    <p class="wu-sentence" id="wu-sentence" hidden></p>
+    <div class="wu-controls">
+      <button class="btn btn-soft" type="button" id="wu-pausebtn">Pause</button>
+      <button class="btn btn-soft" type="button" id="wu-skip">Next step</button>
+    </div>
+  </section>
+
+  <!-- Done -->
+  <section class="wu-done panel" id="wu-done" hidden aria-labelledby="wu-done-h">
+    <p class="eyebrow">Warm-up done</p>
+    <h2 id="wu-done-h">Nice work</h2>
+    <div class="wu-streak big" id="wu-done-streak"></div>
+    <ul class="wu-results" id="wu-results"></ul>
+    <div class="wu-cal" id="wu-done-cal" aria-label="Last four weeks"></div>
+    <div class="row">
+      <a class="btn btn-primary" href="games.html#glide">Play a round of Glide?</a>
+      <a class="btn btn-soft" href="voice.html">Free practice</a>
+      <button class="btn btn-soft" type="button" id="wu-close">Done</button>
+    </div>
+  </section>
+
+  <aside class="care">
+    <h3>Comfort first</h3>
+    <p>A warm-up should feel easy. Keep everything light, sip water, and skip any step that feels tight or scratchy. If your voice is tired or sore, rest today; that counts as looking after it too.</p>
+  </aside>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Tendril stores everything in your browser on this device. Nothing is sent to a server.</p>
+    <p>Press <kbd>Esc</kbd> twice to leave quickly.</p>
+  </div>
+</footer>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/pitch.js"></script>
+<script src="assets/js/formants.js"></script>
+<script src="assets/js/trace.js"></script>
+<script src="assets/js/voice-engine.js"></script>
+<script src="assets/js/days.js"></script>
+<script src="assets/js/warmup.js"></script>
+</body>
+</html>

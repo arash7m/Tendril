@@ -279,15 +279,18 @@ Tendril.ready(function () {
   function cardVoice(c) {
     const f = frame(c, "Voice", "voice.html");
     const pitch = T.store.get("voice.history", []), res = T.store.get("resonance.history", []);
-    const plays = T.store.get("games.plays", []);
-    if (!pitch.length && !res.length && !plays.length) { emptyLine(f.body, "Practice pitch and resonance with live feedback.", "voice.html", "Start practicing"); return f.card; }
+    const plays = T.store.get("games.plays", []), warm = T.store.get("warmup.log", []);
+    if (!pitch.length && !res.length && !plays.length && !warm.length) {
+      emptyLine(f.body, "A guided five-minute warm-up is a gentle way to start.", "warmup.html", "Start a warm-up");
+      return f.card;
+    }
     const week = el("div", "week-dots");
     const start = dayStart(new Date());
     start.setDate(start.getDate() - 6);
     let practiced = 0;
     for (let i = 0; i < 7; i++) {
       const d = new Date(start); d.setDate(start.getDate() + i);
-      const hit = pitch.concat(res, plays).some(function (h) { return dayStart(h.at).getTime() === d.getTime(); });
+      const hit = pitch.concat(res, plays, warm).some(function (h) { return dayStart(h.at).getTime() === d.getTime(); });
       if (hit) practiced++;
       const dot = el("span", "week-dot" + (hit ? " on" : ""));
       dot.title = d.toLocaleDateString(undefined, { weekday: "long" });
@@ -296,6 +299,20 @@ Tendril.ready(function () {
     }
     f.body.appendChild(week);
     f.body.appendChild(el("p", "hc-sub", practiced ? "Practiced " + practiced + (practiced === 1 ? " day" : " days") + " this week" : "A few minutes today would be nice"));
+    // Warm-up streak and button
+    const days = {};
+    warm.forEach(function (w) { days[dayStart(w.at).getTime()] = true; });
+    const today = dayStart(new Date());
+    const doneToday = !!days[today.getTime()];
+    let streak = 0;
+    const d = new Date(today);
+    if (!doneToday) d.setDate(d.getDate() - 1);
+    while (days[dayStart(d).getTime()]) { streak++; d.setDate(d.getDate() - 1); }
+    const row = el("div", "warm-row");
+    if (streak) row.appendChild(el("span", "warm-streak" + (doneToday ? " done" : ""), streak + "-day warm-up streak"));
+    if (doneToday) row.appendChild(el("span", "warm-done", "Warm-up done today ✓"));
+    else row.appendChild(link("warmup.html", streak ? "Keep it going: warm up" : "Start today’s warm-up", "btn btn-primary btn-small"));
+    f.body.appendChild(row);
     const stats = el("div", "voice-stats");
     if (pitch[0]) stats.appendChild(el("span", null, "Pitch " + pitch[0].avg + " Hz"));
     if (res[0]) stats.appendChild(el("span", null, "Resonance " + res[0].avg));

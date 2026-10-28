@@ -510,4 +510,8 @@ Tendril.ready(function () {
   });
 
   renderMenu();
+
+  // Opened with a game in the link, e.g. games.html#glide from the warm-up
+  const fromHash = location.hash.slice(1);
+  if (GAMES[fromHash]) { history.replaceState(null, "", location.pathname); openGame(fromHash); }
 });

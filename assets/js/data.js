@@ -28,6 +28,8 @@ Tendril.ready(function () {
     if (res.length) out.push(["Resonance practice", res.length + plural(res.length, " session", " sessions")]);
     const gp = data["games.plays"] || [];
     if (gp.length) out.push(["Voice games", gp.length + plural(gp.length, " game played", " games played")]);
+    const wu = data["warmup.log"] || [];
+    if (wu.length) out.push(["Voice warm-ups", wu.length + plural(wu.length, " warm-up", " warm-ups")]);
     const jar = data["jar.notes"] || [];
     if (jar.length) out.push(["Euphoria jar", jar.length + plural(jar.length, " moment", " moments")]);
     const drafts = data["comingout.drafts"] || [];

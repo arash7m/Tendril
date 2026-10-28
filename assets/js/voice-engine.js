@@ -1,13 +1,16 @@
-/* Tendril voice engine: microphone + pitch readings for the voice games.
+/* Tendril voice engine: microphone + pitch (and optionally resonance) readings for the
+   voice games and the warm-up.
    const eng = TendrilVoiceEngine.create(); await eng.start(); then call
    eng.poll() every animation frame: it returns the current pitch in Hz
    (smoothed) or null when you're not making a voiced sound. */
 (function (global) {
   "use strict";
 
-  function create() {
-    const P = global.TendrilPitch;
+  function create(opts) {
+    const o = opts || {};
+    const P = global.TendrilPitch, F = global.TendrilFormants;
     let audio = null, smooth = null, gate = null, level = 0.006, last = 0, current = null, heldAt = 0;
+    let formOn = false, formSmooth = null, bright = null;
 
     async function start() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) throw new Error("unsupported");
@@ -24,6 +27,8 @@
       gate = P.makeNoiseGate();
       level = 0.006;
       current = null;
+      bright = null;
+      if (F) formSmooth = F.makeSmoother(7, 12);
     }
 
     function stop() {
@@ -46,12 +51,22 @@
       for (let i = 0; i < audio.buf.length; i += 4) e += audio.buf[i] * audio.buf[i];
       level = gate.update(Math.sqrt(e / (audio.buf.length / 4)), voiced);
       const hz = smooth(voiced ? r.hz : null);
+      if (formOn && F) {
+        const f = formSmooth(voiced ? F.analyze(audio.buf, audio.ctx.sampleRate) : null);
+        bright = f && hz != null ? F.display(F.brightness(f, o.vowel || "ee")) : null;
+      }
       if (hz != null) { current = hz; heldAt = now; }
       else if (now - heldAt > 220) current = null; // keep the value through tiny gaps
       return current;
     }
 
-    return { start: start, stop: stop, poll: poll, running: function () { return !!audio; } };
+    return {
+      start: start, stop: stop, poll: poll, running: function () { return !!audio; },
+      /** Turn resonance measuring on or off (needs formants.js). */
+      measureResonance: function (on) { formOn = !!on; bright = null; if (F) formSmooth = F.makeSmoother(7, 12); },
+      /** Latest brightness on the 0-100 resonance scale, or null. Call after poll(). */
+      resonance: function () { return bright; }
+    };
   }
 
   global.TendrilVoiceEngine = { create: create };

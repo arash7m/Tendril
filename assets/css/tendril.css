@@ -424,3 +424,9 @@ html.is-locked body > *:not(#lock):not(.toast) { visibility: hidden; }
 .lock.shake .lock-dots { animation: lock-shake .35s ease; }
 @keyframes lock-shake { 25% { transform: translateX(-8px); } 50% { transform: translateX(8px); } 75% { transform: translateX(-4px); } }
 @media (max-height: 640px) { .lock-pad { grid-template-columns: repeat(3, 60px); gap: 10px; } .lock-pad button { width: 60px; height: 60px; } }
+
+/* Four voice tabs on a phone */
+@media (max-width: 560px) {
+  .voice-tabs { display: flex; justify-self: stretch; }
+  .voice-tabs a { flex: 1 1 auto; text-align: center; padding: 8px 8px; font-size: 0.88rem; }
+}
