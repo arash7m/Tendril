@@ -114,7 +114,63 @@
     toastTimer = setTimeout(function () { el.hidden = true; }, 2600);
   }
 
+  // ---------------- App install + offline ----------------
+  const isStandalone = function () {
+    return (global.matchMedia && global.matchMedia("(display-mode: standalone)").matches) || global.navigator.standalone === true;
+  };
+  let installPrompt = null;
+  global.addEventListener("beforeinstallprompt", function (ev) {
+    ev.preventDefault();
+    installPrompt = ev;
+    document.dispatchEvent(new CustomEvent("tendril:installable"));
+  });
+  global.addEventListener("appinstalled", function () {
+    installPrompt = null;
+    document.dispatchEvent(new CustomEvent("tendril:installed"));
+  });
+  function promptInstall() {
+    if (!installPrompt) return Promise.resolve(false);
+    const p = installPrompt;
+    installPrompt = null;
+    p.prompt();
+    return p.userChoice.then(function (c) { return c && c.outcome === "accepted"; });
+  }
+
+  function showUpdateBar(worker) {
+    if (document.getElementById("tendril-update")) return;
+    const bar = document.createElement("div");
+    bar.id = "tendril-update";
+    bar.className = "toast update-bar";
+    bar.setAttribute("role", "status");
+    bar.innerHTML = '<span>A new version of Tendril is ready.</span> <button type="button" class="btn btn-primary btn-small">Update</button>';
+    bar.querySelector("button").addEventListener("click", function () { worker.postMessage("skip-waiting"); });
+    document.body.appendChild(bar);
+  }
+
+  if ("serviceWorker" in navigator && /^https:|^http:\/\/(localhost|127\.0\.0\.1)/.test(location.href)) {
+    global.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").then(function (reg) {
+        if (reg.waiting && navigator.serviceWorker.controller) showUpdateBar(reg.waiting);
+        reg.addEventListener("updatefound", function () {
+          const w = reg.installing;
+          if (!w) return;
+          w.addEventListener("statechange", function () {
+            if (w.state === "installed" && navigator.serviceWorker.controller) showUpdateBar(w);
+          });
+        });
+      }).catch(function () { /* offline support unavailable; the site still works */ });
+      let reloaded = false;
+      navigator.serviceWorker.addEventListener("controllerchange", function () {
+        if (reloaded) return;
+        reloaded = true;
+        global.location.reload();
+      });
+    });
+  }
+
   global.Tendril = {
+    isStandalone: isStandalone, promptInstall: promptInstall,
+    canPromptInstall: function () { return !!installPrompt; },
     store: store, quickExit: quickExit, uid: uid, download: download, toast: toast,
     relDays: relDays, fmtDate: fmtDate
   };

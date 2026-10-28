@@ -5,9 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tendril</title>
 <meta name="description" content="Small, private tools for trans people: voice practice, dose tracking and more. Everything stays on your device.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fredoka:wght@500;600&family=Nunito+Sans:opsz,wght@6..12,400;6..12,700;6..12,800&display=swap">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#f4fbfa" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0b1f1e" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tendril">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/css/fonts.css">
 <link rel="stylesheet" href="assets/css/tendril.css">
 <style>
   .home { padding-block: 40px 0; display: grid; gap: 48px; }
@@ -61,6 +68,24 @@
   @media (max-width: 720px) { .privacy { grid-template-columns: minmax(0, 1fr); } }
   .privacy ul { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
   .privacy .intro { display: grid; gap: 10px; }
+
+  .install {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    gap: 24px;
+    align-items: center;
+    background: var(--surface);
+    border-radius: var(--r-xl);
+    box-shadow: var(--shadow);
+    padding: clamp(20px, 4vw, 36px);
+  }
+  @media (max-width: 720px) { .install { grid-template-columns: minmax(0, 1fr); } }
+  .install-text { display: grid; gap: 10px; }
+  .install-text p { color: var(--muted); }
+  .install-steps { margin: 0; padding-left: 1.3em; display: grid; gap: 8px; }
+  .install-steps li::marker { font-weight: 800; color: var(--pink-text); }
+  .share-ico { vertical-align: -3px; }
+  .installed-note { font-weight: 700; background: var(--primary-light); border-radius: var(--r-sm); padding: 12px 16px; }
 </style>
 </head>
 <body>
@@ -128,6 +153,28 @@
     </div>
   </section>
 
+  <section class="install" id="install" aria-labelledby="install-h">
+    <div class="install-text">
+      <h2 id="install-h">Use Tendril as an app</h2>
+      <p>Add Tendril to your home screen. It opens full screen, works with no internet connection, and your data stays on your phone. There’s no app store and no account.</p>
+    </div>
+    <div class="install-how">
+      <div id="install-ready" hidden>
+        <button class="btn btn-pink" type="button" id="install-btn">Install Tendril</button>
+      </div>
+      <ol class="install-steps" id="install-ios" hidden>
+        <li>Open this page in <strong>Safari</strong>.</li>
+        <li>Tap the <strong>Share</strong> button <svg class="share-ico" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M6 11v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>.</li>
+        <li>Choose <strong>Add to Home Screen</strong>, then <strong>Add</strong>.</li>
+      </ol>
+      <ol class="install-steps" id="install-other">
+        <li>Open your browser’s menu (often <strong>⋮</strong> or <strong>…</strong>).</li>
+        <li>Choose <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li>
+      </ol>
+      <p class="installed-note" id="install-done" hidden>You’re using the Tendril app. It works offline.</p>
+    </div>
+  </section>
+
   <section class="privacy" id="privacy" aria-labelledby="privacy-h">
     <div class="intro">
       <h2 id="privacy-h">Your data stays with you</h2>
@@ -150,5 +197,29 @@
 </footer>
 
 <script src="assets/js/common.js"></script>
+<script>
+  (function () {
+    var T = window.Tendril;
+    var $ = function (id) { return document.getElementById(id); };
+    var ios = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    function update() {
+      if (T.isStandalone()) {
+        $("install-done").hidden = false;
+        $("install-ready").hidden = $("install-ios").hidden = $("install-other").hidden = true;
+        return;
+      }
+      var canPrompt = T.canPromptInstall();
+      $("install-ready").hidden = !canPrompt;
+      $("install-ios").hidden = !ios || canPrompt;
+      $("install-other").hidden = ios || canPrompt;
+    }
+    $("install-btn").addEventListener("click", function () {
+      T.promptInstall().then(function (ok) { if (ok) T.toast("Tendril installed"); update(); });
+    });
+    document.addEventListener("tendril:installable", update);
+    document.addEventListener("tendril:installed", update);
+    update();
+  })();
+</script>
 </body>
 </html>

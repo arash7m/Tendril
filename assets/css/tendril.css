@@ -415,3 +415,5 @@ kbd {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+.update-bar { display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 18px; }

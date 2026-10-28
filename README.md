@@ -49,6 +49,16 @@ Everything is stored in the browser's localStorage under keys starting with `ten
 
 Backups are JSON files. With a password they're encrypted with AES-GCM using a key derived by PBKDF2 (SHA-256, 250,000 iterations).
 
+## App and offline
+
+Tendril is a Progressive Web App. People can install it from the browser ("Add to Home Screen" on iPhone, "Install app" on Android and desktop). Once installed it opens full screen and works with no connection.
+
+- `manifest.webmanifest` describes the app (name, icons, colors).
+- `sw.js` is the service worker that caches every file for offline use.
+- Fonts are self-hosted in `assets/fonts/` (SIL Open Font License), so the app never contacts Google or any other server.
+
+**After changing any file, run `python3 tools/build-sw.py`** before committing. It refreshes the file list and version in `sw.js`, so installed apps pick up the update and show an "Update" button.
+
 ## Content review
 
 The guides (binding, tucking, appointments) are general safety information and should be reviewed by trans community members and a clinician before launch.
