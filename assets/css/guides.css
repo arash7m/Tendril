@@ -1,0 +1,48 @@
+/* Guides */
+
+.toc {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 12px;
+}
+.toc a {
+  display: grid;
+  gap: 2px;
+  padding: 14px 18px;
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border: 2px solid var(--line);
+  text-decoration: none;
+  color: var(--ink);
+}
+.toc a:hover { border-color: var(--primary); }
+.toc-n { font-family: var(--font-display); font-weight: 600; font-size: 1.1rem; color: var(--deep); }
+.toc-d { font-size: 0.86rem; color: var(--muted); }
+
+.guide { display: grid; gap: 22px; scroll-margin-top: 120px; max-width: 760px; }
+.guide-head { display: grid; gap: 8px; }
+.guide section { display: grid; gap: 8px; }
+.guide ul { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; max-width: 65ch; }
+.guide li::marker { color: var(--primary); }
+.questions li::marker { content: "? "; font-weight: 800; color: var(--pink-text); }
+
+.warning {
+  background: var(--secondary-light);
+  border-radius: var(--r-md);
+  padding: 16px 20px;
+  display: grid;
+  gap: 6px;
+  max-width: 65ch;
+}
+
+/* Checklist */
+.checklist-progress { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.bar { flex: 1; min-width: 160px; height: 12px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.bar span { display: block; height: 100%; width: 0; border-radius: 999px; background: linear-gradient(90deg, var(--primary), var(--accent)); transition: width .3s ease; }
+
+.checklist { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 18px 24px; }
+.check-group { display: grid; gap: 6px; align-content: start; }
+.check-group legend { font-family: var(--font-display); font-weight: 600; font-size: 1.02rem; color: var(--deep); margin-bottom: 6px; }
+.check-item { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 0.95rem; padding: 4px 0; }
+.check-item input { width: 20px; height: 20px; margin-top: 2px; flex: none; accent-color: var(--primary); }
+.check-item input:checked + span { color: var(--muted); text-decoration: line-through; }

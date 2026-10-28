@@ -6,26 +6,27 @@ Everything runs in the browser and is stored on the user's own device. There is 
 
 ## What's here
 
-| Page | Status |
+| Page | What it does |
 |---|---|
-| `index.html`: home page and privacy explainer | Ready |
-| `voice.html`: pitch trainer with live graph, target range, prompts and session history | Ready |
-| Dose tracker | Planned |
-| Name & pronoun sandbox | Planned |
-| Guides | Planned |
+| `index.html` | Home page and privacy explainer |
+| `voice.html` | Pitch trainer: live graph, target range, read-aloud prompts, recording analysis, session history |
+| `doses.html` | Dose tracker: medications, dose log, next due, doses left, injection/patch site rotation on a body map, calendar reminders (.ics) |
+| `names.html` | Name & pronoun sandbox: everyday sentences, read-aloud, private shortlist |
+| `guides.html` | Binding, tucking, appointment prep, name-change checklist |
+| `data.html` | Backup (optionally password-encrypted), restore, delete everything |
 
 ## Structure
 
 ```
-index.html
-voice.html
-assets/
-  css/tendril.css   shared tokens, header, buttons, panels (light + dark)
-  css/voice.css     voice page layout
-  js/common.js      safe localStorage wrapper + quick exit (button or Esc twice)
-  js/pitch.js       YIN pitch detection, note names, smoothing
-  js/voice.js       voice page: mic, recording analysis, graph, history
+assets/css/tendril.css   shared tokens, header, buttons, forms, sheets (light + dark)
+assets/css/*.css         one stylesheet per page
+assets/js/common.js      storage wrapper, quick exit, toast, download, date helpers
+assets/js/pitch.js       YIN pitch detection
+assets/js/bodymap.js     body map picker and site rotation
+assets/js/<page>.js      one script per page
 ```
+
+Every page shares the same header markup. If you add a page, copy the header from an existing page and add a link to the nav in all pages.
 
 Plain HTML, CSS and JavaScript with no build step. To run it locally:
 
@@ -34,6 +35,23 @@ python3 -m http.server 8000
 ```
 
 then open http://localhost:8000. Browsers only allow microphone access over HTTPS or on localhost.
+
+## Where data lives
+
+Everything is stored in the browser's localStorage under keys starting with `tendril:`:
+
+| Key | Contents |
+|---|---|
+| `voice.target`, `voice.history` | Target range, session summaries |
+| `doses.meds`, `doses.log` | Medications, logged doses |
+| `names.shortlist` | Saved names and pronouns |
+| `guides.checklist` | Ticked name-change items |
+
+Backups are JSON files. With a password they're encrypted with AES-GCM using a key derived by PBKDF2 (SHA-256, 250,000 iterations).
+
+## Content review
+
+The guides (binding, tucking, appointments) are general safety information and should be reviewed by trans community members and a clinician before launch.
 
 ## Hosting
 

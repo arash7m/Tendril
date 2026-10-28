@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Your data · Tendril</title>
+<meta name="description" content="Back up, restore or delete everything Tendril has saved on this device.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fredoka:wght@500;600&family=Nunito+Sans:opsz,wght@6..12,400;6..12,700;6..12,800&display=swap">
+<link rel="stylesheet" href="assets/css/tendril.css">
+<link rel="stylesheet" href="assets/css/data.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Tendril home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 29c0-8 2-13 7-16 4-2.5 7-1 7 2s-3 4-5 2.5" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M15 14c-1-5 2-9 7-10-0.5 5-3 8.5-7 10z" fill="var(--secondary)"/></svg>
+      Tendril
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="voice.html">Voice</a>
+      <a class="navlink" href="doses.html">Doses</a>
+      <a class="navlink" href="names.html">Names</a>
+      <a class="navlink" href="guides.html">Guides</a>
+      <a class="navlink" href="data.html" aria-current="page">Your data</a>
+    </nav>
+    <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
+  </div>
+</header>
+
+<main class="wrap page data">
+  <section class="page-intro">
+    <p class="eyebrow">Your data</p>
+    <h1>Everything stays on this device</h1>
+    <p class="lede">Tendril keeps what you save in this browser only. That keeps it private, but it also means it can be lost if you clear your browsing data or switch phones. Make a backup now and then, and restore it on any device.</p>
+  </section>
+
+  <section class="panel" aria-labelledby="stored-h">
+    <h2 id="stored-h">Saved on this device</h2>
+    <ul class="stored" id="stored"></ul>
+    <p class="notice-line" id="storage-off" hidden>This browser is blocking storage, so Tendril can’t save anything here. Private or incognito windows often do this.</p>
+  </section>
+
+  <div class="data-grid">
+    <section class="panel" aria-labelledby="backup-h">
+      <h2 id="backup-h">Make a backup</h2>
+      <p class="muted">Downloads one small file with everything above. Keep it somewhere private, like a password-protected folder or your own cloud storage.</p>
+      <label class="field">
+        <span>Password <span class="hint">optional, but recommended</span></span>
+        <input class="input" type="password" id="backup-pass" autocomplete="new-password" placeholder="Leave empty for no password">
+      </label>
+      <p class="small muted">With a password, the file is encrypted and nobody can read it without the password. If you forget it, the backup can’t be opened, not even by us.</p>
+      <div class="row"><button class="btn btn-primary" type="button" id="backup">Download backup</button></div>
+    </section>
+
+    <section class="panel" aria-labelledby="restore-h">
+      <h2 id="restore-h">Restore a backup</h2>
+      <p class="muted">Choose a Tendril backup file. You’ll see what’s inside before anything is replaced.</p>
+      <div class="row">
+        <label class="btn btn-soft" for="restore-file">Choose backup file</label>
+        <input type="file" id="restore-file" accept=".json,application/json" class="visually-hidden">
+      </div>
+      <div class="restore-step" id="restore-pass-step" hidden>
+        <label class="field">
+          <span>This backup is password protected</span>
+          <input class="input" type="password" id="restore-pass" autocomplete="current-password" placeholder="Backup password">
+        </label>
+        <div class="row"><button class="btn btn-primary btn-small" type="button" id="unlock">Unlock</button></div>
+      </div>
+      <div class="restore-step" id="restore-confirm" hidden>
+        <p><strong>Found in the backup:</strong></p>
+        <ul class="stored" id="restore-summary"></ul>
+        <p class="small muted" id="restore-date"></p>
+        <p class="small">Restoring replaces what’s currently saved on this device.</p>
+        <div class="row">
+          <button class="btn btn-primary" type="button" id="restore-go">Replace with backup</button>
+          <button class="btn btn-soft" type="button" id="restore-cancel">Cancel</button>
+        </div>
+      </div>
+      <p class="notice-line" id="restore-error" role="alert" hidden></p>
+    </section>
+  </div>
+
+  <section class="panel danger-zone" aria-labelledby="wipe-h">
+    <h2 id="wipe-h">Delete everything</h2>
+    <p class="muted">Removes all Tendril data from this browser right away. Make a backup first if you might want it again.</p>
+    <div class="row">
+      <button class="btn btn-soft" type="button" id="wipe">Delete all my Tendril data</button>
+      <span class="wipe-confirm" id="wipe-confirm" hidden>
+        <span>This can’t be undone.</span>
+        <button class="btn btn-pink btn-small" type="button" id="wipe-yes">Delete everything</button>
+        <button class="btn btn-soft btn-small" type="button" id="wipe-no">Keep my data</button>
+      </span>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Backups are created and encrypted in your browser. Nothing is uploaded.</p>
+    <p>Press <kbd>Esc</kbd> twice to leave quickly.</p>
+  </div>
+</footer>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/data.js"></script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+/* Dose tracker */
+
+.meds-section { display: grid; gap: 16px; }
+
+.med-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr)); gap: 16px; }
+.med-grid:empty { display: none; }
+
+.med-card {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  display: grid;
+  gap: 14px;
+  align-content: start;
+}
+.med-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.med-name { display: grid; gap: 2px; min-width: 0; }
+.med-name h3 { overflow-wrap: anywhere; }
+
+.due-chip {
+  flex: none;
+  font-weight: 800;
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--ink);
+  text-align: center;
+}
+.med-card[data-state="today"] .due-chip { background: var(--accent); color: #2a2200; }
+.med-card[data-state="late"] .due-chip { background: var(--secondary); color: #2b0613; }
+.med-card[data-state="soon"] .due-chip { background: var(--primary-light); }
+
+.med-facts {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 8px;
+}
+.med-facts div { background: var(--surface-2); border-radius: var(--r-sm); padding: 8px 12px; min-width: 0; }
+.med-facts dt { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.med-facts dd { margin: 2px 0 0; font-weight: 700; font-size: 0.92rem; }
+
+.med-sites {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  border: 2px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+}
+.med-sites div { display: grid; }
+.med-sites .k { font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.med-sites .v { font-weight: 700; }
+.med-sites .v.next { color: var(--link); }
+
+.refill {
+  font-size: 0.86rem;
+  font-weight: 700;
+  background: var(--secondary-light);
+  border-radius: var(--r-sm);
+  padding: 8px 12px;
+}
+
+.med-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* History */
+.panel { display: grid; gap: 14px; }
+.log-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.log-list li {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--surface-2);
+  border-radius: var(--r-sm);
+}
+@media (max-width: 560px) {
+  .log-list li { grid-template-columns: minmax(0, 1fr) auto; }
+  .log-list .log-what { grid-column: 1 / -1; grid-row: 2; }
+}
+.log-when, .log-what { display: grid; min-width: 0; }
+.log-when span, .log-detail { font-size: 0.82rem; color: var(--muted); }
+.log-med { font-weight: 700; overflow-wrap: anywhere; }
+.btn.danger, .btn-soft.danger { background: var(--secondary-light); }
+
+/* Body map */
+.bodymap-host { display: grid; justify-items: center; }
+.bodymap { width: 100%; max-width: 340px; height: auto; }
+.bm-figure circle, .bm-figure rect { fill: var(--surface-2); stroke: var(--line); stroke-width: 1.5; }
+.bm-title { font-family: var(--font-mono); font-size: 12px; fill: var(--muted); text-anchor: middle; }
+.bm-site { cursor: pointer; outline: none; }
+.bm-hit { fill: transparent; }
+.bm-dot { fill: var(--surface); stroke: var(--primary); stroke-width: 2.5; transition: r .12s ease; }
+.bm-site:hover .bm-dot, .bm-site:focus-visible .bm-dot { r: 12; }
+.bm-site:focus-visible .bm-hit { stroke: var(--secondary); stroke-width: 2.5; }
+.bm-site.is-last .bm-dot { fill: var(--secondary-light); stroke: var(--secondary); }
+.bm-site.is-suggested .bm-dot { stroke-dasharray: 3 2.5; }
+.bm-site.is-selected .bm-dot { fill: var(--primary); stroke: var(--primary-dark); }
+.bm-tag { font-size: 10px; font-weight: 800; text-anchor: middle; fill: var(--ink); pointer-events: none; font-family: var(--font-body); }
+.bm-legend { display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
+.bm-key {
+  display: inline-grid; place-items: center;
+  width: 20px; height: 20px; border-radius: 50%;
+  font-size: 0.7rem; font-weight: 800;
+  border: 2px solid var(--primary);
+}
+.bm-key.last { background: var(--secondary-light); border-color: var(--secondary); }
+.bm-key.sug { border-style: dashed; }
+.site-chosen { font-weight: 800; text-align: center; }
+
+.example-banner { display: grid; gap: 10px; }

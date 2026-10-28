@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Name sandbox · Tendril</title>
+<meta name="description" content="Try a name and pronouns in everyday sentences, privately.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fredoka:wght@500;600&family=Nunito+Sans:opsz,wght@6..12,400;6..12,700;6..12,800&display=swap">
+<link rel="stylesheet" href="assets/css/tendril.css">
+<link rel="stylesheet" href="assets/css/names.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Tendril home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 29c0-8 2-13 7-16 4-2.5 7-1 7 2s-3 4-5 2.5" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M15 14c-1-5 2-9 7-10-0.5 5-3 8.5-7 10z" fill="var(--secondary)"/></svg>
+      Tendril
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="voice.html">Voice</a>
+      <a class="navlink" href="doses.html">Doses</a>
+      <a class="navlink" href="names.html" aria-current="page">Names</a>
+      <a class="navlink" href="guides.html">Guides</a>
+      <a class="navlink" href="data.html">Your data</a>
+    </nav>
+    <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
+  </div>
+</header>
+
+<main class="wrap page names">
+  <section class="page-intro">
+    <p class="eyebrow">Name &amp; pronoun sandbox</p>
+    <h1>Try it on</h1>
+    <p class="lede">Type a name and pick pronouns to see them in everyday sentences, the way friends and strangers would say them. Nothing you type is saved unless you add it to your shortlist.</p>
+  </section>
+
+  <div class="names-layout">
+    <section class="panel try" aria-labelledby="try-h">
+      <h2 id="try-h" class="visually-hidden">Name and pronouns</h2>
+      <label class="field">
+        <span>Name</span>
+        <input class="input big-input" type="text" id="name" maxlength="30" autocomplete="off" spellcheck="false" placeholder="Type a name">
+      </label>
+
+      <fieldset class="field">
+        <legend>Pronouns</legend>
+        <div class="pills" id="pronoun-pills"></div>
+      </fieldset>
+
+      <div class="custom-pronouns" id="custom-pronouns" hidden>
+        <p class="small muted">Fill in each form. The example shows where it goes.</p>
+        <div class="grid-2">
+          <label class="field"><span>Subject <span class="hint"><em>___</em> is here</span></span><input class="input" id="c-sub" maxlength="12" value="fae"></label>
+          <label class="field"><span>Object <span class="hint">I saw <em>___</em></span></span><input class="input" id="c-obj" maxlength="12" value="faer"></label>
+          <label class="field"><span>Possessive <span class="hint"><em>___</em> book</span></span><input class="input" id="c-det" maxlength="12" value="faer"></label>
+          <label class="field"><span>Possessive alone <span class="hint">it’s <em>___</em></span></span><input class="input" id="c-pos" maxlength="12" value="faers"></label>
+          <label class="field"><span>Reflexive <span class="hint">by <em>___</em></span></span><input class="input" id="c-ref" maxlength="14" value="faerself"></label>
+          <label class="field check-field"><input type="checkbox" id="c-plural"><span>Uses “are”, like they</span></label>
+        </div>
+      </div>
+
+      <div class="row">
+        <button class="btn btn-pink" type="button" id="save">Add to shortlist</button>
+        <button class="btn btn-soft" type="button" id="shuffle">New sentences</button>
+      </div>
+
+      <div class="shortlist" aria-labelledby="short-h">
+        <div class="spread">
+          <h3 id="short-h">Shortlist</h3>
+          <span class="small muted">Saved on this device</span>
+        </div>
+        <ul id="shortlist"></ul>
+        <p class="small muted" id="short-empty">Names you’re considering will appear here. Tap one to try it again.</p>
+      </div>
+    </section>
+
+    <section class="sentences" aria-labelledby="sent-h" aria-live="polite">
+      <div class="hello">
+        <p class="eyebrow" id="hello-label">Example</p>
+        <p class="hello-line">Hi, I’m <span class="hl" id="hello-name">Robin</span>.</p>
+        <p class="hello-sub" id="hello-pron">My pronouns are they/them.</p>
+      </div>
+      <h2 id="sent-h" class="visually-hidden">Sentences</h2>
+      <ol class="sentence-list" id="sentences"></ol>
+      <p class="small muted" id="speak-note">Tap the speaker to hear a sentence read aloud by your device’s voice.</p>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Tendril stores everything in your browser on this device. Nothing is sent to a server. <a href="data.html">Back up your data</a>.</p>
+    <p>Press <kbd>Esc</kbd> twice to leave quickly.</p>
+  </div>
+</footer>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/names.js"></script>
+</body>
+</html>

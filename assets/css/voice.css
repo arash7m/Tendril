@@ -91,13 +91,7 @@
 
 .controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding-top: 4px; }
 
-.visually-hidden {
-  position: absolute !important;
-  width: 1px; height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
-}
+
 #file:focus-visible + label, .controls label:focus-within { outline: 3px solid var(--secondary); outline-offset: 3px; }
 
 .notice {

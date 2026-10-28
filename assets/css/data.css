@@ -1,0 +1,24 @@
+/* Your data */
+
+.data .panel { display: grid; gap: 14px; align-content: start; }
+.data-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start; }
+@media (max-width: 760px) { .data-grid { grid-template-columns: minmax(0, 1fr); } }
+
+.stored { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.stored li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: var(--surface-2);
+  border-radius: var(--r-sm);
+}
+.stored li.none { color: var(--muted); }
+.stored strong { font-variant-numeric: tabular-nums; }
+
+.restore-step { display: grid; gap: 10px; border-top: 2px solid var(--line); padding-top: 14px; }
+.notice-line { background: var(--secondary-light); border-radius: var(--r-sm); padding: 10px 14px; font-size: 0.92rem; }
+
+.danger-zone { border: 2px solid var(--secondary-light); box-shadow: none; }
+.wipe-confirm { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; font-weight: 700; }

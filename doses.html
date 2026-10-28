@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Doses · Tendril</title>
+<meta name="description" content="Track injections, pills, patches and gel, and rotate injection sites. Everything stays on your device.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fredoka:wght@500;600&family=Nunito+Sans:opsz,wght@6..12,400;6..12,700;6..12,800&display=swap">
+<link rel="stylesheet" href="assets/css/tendril.css">
+<link rel="stylesheet" href="assets/css/doses.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Tendril home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 29c0-8 2-13 7-16 4-2.5 7-1 7 2s-3 4-5 2.5" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M15 14c-1-5 2-9 7-10-0.5 5-3 8.5-7 10z" fill="var(--secondary)"/></svg>
+      Tendril
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="voice.html">Voice</a>
+      <a class="navlink" href="doses.html" aria-current="page">Doses</a>
+      <a class="navlink" href="names.html">Names</a>
+      <a class="navlink" href="guides.html">Guides</a>
+      <a class="navlink" href="data.html">Your data</a>
+    </nav>
+    <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
+  </div>
+</header>
+
+<main class="wrap page doses">
+  <section class="page-intro">
+    <p class="eyebrow">Doses</p>
+    <h1>Keep track of your doses</h1>
+    <p class="lede">Log each injection, pill, patch or gel, see when the next one is due, and let Tendril suggest where to inject next so you rotate sites.</p>
+  </section>
+
+  <div class="example-banner callout soft" id="example-banner" hidden>
+    <p><strong>You’re looking at example data.</strong> Nothing here is yours. Clear it when you’re ready to add your own medications.</p>
+    <div class="row"><button class="btn btn-soft btn-small" id="clear-examples" type="button">Clear example data</button></div>
+  </div>
+
+  <section aria-labelledby="meds-h" class="meds-section">
+    <div class="spread">
+      <h2 id="meds-h">Up next</h2>
+      <button class="btn btn-primary btn-small" id="add-med" type="button">Add medication</button>
+    </div>
+    <div class="med-grid" id="med-grid"></div>
+    <div class="empty" id="meds-empty" hidden>
+      <h3>No medications yet</h3>
+      <p class="muted">Add what you take and how often. Tendril shows when each one is next due and keeps a history you can bring to appointments.</p>
+      <div class="row">
+        <button class="btn btn-primary" id="add-first" type="button">Add your first medication</button>
+        <button class="btn btn-soft" id="load-examples" type="button">Show me an example</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="history-h">
+    <div class="spread">
+      <h2 id="history-h">History</h2>
+      <span class="small muted" id="history-count"></span>
+    </div>
+    <ol class="log-list" id="log-list"></ol>
+    <p class="muted" id="log-empty">Doses you log will appear here, newest first.</p>
+  </section>
+
+  <aside class="callout">
+    <h3>Good to know</h3>
+    <p>Tendril helps you remember what you’ve taken. It doesn’t give dosing advice, so follow what your prescriber told you. If you miss a dose and aren’t sure what to do, ask your doctor or pharmacist.</p>
+    <p>Websites can’t send reminders while closed. Use <strong>Calendar reminder</strong> on a medication to add a repeating event to your phone’s calendar instead.</p>
+  </aside>
+</main>
+
+<!-- Log a dose -->
+<dialog class="sheet" id="log-sheet" aria-labelledby="log-title">
+  <form class="sheet-body" id="log-form" method="dialog">
+    <div class="sheet-head">
+      <h2 id="log-title">Log dose</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <label class="field">
+      <span>When</span>
+      <input class="input" type="datetime-local" id="log-when" required>
+    </label>
+    <div class="field" id="site-field">
+      <span>Where <span class="hint" id="site-hint"></span></span>
+      <div class="bodymap-host" id="bodymap"></div>
+      <p class="small muted bm-legend"><span class="bm-key last">L</span> used last time <span class="bm-key sug">★</span> suggested next. Your left is drawn on the left, like a mirror.</p>
+      <p class="site-chosen" id="site-chosen">No site chosen</p>
+    </div>
+    <label class="field">
+      <span>Note <span class="hint">optional</span></span>
+      <input class="input" type="text" id="log-note" maxlength="140" placeholder="e.g. bit of bruising, new batch">
+    </label>
+    <div class="row">
+      <button class="btn btn-primary" type="submit">Save dose</button>
+      <button class="btn btn-soft" type="button" data-close>Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Add / edit medication -->
+<dialog class="sheet" id="med-sheet" aria-labelledby="med-title">
+  <form class="sheet-body" id="med-form" method="dialog">
+    <div class="sheet-head">
+      <h2 id="med-title">Add medication</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <label class="field">
+      <span>Name</span>
+      <input class="input" type="text" id="med-name" required maxlength="40" placeholder="e.g. Estradiol, Testosterone, Spironolactone">
+    </label>
+    <fieldset class="field">
+      <legend>Type</legend>
+      <div class="pills" id="med-kind">
+        <label><input type="radio" name="kind" value="injection" checked><span>Injection</span></label>
+        <label><input type="radio" name="kind" value="pill"><span>Pill</span></label>
+        <label><input type="radio" name="kind" value="patch"><span>Patch</span></label>
+        <label><input type="radio" name="kind" value="gel"><span>Gel</span></label>
+        <label><input type="radio" name="kind" value="other"><span>Other</span></label>
+      </div>
+    </fieldset>
+    <div class="grid-2">
+      <label class="field">
+        <span>Amount <span class="hint">as prescribed, optional</span></span>
+        <input class="input" type="text" id="med-amount" maxlength="30" placeholder="e.g. 1 tablet, 0.5 ml">
+      </label>
+      <label class="field">
+        <span>Every how many days?</span>
+        <input class="input" type="number" id="med-every" min="0.5" max="90" step="0.5" value="7" required inputmode="numeric">
+      </label>
+    </div>
+    <div class="pills" aria-label="Quick choices">
+      <button type="button" class="btn btn-soft btn-small" data-every="1">Daily</button>
+      <button type="button" class="btn btn-soft btn-small" data-every="3.5">Twice a week</button>
+      <button type="button" class="btn btn-soft btn-small" data-every="7">Weekly</button>
+      <button type="button" class="btn btn-soft btn-small" data-every="14">Every 2 weeks</button>
+    </div>
+    <fieldset class="field" id="sites-field">
+      <legend>Sites you use <span class="hint">Tendril rotates between these</span></legend>
+      <div class="pills" id="med-sites"></div>
+    </fieldset>
+    <label class="field">
+      <span>Doses left <span class="hint">optional, counts down as you log</span></span>
+      <input class="input" type="number" id="med-supply" min="0" max="999" step="1" inputmode="numeric" placeholder="e.g. 8">
+    </label>
+    <div class="spread">
+      <div class="row">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <button class="btn btn-soft" type="button" data-close>Cancel</button>
+      </div>
+      <button class="btn btn-soft btn-small danger" type="button" id="delete-med" hidden>Delete medication</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Calendar reminder -->
+<dialog class="sheet" id="cal-sheet" aria-labelledby="cal-title">
+  <form class="sheet-body" id="cal-form" method="dialog">
+    <div class="sheet-head">
+      <h2 id="cal-title">Calendar reminder</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <p class="muted small">This downloads a repeating event you can open in your phone’s calendar app. Calendars often sync to the cloud and can be seen by others, so you might prefer a neutral title.</p>
+    <label class="field">
+      <span>Event title</span>
+      <input class="input" type="text" id="cal-name" maxlength="60" value="Reminder">
+    </label>
+    <div class="grid-2">
+      <label class="field">
+        <span>Starting</span>
+        <input class="input" type="date" id="cal-date" required>
+      </label>
+      <label class="field">
+        <span>Time</span>
+        <input class="input" type="time" id="cal-time" value="09:00" required>
+      </label>
+    </div>
+    <p class="small muted" id="cal-summary"></p>
+    <div class="row">
+      <button class="btn btn-primary" type="submit">Download event</button>
+      <button class="btn btn-soft" type="button" data-close>Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Tendril stores everything in your browser on this device. Nothing is sent to a server. <a href="data.html">Back up your data</a>.</p>
+    <p>Press <kbd>Esc</kbd> twice to leave quickly.</p>
+  </div>
+</footer>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/bodymap.js"></script>
+<script src="assets/js/doses.js"></script>
+</body>
+</html>
