@@ -27,9 +27,11 @@ def main():
         with open(os.path.join(ROOT, rel), "rb") as fh:
             h.update(rel.encode())
             h.update(fh.read())
-    version = h.hexdigest()[:10]
     path = os.path.join(ROOT, "sw.js")
     src = open(path).read()
+    # The worker's own code counts too (minus the lines this script rewrites).
+    h.update(re.sub(r'const VERSION = "[^"]*";|const FILES = \[.*?\];', "", src, flags=re.S).encode())
+    version = h.hexdigest()[:10]
     listing = "const FILES = [\n  \"./\",\n" + ",\n".join('  "./' + f + '"' for f in files) + "\n];"
     src = re.sub(r"const FILES = \[.*?\];", lambda m: listing, src, count=1, flags=re.S)
     src = re.sub(r'const VERSION = "[^"]*";', 'const VERSION = "' + version + '";', src, count=1)
