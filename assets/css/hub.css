@@ -185,5 +185,5 @@ html:not(.hub-mode) .about-body { padding-top: 0; }
 @media (prefers-reduced-motion: reduce) { .hub-orbs span { animation: none; } }
 .hc-soon { font-size: 0.85rem; font-weight: 800; color: var(--pink-text); }
 .warm-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.warm-streak { font-size: 0.8rem; font-weight: 800; padding: 4px 12px; border-radius: 999px; background: linear-gradient(120deg, rgba(255, 79, 163, .25), rgba(61, 169, 252, .2)); color: var(--ink); }
+.warm-streak { white-space: nowrap; font-size: 0.8rem; font-weight: 800; padding: 4px 12px; border-radius: 999px; background: linear-gradient(120deg, rgba(255, 79, 163, .25), rgba(61, 169, 252, .2)); color: var(--ink); }
 .warm-done { font-size: 0.86rem; font-weight: 800; color: var(--pink-text); }

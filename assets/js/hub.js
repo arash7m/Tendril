@@ -309,8 +309,8 @@ Tendril.ready(function () {
     if (!doneToday) d.setDate(d.getDate() - 1);
     while (days[dayStart(d).getTime()]) { streak++; d.setDate(d.getDate() - 1); }
     const row = el("div", "warm-row");
-    if (streak) row.appendChild(el("span", "warm-streak" + (doneToday ? " done" : ""), streak + "-day warm-up streak"));
-    if (doneToday) row.appendChild(el("span", "warm-done", "Warm-up done today ✓"));
+    if (streak) row.appendChild(el("span", "warm-streak" + (doneToday ? " done" : ""), streak + "-day streak"));
+    if (doneToday) row.appendChild(el("span", "warm-done", "Warm-up done ✓"));
     else row.appendChild(link("warmup.html", streak ? "Keep it going: warm up" : "Start today’s warm-up", "btn btn-primary btn-small"));
     f.body.appendChild(row);
     const stats = el("div", "voice-stats");
