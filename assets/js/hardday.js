@@ -235,8 +235,8 @@ Tendril.ready(function () {
     it: [["Gay Help Line", "800 713 713", "Free, for LGBT+ people including trans people. Mon–Sat, 16:00–20:00."]],
     uk: [["Switchboard LGBTQIA+", "0800 0119 100", "Free, every day 10:00–22:00."], ["Samaritans", "116 123", "Free, any time, day or night."]],
     ie: [["Samaritans", "116 123", "Free, any time, day or night."]],
-    us: [["Trans Lifeline", "(877) 565-8860", "Peer support by trans people. Mon–Fri, 10am–6pm Pacific."], ["988 Suicide & Crisis Lifeline", "988", "Call or text, any time."], ["The Trevor Project", "(866) 488-7386", "For LGBTQ+ young people, any time. Or text START to 678678."]],
-    ca: [["Trans Lifeline", "(877) 330-6366", "Peer support by trans people. Mon–Fri, 1pm–9pm Eastern."], ["9-8-8 Suicide Crisis Helpline", "988", "Call or text, any time."]],
+    us: [["Trans Lifeline", "(877) 565-8860", "Peer support by trans people. Mon–Fri, 10am–6pm Pacific."], ["988 Lifeline", "988", "Free support, call or text any time."], ["The Trevor Project", "(866) 488-7386", "For LGBTQ+ young people, any time. Or text START to 678678."]],
+    ca: [["Trans Lifeline", "(877) 330-6366", "Peer support by trans people. Mon–Fri, 1pm–9pm Eastern."], ["9-8-8 Helpline", "988", "Free support, call or text any time."]],
     other: []
   };
   const EMERGENCY = { it: "112", uk: "999", ie: "112", us: "911", ca: "911", other: "" };
@@ -276,7 +276,7 @@ Tendril.ready(function () {
     const num = EMERGENCY[region];
     $("danger-call").hidden = !num;
     if (num) { $("danger-call").href = "tel:" + num; $("danger-call").textContent = "Call " + num; }
-    $("danger-text").textContent = num ? "Please call emergency services now, or go to the nearest emergency department." : "Please call your local emergency number now, or go to the nearest emergency department.";
+    $("danger-text").textContent = num ? "You can always call for help, any time. The support lines under “Reach out” are there too." : "Your local emergency number is always there, and so are the support lines under “Reach out”.";
   }
 
   function people() { return T.store.get("hardday.people", []); }

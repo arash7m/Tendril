@@ -117,7 +117,8 @@ body.calm::before { opacity: 0.45; filter: saturate(0.7); }
   display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
   padding: 14px 16px; border-radius: var(--r-md); background: var(--surface); border: 1px solid var(--line); font-size: 0.92rem;
 }
-.hd-danger p { flex: 1 1 260px; }
+.hd-danger p { flex: 1 1 260px; color: var(--muted); }
+.hd-danger strong { color: var(--ink); }
 
 @media (prefers-reduced-motion: reduce) {
   .hd-sec, .affirm.fresh { animation: none; }
