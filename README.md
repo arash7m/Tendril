@@ -18,7 +18,7 @@ Everything runs in the browser and is stored on the user's own device. There is 
 | `labs.html` | Lab results: markers with unit conversion (`assets/js/labs-core.js`), per-marker charts with the doctor's range, test history |
 | `visits.html` | Appointments and blood tests with countdowns and calendar export (`assets/js/visits-core.js`) |
 | `summary.html` | Doctor summary: medications with doses taken, latest labs, mood, chosen journal notes, voice, questions; print/PDF or copy as text |
-| `hardday.html` | Hard day mode: breathing circle, 5-4-3-2-1 grounding, good reminders (jar, milestones, kind words incl. your own), trusted people with call/text and message ideas, regional support lines, gentle care checklist, write it out (let it go or keep in timeline). Linked from the hub greeting, a low mood check-in, All tools and the jar |
+| `hardday.html` | Hard day mode: breathing circle, 5-4-3-2-1 grounding, good reminders (jar, milestones, kind words incl. your own), trusted people with call/text and message ideas, regional support lines, gentle care checklist, write it out (let it go or keep in timeline). Linked from a floating heart on the hub, a low mood check-in, All tools and the jar |
 | `jar.html` | Euphoria jar: save moments, pick one at random (includes timeline entries tagged euphoria) |
 | `comingout.html` | Coming-out helper: builds an editable letter, talking points or short text from a few choices; saved drafts |
 | `names.html` | Name & pronoun sandbox: everyday sentences, read-aloud, private shortlist |

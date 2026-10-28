@@ -187,10 +187,25 @@ html:not(.hub-mode) .about-body { padding-top: 0; }
 .warm-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .warm-streak { white-space: nowrap; font-size: 0.8rem; font-weight: 800; padding: 4px 12px; border-radius: 999px; background: linear-gradient(120deg, rgba(255, 79, 163, .25), rgba(61, 169, 252, .2)); color: var(--ink); }
 .warm-done { font-size: 0.86rem; font-weight: 800; color: var(--pink-text); }
-.hub-hard {
-  justify-self: start; display: inline-flex; align-items: center; gap: 7px; margin-top: 6px;
-  padding: 6px 14px; border-radius: 999px; text-decoration: none; font-weight: 800; font-size: 0.86rem;
-  color: #FFD0E6; background: rgba(7, 10, 31, 0.5); backdrop-filter: blur(6px); border: 1px solid rgba(255, 179, 214, 0.25);
+/* Floating hard day heart */
+.hub { padding-bottom: 76px; }
+.hard-fab {
+  position: fixed; z-index: 20;
+  right: max(18px, env(safe-area-inset-right, 0px));
+  bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+  height: 56px; min-width: 56px; padding: 0 16px;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0;
+  border-radius: 999px; text-decoration: none; color: #fff;
+  background: radial-gradient(circle at 30% 25%, #FF8CC6, #FF4FA3 45%, #9B5DE5);
+  box-shadow: 0 8px 24px rgba(7, 10, 31, 0.6), 0 0 22px rgba(255, 79, 163, 0.35);
+  transition: transform .2s ease, box-shadow .2s ease, gap .35s ease;
 }
-.hub-hard:hover { background: rgba(155, 93, 229, 0.3); }
+.hard-fab:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(7, 10, 31, 0.6), 0 0 30px rgba(255, 79, 163, 0.5); }
+.hard-fab:active { transform: scale(0.96); }
+.hard-fab-label { max-width: 0; overflow: hidden; white-space: nowrap; font-weight: 800; font-size: 0.92rem; transition: max-width .35s ease; }
+.hard-fab.show-label { gap: 8px; }
+.hard-fab.show-label .hard-fab-label { max-width: 7em; }
+.hard-fab:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .hard-fab, .hard-fab-label { transition: none; } }
+@media print { .hard-fab { display: none; } }
 .hc-soft { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 12px; border-radius: var(--r-sm); background: rgba(155, 93, 229, 0.16); font-size: 0.9rem; }

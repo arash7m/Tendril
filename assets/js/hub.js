@@ -414,6 +414,23 @@ Tendril.ready(function () {
   // ---------------- Settings ----------------
   function saveSettings() { T.store.set("hub.settings", settings); }
 
+  // The hard day heart says "Hard day?" for a few seconds on the first visits.
+  (function () {
+    const fab = $("hard-fab");
+    if (!fab) return;
+    const n = settings.fabSeen || 0;
+    if (n < 4) {
+      fab.classList.add("show-label");
+      setTimeout(function () { fab.classList.remove("show-label"); }, 3500);
+      settings.fabSeen = n + 1;
+      if (inUse()) saveSettings();
+    }
+    fab.addEventListener("mouseenter", function () { fab.classList.add("show-label"); });
+    fab.addEventListener("mouseleave", function () { fab.classList.remove("show-label"); });
+    fab.addEventListener("focus", function () { fab.classList.add("show-label"); });
+    fab.addEventListener("blur", function () { fab.classList.remove("show-label"); });
+  })();
+
   function renderSettings() {
     $("hub-name-input").value = greetingName();
     $("hub-discreet").checked = !!settings.discreet;
