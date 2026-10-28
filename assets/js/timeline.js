@@ -681,4 +681,10 @@ Tendril.ready(function () {
   });
 
   render();
+
+  // Opened from the home screen's "Compare" shortcut
+  if (location.hash === "#compare" && allPhotos().length >= 2) {
+    history.replaceState(null, "", location.pathname);
+    openCompare();
+  }
 });

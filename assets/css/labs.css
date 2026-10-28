@@ -122,3 +122,32 @@
   .doc { box-shadow: none; padding: 0; border-radius: 0; }
   .doc-table-wrap { overflow: visible; }
 }
+
+/* ---------- Appointments ---------- */
+.visits-section { display: grid; gap: 16px; }
+.visit-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.visit {
+  display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: start;
+  background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); padding: 16px 18px;
+}
+.visit.is-soon { outline: 2px solid var(--secondary); }
+.visit.is-past { box-shadow: none; background: var(--surface-2); }
+.visit-date {
+  width: 58px; display: grid; justify-items: center; padding: 8px 0; border-radius: var(--r-sm);
+  background: linear-gradient(160deg, var(--primary-light), var(--lav-light));
+}
+.visit[data-kind="blood"] .visit-date { background: linear-gradient(160deg, var(--secondary-light), var(--lav-light)); }
+.vd-day { font-family: var(--font-display); font-weight: 600; font-size: 1.6rem; line-height: 1; color: var(--deep); }
+.vd-mon { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.visit-body { display: grid; gap: 4px; min-width: 0; }
+.visit-count { font-size: 0.8rem; font-weight: 800; color: var(--pink-text); }
+.is-past .visit-count { color: var(--muted); }
+.visit-title { font-size: 1.1rem; overflow-wrap: anywhere; }
+.visit-where, .visit-note { font-size: 0.88rem; color: var(--muted); overflow-wrap: anywhere; }
+.visit-note { white-space: pre-wrap; }
+.visit-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.health-tabs { grid-template-columns: repeat(4, auto); }
+@media (max-width: 440px) { .health-tabs { grid-template-columns: auto auto 1fr auto; } .health-tabs a { padding: 8px 9px; font-size: 0.82rem; } }
+
+/* Summary: chosen appointment line */
+.doc-appt { font-weight: 800; color: var(--paper-accent); }

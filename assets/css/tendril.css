@@ -271,6 +271,9 @@ body::before {
 }
 .voice-tabs a[aria-current="page"] { background: var(--primary); color: var(--on-primary); box-shadow: 0 3px 0 var(--primary-dark); }
 
+.check-line { display: flex; align-items: flex-start; gap: 10px; font-size: 0.92rem; cursor: pointer; }
+.check-line input { width: 18px; height: 18px; margin-top: 2px; flex: none; accent-color: var(--primary); }
+
 /* ---------- Page scaffolding ---------- */
 .page { padding-block: 28px 0; display: grid; gap: 24px; }
 .page-intro { display: grid; gap: 10px; max-width: 62ch; }

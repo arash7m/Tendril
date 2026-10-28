@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{if(localStorage.getItem("tendril:__lock"))document.documentElement.classList.add("is-locked")}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Appointments · Tendril</title>
+<meta name="description" content="Keep track of upcoming appointments and blood tests.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#070A1F">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tendril">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/tendril.css">
+
+<link rel="stylesheet" href="assets/css/labs.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Tendril home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 29c0-8 2-13 7-16 4-2.5 7-1 7 2s-3 4-5 2.5" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M15 14c-1-5 2-9 7-10-0.5 5-3 8.5-7 10z" fill="var(--secondary)"/></svg>
+      Tendril
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="timeline.html">Timeline</a>
+      <a class="navlink" href="voice.html">Voice</a>
+      <a class="navlink" href="doses.html" aria-current="page">Health</a>
+      <a class="navlink" href="jar.html">Jar</a>
+      <a class="navlink" href="names.html">Names</a>
+      <a class="navlink" href="guides.html">Guides</a>
+      <a class="navlink" href="data.html">Your data</a>
+    </nav>
+    <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
+  </div>
+</header>
+
+<main class="wrap page visits">
+  <section class="page-intro">
+    <p class="eyebrow">Health</p>
+    <h1>Appointments</h1>
+    <p class="lede">Keep track of upcoming appointments and blood tests. Your home screen counts down to the next one, and your doctor summary gets ready for it.</p>
+  </section>
+
+  <nav class="voice-tabs health-tabs" aria-label="Health">
+    <a href="doses.html">Doses</a>
+    <a href="labs.html">Labs</a>
+    <a href="visits.html" aria-current="page">Appointments</a>
+    <a href="summary.html">Summary</a>
+  </nav>
+
+  <section class="visits-section" aria-labelledby="up-h">
+    <div class="spread">
+      <h2 id="up-h">Coming up</h2>
+      <button class="btn btn-primary btn-small" id="add-visit" type="button">Add appointment</button>
+    </div>
+    <ol class="visit-list" id="upcoming"></ol>
+    <div class="empty" id="visits-empty" hidden>
+      <h3>Nothing scheduled</h3>
+      <p class="muted">Add your next doctor’s appointment or blood test so you don’t lose track, and so you can prepare your questions ahead of time.</p>
+      <div class="row"><button class="btn btn-primary" id="add-first" type="button">Add an appointment</button></div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="past-h" id="past-panel" hidden>
+    <h2 id="past-h">Past</h2>
+    <ol class="visit-list past" id="past"></ol>
+  </section>
+</main>
+
+<dialog class="sheet" id="visit-sheet" aria-labelledby="visit-title">
+  <form class="sheet-body" id="visit-form" method="dialog">
+    <div class="sheet-head">
+      <h2 id="visit-title">Add appointment</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <fieldset class="field">
+      <legend>What is it?</legend>
+      <div class="pills" id="visit-kind">
+        <label><input type="radio" name="vkind" value="doctor" checked><span>Doctor</span></label>
+        <label><input type="radio" name="vkind" value="blood"><span>Blood test</span></label>
+        <label><input type="radio" name="vkind" value="therapy"><span>Therapy</span></label>
+        <label><input type="radio" name="vkind" value="voice"><span>Voice coach</span></label>
+        <label><input type="radio" name="vkind" value="other"><span>Other</span></label>
+      </div>
+    </fieldset>
+    <label class="field">
+      <span>Name <span class="hint">optional</span></span>
+      <input class="input" type="text" id="visit-name" maxlength="60" placeholder="Endocrinologist check-up">
+    </label>
+    <div class="grid-2">
+      <label class="field"><span>Date</span><input class="input" type="date" id="visit-date" required></label>
+      <label class="field"><span>Time <span class="hint">optional</span></span><input class="input" type="time" id="visit-time"></label>
+    </div>
+    <label class="field">
+      <span>Where <span class="hint">optional</span></span>
+      <input class="input" type="text" id="visit-where" maxlength="80" placeholder="Clinic, address or video call">
+    </label>
+    <label class="field">
+      <span>Notes <span class="hint">optional</span></span>
+      <textarea class="input" id="visit-note" rows="3" maxlength="1000" placeholder="Fast from midnight. Bring my lab printouts."></textarea>
+    </label>
+    <div class="spread">
+      <div class="row">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <button class="btn btn-soft" type="button" data-close>Cancel</button>
+      </div>
+      <button class="btn btn-soft btn-small" type="button" id="visit-delete" hidden>Delete</button>
+    </div>
+  </form>
+</dialog>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Appointments are stored only on this device. “Add to calendar” downloads an event you open in your calendar app, with a neutral title you can change.</p>
+    <p>Press <kbd>Esc</kbd> twice to leave quickly.</p>
+  </div>
+</footer>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/visits-core.js"></script>
+<script src="assets/js/visits.js"></script>
+</body>
+</html>

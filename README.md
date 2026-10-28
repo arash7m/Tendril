@@ -8,12 +8,13 @@ Everything runs in the browser and is stored on the user's own device. There is 
 
 | Page | What it does |
 |---|---|
-| `index.html` | Home page and privacy explainer |
+| `index.html` | Welcome page for first-time visitors; once anything is saved it becomes the hub (`assets/js/hub.js`): greeting, doses due with one-tap logging, next appointment, milestone, mood check-in, voice week, latest photo, labs, jar, all tools. Cards can be hidden and reordered; discreet mode covers sensitive cards until tapped |
 | `timeline.html` | Journal entries with mood and tags, milestones with day counts, private photo diary with in-app camera (pose outline, timer), photo viewer and before/after compare; voice sessions appear in the feed |
 | `voice.html` | Pitch trainer: live graph, target range, read-aloud prompts, recording analysis, session history with audio playback |
 | `resonance.html` | Resonance trainer: live brighter/darker meter from formants (LPC, `assets/js/formants.js`), target zones, vowel-aware scoring, guided exercises, session history |
 | `doses.html` | Dose tracker: medications, dose log, next due, doses left, injection/patch site rotation on a body map, calendar reminders (.ics) |
 | `labs.html` | Lab results: markers with unit conversion (`assets/js/labs-core.js`), per-marker charts with the doctor's range, test history |
+| `visits.html` | Appointments and blood tests with countdowns and calendar export (`assets/js/visits-core.js`) |
 | `summary.html` | Doctor summary: medications with doses taken, latest labs, mood, chosen journal notes, voice, questions; print/PDF or copy as text |
 | `jar.html` | Euphoria jar: save moments, pick one at random (includes timeline entries tagged euphoria) |
 | `comingout.html` | Coming-out helper: builds an editable letter, talking points or short text from a few choices; saved drafts |
@@ -54,6 +55,8 @@ Everything is stored in the browser's localStorage under keys starting with `ten
 | `guides.checklist` | Ticked name-change items |
 | `resonance.target`, `resonance.vowel`, `resonance.history` | Resonance zone, chosen vowel, session summaries and traces |
 | `labs.tests`, `labs.ranges`, `labs.units` | Blood tests, target ranges from the doctor, last unit used per marker |
+| `visits.list` | Appointments |
+| `hub.settings` | Greeting name, discreet mode, card order and hidden cards |
 | `summary.settings` | Doctor summary choices and questions |
 | `jar.notes`, `jar.seen` | Euphoria jar moments, when each was last shown |
 | `comingout.drafts` | Saved coming-out drafts |

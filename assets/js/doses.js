@@ -419,4 +419,14 @@ Tendril.ready(function () {
   });
 
   render();
+
+  // Opened from the home screen's "Log" button: doses.html?log=<medication id>
+  try {
+    const want = new URLSearchParams(location.search).get("log");
+    const med = want && meds.find(function (m) { return m.id === want; });
+    if (med) {
+      history.replaceState(null, "", location.pathname);
+      openLog(med);
+    }
+  } catch (e) { /* ignore */ }
 });

@@ -154,8 +154,13 @@ Tendril.ready(function () {
     const who = [name, pron ? "(" + pron + ")" : ""].filter(Boolean).join(" ");
     if (who) head.appendChild(el("p", "doc-who", who));
     head.appendChild(el("p", "doc-period", "Covers " + day(start) + " to " + day(now) + " · Prepared " + day(now)));
+    const V = window.TendrilVisits;
+    const next = V ? V.upcoming(T.store).filter(function (v) { return v.kind === "doctor" || v.kind === "blood" || v.kind === "other"; })[0] : null;
+    if (next && V.dayDiff(next) <= 60) head.appendChild(el("p", "doc-appt", "For: " + V.title(next) + ", " + day(next.date + "T12:00")));
     doc.appendChild(head);
-    text.push("HEALTH SUMMARY" + (who ? " – " + who : ""), "Covers " + day(start) + " to " + day(now), "");
+    text.push("HEALTH SUMMARY" + (who ? " – " + who : ""), "Covers " + day(start) + " to " + day(now));
+    if (next && V.dayDiff(next) <= 60) text.push("For: " + V.title(next) + ", " + day(next.date + "T12:00"));
+    text.push("");
 
     function section(title) {
       const s = el("section", "doc-sec");

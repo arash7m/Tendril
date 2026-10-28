@@ -34,5 +34,3 @@
 .lock-more[open] summary { margin-bottom: 12px; }
 #lock-off, #lock-on { display: grid; gap: 14px; }
 #lock-off[hidden], #lock-on[hidden] { display: none; }
-.check-line { display: flex; align-items: flex-start; gap: 10px; font-size: 0.92rem; cursor: pointer; }
-.check-line input { width: 18px; height: 18px; margin-top: 2px; flex: none; accent-color: var(--primary); }
