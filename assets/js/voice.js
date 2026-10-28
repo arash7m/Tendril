@@ -49,7 +49,10 @@ Tendril.ready(function () {
   let startedAt = 0;
   let rafId = 0;
   let frame = 0;
-  const smooth = P.makeSmoother(5);
+  let smooth = P.makeSmoother(5, 12);
+  let gate = P.makeNoiseGate(), gateLevel = 0.006;
+  const ease = window.TendrilTrace.easer(0.22);
+  let heldHz = null, heldAt = 0;
 
   // ---------------- Elements ----------------
   const canvas = $("graph");
@@ -120,7 +123,8 @@ Tendril.ready(function () {
     // Time window
     let t0, t1;
     const lastT = points.length ? points[points.length - 1].t : 0;
-    if (mode === "live") { t1 = Math.max(LIVE_WINDOW, lastT); t0 = t1 - LIVE_WINDOW; }
+    const nowT = mode === "live" ? (performance.now() - startedAt) / 1000 : lastT;
+    if (mode === "live") { t1 = Math.max(LIVE_WINDOW, nowT); t0 = t1 - LIVE_WINDOW; }
     else { t0 = 0; t1 = Math.max(lastT, 1); }
     const x = function (t) { return padL + plotW * ((t - t0) / (t1 - t0)); };
 
@@ -134,29 +138,14 @@ Tendril.ready(function () {
       g.fillText(s + "s", x(s), h - padB + 6);
     }
 
-    // Pitch trace in the target's color: solid inside the range,
-    // faded outside it, with gaps where you weren't speaking.
-    g.lineWidth = 2.5;
-    g.lineJoin = "round";
-    g.lineCap = "round";
-    let prev = null;
-    for (let i = 0; i < points.length; i++) {
-      const p = points[i];
-      if (p.t < t0 - 0.2) { prev = null; continue; }
-      if (p.hz == null) { prev = null; continue; }
-      const cy = y(Math.max(Y_MIN, Math.min(Y_MAX, p.hz)));
-      if (prev && p.t - prev.t < 0.25) {
-        const inRange = p.hz >= tg.low && p.hz <= tg.high;
-        g.strokeStyle = tone;
-        g.globalAlpha = inRange ? 1 : 0.35;
-        g.beginPath();
-        g.moveTo(x(prev.t), y(Math.max(Y_MIN, Math.min(Y_MAX, prev.hz))));
-        g.lineTo(x(p.t), cy);
-        g.stroke();
-        g.globalAlpha = 1;
-      }
-      prev = p;
-    }
+    // Pitch trace in the target's color: one smooth line, solid inside
+    // the target band and faded outside it. Short silences are bridged.
+    const clampHz = function (hz) { return y(Math.max(Y_MIN, Math.min(Y_MAX, hz))); };
+    window.TendrilTrace.draw(g, points, {
+      key: "hz", t0: t0, x: x, y: clampHz, color: tone,
+      left: padL, right: w - padR,
+      band: { top: y(hi), bottom: y(lo) }
+    });
 
     // Playhead while listening back
     if (mode === "session" && playerUrl && !fixingDuration && player.currentTime > 0) {
@@ -169,20 +158,24 @@ Tendril.ready(function () {
       g.stroke();
     }
 
-    // Endpoint dot while live
-    if (mode === "live") {
-      for (let i = points.length - 1; i >= 0 && i > points.length - 8; i--) {
-        if (points[i].hz != null) {
-          g.fillStyle = tone;
-          g.strokeStyle = cssVar("--deep");
-          g.lineWidth = 1.5;
-          g.beginPath();
-          g.arc(x(points[i].t), y(Math.max(Y_MIN, Math.min(Y_MAX, points[i].hz))), 5, 0, Math.PI * 2);
-          g.fill();
-          g.stroke();
-          break;
-        }
-      }
+    // A glowing dot that glides to your current pitch while live
+    const shown = ease.get();
+    if (mode === "live" && shown != null && heldHz != null) {
+      const cx = x(nowT), cy = clampHz(shown);
+      g.save();
+      g.fillStyle = tone;
+      g.globalAlpha = 0.25;
+      g.beginPath();
+      g.arc(cx, cy, 11, 0, Math.PI * 2);
+      g.fill();
+      g.globalAlpha = 1;
+      g.strokeStyle = cssVar("--deep");
+      g.lineWidth = 2;
+      g.beginPath();
+      g.arc(cx, cy, 5.5, 0, Math.PI * 2);
+      g.fill();
+      g.stroke();
+      g.restore();
     }
   }
 
@@ -251,7 +244,7 @@ Tendril.ready(function () {
     let stream;
     try {
       stream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
+        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: true }
       });
     } catch (err) {
       const denied = err && (err.name === "NotAllowedError" || err.name === "SecurityError");
@@ -271,6 +264,11 @@ Tendril.ready(function () {
     startRecorder(stream);
 
     mode = "live";
+    smooth = P.makeSmoother(5, 12);
+    gate = P.makeNoiseGate();
+    gateLevel = 0.006;
+    ease.reset();
+    heldHz = null;
     leaveSession();
     $("example-chip").hidden = true;
     points = [];
@@ -287,16 +285,25 @@ Tendril.ready(function () {
   function loop() {
     rafId = requestAnimationFrame(loop);
     frame++;
-    if (frame % 2) return; // ~30 readings per second keeps phones cool
-    const a = audio;
-    a.analyser.getFloatTimeDomainData(a.buf);
-    const r = P.detectPitch(a.buf, a.ctx.sampleRate);
-    const hz = smooth(r && r.clarity > 0.8 ? r.hz : null);
     const t = (performance.now() - startedAt) / 1000;
-    points.push({ t: t, hz: hz });
-    setReadout(hz);
-    timerEl.textContent = formatTime(t);
-    if (frame % 10 === 0) renderStats();
+    if (frame % 2 === 0) {
+      // ~30 readings per second keeps phones cool; drawing runs every frame.
+      const a = audio;
+      a.analyser.getFloatTimeDomainData(a.buf);
+      const r = P.detectPitch(a.buf, a.ctx.sampleRate, { minRms: gateLevel });
+      const voiced = !!(r && r.clarity > 0.5);
+      let rms = 0;
+      for (let i = 0; i < a.buf.length; i += 4) rms += a.buf[i] * a.buf[i];
+      gateLevel = gate.update(Math.sqrt(rms / (a.buf.length / 4)), voiced);
+      const hz = smooth(voiced ? r.hz : null);
+      points.push({ t: t, hz: hz });
+      if (hz != null) { heldHz = hz; heldAt = t; }
+      else if (t - heldAt > 0.45) heldHz = null; // keep showing the last pitch through short gaps
+      timerEl.textContent = formatTime(t);
+      if (frame % 20 === 0) renderStats();
+    }
+    const shown = ease.step(heldHz);
+    setReadout(heldHz == null ? null : shown);
     draw();
   }
 
@@ -390,11 +397,18 @@ Tendril.ready(function () {
       const ch = decoded.getChannelData(0);
       const sr = decoded.sampleRate;
       const size = 2048, hop = Math.round(HOP * sr / 44100);
-      const sm = P.makeSmoother(5);
+      const sm = P.makeSmoother(5, 12);
+      const ng = P.makeNoiseGate();
+      let level = 0.004;
       const out = [];
       for (let i = 0; i + size < ch.length; i += hop) {
-        const r = P.detectPitch(ch.subarray(i, i + size), sr);
-        out.push({ t: i / sr, hz: sm(r && r.clarity > 0.8 ? r.hz : null) });
+        const frameBuf = ch.subarray(i, i + size);
+        const r = P.detectPitch(frameBuf, sr, { minRms: level });
+        const voiced = !!(r && r.clarity > 0.5);
+        let e = 0;
+        for (let k = 0; k < frameBuf.length; k += 4) e += frameBuf[k] * frameBuf[k];
+        level = ng.update(Math.sqrt(e / (frameBuf.length / 4)), voiced);
+        out.push({ t: i / sr, hz: sm(voiced ? r.hz : null) });
       }
       ctx.close();
       mode = "recording";

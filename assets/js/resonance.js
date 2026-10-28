@@ -9,9 +9,9 @@ Tendril.ready(function () {
 
   // Zones on the 0-100 scale. They overlap a little on purpose: voices sit on a spectrum.
   const ZONES = {
-    lighter: { label: "Brighter", low: 62, high: 130 },
-    between: { label: "In-between", low: 35, high: 68 },
-    deeper: { label: "Darker", low: -30, high: 38 }
+    lighter: { label: "Brighter", low: 60, high: 101 },
+    between: { label: "In-between", low: 38, high: 62 },
+    deeper: { label: "Darker", low: -1, high: 40 }
   };
   const Y_MIN = -20, Y_MAX = 120, LIVE_WINDOW = 12;
 
@@ -20,26 +20,31 @@ Tendril.ready(function () {
       steps: ["Pant like a big dog with your mouth open: slow and deep.", "Now pant like a tiny dog: quick and light. Notice your tongue and the back of your throat rise and the space inside gets smaller.", "Keep that small-dog shape and say a light “ee”. Watch the meter move toward Brighter."] },
     { dir: "Brighter", vowel: "ee", title: "Whisper slide",
       steps: ["Whisper “ee” and slide it from low to high, like a little siren.", "Feel the space in your throat shrink as it rises. Stop near the top where it still feels easy.", "Keep that shape and slowly add a little voice to the “ee”."] },
-    { dir: "Brighter", vowel: "speech", title: "Forward hum",
-      steps: ["Hum “mmm” and feel the buzz on your lips and nose.", "Open the hum into “mee, may, mah”, keeping the buzz up front.", "Say the sentence below, aiming to keep that forward feeling."],
-      say: "My mom made me a lemon meringue pie." },
-    { dir: "Any", vowel: "speech", title: "Hold it while talking",
-      steps: ["Find your target zone on a held “ee” first.", "Without changing that feeling, read the sentence below slowly.", "Then read it again a bit faster. It’s normal for the meter to dip; aim to bring it back each time."],
-      say: "Could you tell me where the nearest bookshop is, please?" },
+    { dir: "Brighter", vowel: "ee", title: "Forward hum",
+      steps: ["Hum “mmm” and feel the buzz on your lips and nose.", "Open the hum into “meee”, keeping the buzz up front.", "Say the words below with that same forward feeling."],
+      say: "me · see · tea · key · bee · we" },
+    { dir: "Any", vowel: "ee", title: "Words on one vowel",
+      steps: ["Find your target zone on a held “ee” first.", "Without changing that feeling, say the words below at a normal pace.", "Then try the “Ah” words, switching “What you’ll say” to “Ah”. It’s normal for the meter to dip; aim to bring it back each time."],
+      say: "see · me · tea · free · cheese · leaf" },
     { dir: "Darker", vowel: "ah", title: "Yawn and sigh",
       steps: ["Start a yawn and notice the back of your throat opening and lowering.", "Before the yawn finishes, let out a relaxed sigh on “ah”.", "Keep that open space and say “ah” again without the yawn. Watch the meter move toward Darker."] },
-    { dir: "Darker", vowel: "oo", title: "Round and low",
-      steps: ["Round your lips slightly, as if saying “who”.", "Say a relaxed “oo”, letting your tongue sit low and back.", "Slide from “oo” to “oh” to “ah” while keeping that roomy, rounded feeling."] }
+    { dir: "Darker", vowel: "ah", title: "Round and low",
+      steps: ["Round your lips slightly, as if saying “who”, then open to “ah”.", "Let your tongue sit low and back, and keep the roomy feeling.", "Say the words below the same way."],
+      say: "spa · car · far · father · calm · palm" }
   ];
 
   // ---------------- State ----------------
   let target = T.store.get("resonance.target", { preset: "lighter" });
   let vowel = T.store.get("resonance.vowel", "ee");
+  if (vowel !== "ee" && vowel !== "ah") vowel = "ee";
   let points = [];   // { t, v } with v on the 0-100 scale, or null when silent
   let mode = "example";
   let sessionZone = null;
   let audio = null, rafId = 0, frame = 0, startedAt = 0;
-  let pitchSmooth = P.makeSmoother(5), formSmooth = F.makeSmoother(7);
+  let pitchSmooth = P.makeSmoother(5, 12), formSmooth = F.makeSmoother(7, 12);
+  let gate = P.makeNoiseGate(), gateLevel = 0.006;
+  const ease = window.TendrilTrace.easer(0.18);
+  let heldV = null, heldAt = 0;
   let showNumbers = false;
   let exIndex = 0;
 
@@ -47,7 +52,7 @@ Tendril.ready(function () {
 
   function zone() { return sessionZone || ZONES[target.preset] || ZONES.lighter; }
   function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
-  function wordFor(v) { return v >= 62 ? "Brighter" : v <= 38 ? "Darker" : "In-between"; }
+  function wordFor(v) { return v >= 60 ? "Brighter" : v <= 40 ? "Darker" : "In-between"; }
 
   // ---------------- Drawing ----------------
   function resizeCanvas() {
@@ -89,7 +94,8 @@ Tendril.ready(function () {
 
     let t0, t1;
     const lastT = points.length ? points[points.length - 1].t : 0;
-    if (mode === "live") { t1 = Math.max(LIVE_WINDOW, lastT); t0 = t1 - LIVE_WINDOW; }
+    const nowT = mode === "live" ? (performance.now() - startedAt) / 1000 : lastT;
+    if (mode === "live") { t1 = Math.max(LIVE_WINDOW, nowT); t0 = t1 - LIVE_WINDOW; }
     else { t0 = 0; t1 = Math.max(lastT, 1); }
     const x = function (t) { return padL + plotW * ((t - t0) / (t1 - t0)); };
 
@@ -101,23 +107,24 @@ Tendril.ready(function () {
     for (let s = Math.ceil(t0 / step) * step; s <= t1; s += step) g.fillText(s + "s", x(s), h - padB + 6);
 
     const tone = cssVar("--tone");
-    g.lineWidth = 2.5;
-    g.lineJoin = "round";
-    g.lineCap = "round";
-    let prev = null;
-    for (let i = 0; i < points.length; i++) {
-      const p = points[i];
-      if (p.t < t0 - 0.2 || p.v == null) { prev = null; continue; }
-      if (prev && p.t - prev.t < 0.3) {
-        g.strokeStyle = tone;
-        g.globalAlpha = p.v >= z.low && p.v <= z.high ? 1 : 0.35;
-        g.beginPath();
-        g.moveTo(x(prev.t), y(prev.v));
-        g.lineTo(x(p.t), y(p.v));
-        g.stroke();
-        g.globalAlpha = 1;
-      }
-      prev = p;
+    window.TendrilTrace.draw(g, points, {
+      key: "v", t0: t0, x: x, y: y, color: tone,
+      left: padL, right: w - padR,
+      band: { top: y(Math.min(Y_MAX, z.high)), bottom: y(Math.max(Y_MIN, z.low)) }
+    });
+
+    const shown = ease.get();
+    if (mode === "live" && shown != null && heldV != null) {
+      const cx = x(nowT), cy = y(shown);
+      g.save();
+      g.fillStyle = tone;
+      g.globalAlpha = 0.25;
+      g.beginPath(); g.arc(cx, cy, 11, 0, Math.PI * 2); g.fill();
+      g.globalAlpha = 1;
+      g.strokeStyle = cssVar("--deep");
+      g.lineWidth = 2;
+      g.beginPath(); g.arc(cx, cy, 5.5, 0, Math.PI * 2); g.fill(); g.stroke();
+      g.restore();
     }
   }
 
@@ -145,7 +152,7 @@ Tendril.ready(function () {
     const z = zone();
     $("score").textContent = Math.round(meterPos(v));
     $("res-word").textContent = wordFor(v);
-    $("res-word").dataset.word = v >= 62 ? "bright" : v <= 38 ? "dark" : "mid";
+    $("res-word").dataset.word = v >= 60 ? "bright" : v <= 40 ? "dark" : "mid";
     needle.classList.remove("off");
     needle.style.left = meterPos(v) + "%";
     if (v < z.low) { status.textContent = "Darker than zone"; status.dataset.state = "low"; }
@@ -195,7 +202,7 @@ Tendril.ready(function () {
     }
     let stream;
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+      stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: true } });
     } catch (err) {
       showNotice(err && err.name === "NotAllowedError"
         ? "Microphone access was blocked. Allow the microphone for Tendril in your browser settings."
@@ -210,8 +217,12 @@ Tendril.ready(function () {
     analyser.fftSize = 2048;
     source.connect(analyser);
     audio = { ctx: ctx, stream: stream, analyser: analyser, buf: new Float32Array(2048) };
-    pitchSmooth = P.makeSmoother(5);
-    formSmooth = F.makeSmoother(7);
+    pitchSmooth = P.makeSmoother(5, 12);
+    formSmooth = F.makeSmoother(7, 12);
+    gate = P.makeNoiseGate();
+    gateLevel = 0.006;
+    ease.reset();
+    heldV = null;
     mode = "live";
     sessionZone = null;
     openId = null;
@@ -232,23 +243,30 @@ Tendril.ready(function () {
   function loop() {
     rafId = requestAnimationFrame(loop);
     frame++;
-    if (frame % 2) return;
-    audio.analyser.getFloatTimeDomainData(audio.buf);
-    const r = P.detectPitch(audio.buf, audio.ctx.sampleRate);
-    const voiced = r && r.clarity > 0.8;
-    const hz = pitchSmooth(voiced ? r.hz : null);
-    const f = formSmooth(voiced ? F.analyze(audio.buf, audio.ctx.sampleRate) : null);
-    const v = f ? F.brightness(f, vowel) * 100 : null;
     const t = (performance.now() - startedAt) / 1000;
-    points.push({ t: t, v: v });
-    setReadout(v);
-    if (showNumbers && frame % 6 === 0) {
-      $("res-details").textContent = f
-        ? "Pitch " + (hz ? Math.round(hz) : "—") + " Hz · F1 " + Math.round(f[0]) + " · F2 " + Math.round(f[1]) + " · F3 " + Math.round(f[2])
-        : "Pitch — · F1 — · F2 — · F3 —";
+    if (frame % 2 === 0) {
+      audio.analyser.getFloatTimeDomainData(audio.buf);
+      const r = P.detectPitch(audio.buf, audio.ctx.sampleRate, { minRms: gateLevel });
+      const voiced = !!(r && r.clarity > 0.5);
+      let rms = 0;
+      for (let i = 0; i < audio.buf.length; i += 4) rms += audio.buf[i] * audio.buf[i];
+      gateLevel = gate.update(Math.sqrt(rms / (audio.buf.length / 4)), voiced);
+      const hz = pitchSmooth(voiced ? r.hz : null);
+      const f = formSmooth(voiced ? F.analyze(audio.buf, audio.ctx.sampleRate) : null);
+      const v = f ? F.display(F.brightness(f, vowel)) : null;
+      points.push({ t: t, v: v });
+      if (v != null) { heldV = v; heldAt = t; }
+      else if (t - heldAt > 0.6) heldV = null; // the needle stays put through short gaps
+      if (showNumbers && frame % 6 === 0) {
+        $("res-details").textContent = f
+          ? "Pitch " + (hz ? Math.round(hz) : "—") + " Hz · F1 " + Math.round(f[0]) + " · F2 " + Math.round(f[1]) + " · F3 " + (f[2] ? Math.round(f[2]) : "—")
+          : "Pitch — · F1 — · F2 — · F3 —";
+      }
+      $("timer").textContent = formatTime(t);
+      if (frame % 20 === 0) renderStats();
     }
-    $("timer").textContent = formatTime(t);
-    if (frame % 10 === 0) renderStats();
+    const shown = ease.step(heldV);
+    setReadout(heldV == null ? null : shown);
     draw();
   }
 

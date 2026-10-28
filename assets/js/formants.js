@@ -16,8 +16,7 @@
   const REF = {
     ee:     { label: "Ee",     m: [340, 2300, 3000], w: [440, 2750, 3350], weights: [0.2, 0.45, 0.35] },
     ah:     { label: "Ah",     m: [770, 1330, 2520], w: [930, 1550, 2820], weights: [0.3, 0.35, 0.35] },
-    oo:     { label: "Oo",     m: [380, 1000, 2340], w: [460, 1100, 2730], weights: [0.25, 0.25, 0.5] },
-    speech: { label: "Speech", m: [500, 1550, 2620], w: [600, 1800, 3000], weights: [0.1, 0.3, 0.6] }
+    oo:     { label: "Oo",     m: [380, 1000, 2340], w: [460, 1100, 2730], weights: [0.25, 0.25, 0.5] }
   };
 
   function downsample(buf, sampleRate) {
@@ -133,8 +132,8 @@
     const f2 = peaks.find(function (p) { return p.f > f1.f + 120 && p.f >= 550 && p.f <= 3200; });
     if (!f2) return null;
     const f3 = peaks.find(function (p) { return p.f > f2.f + 200 && p.f >= 1700 && p.f <= 4300; });
-    if (!f3) return null;
-    return [f1.f, f2.f, f3.f];
+    // F3 is sometimes too weak to find; F1 and F2 still say a lot.
+    return [f1.f, f2.f, f3 ? f3.f : null];
   }
 
   /** Estimate formants for one voiced frame. */
@@ -146,33 +145,55 @@
     return pickFormants(resonances(a, d.rate));
   }
 
-  /** 0 ≈ typical male averages, 1 ≈ typical female averages, for this vowel. */
-  function brightness(f, vowel) {
-    const ref = REF[vowel] || REF.speech;
+  function score(f, ref, weights) {
     let s = 0, wsum = 0;
     for (let i = 0; i < 3; i++) {
+      if (!f[i]) continue;
       const lo = Math.log(ref.m[i]), hi = Math.log(ref.w[i]);
-      const pos = (Math.log(f[i]) - lo) / (hi - lo);
-      s += ref.weights[i] * pos;
-      wsum += ref.weights[i];
+      s += weights[i] * (Math.log(f[i]) - lo) / (hi - lo);
+      wsum += weights[i];
     }
-    return s / wsum;
+    return wsum ? s / wsum : null;
   }
 
-  /** Median smoother over the last `size` formant triples. */
-  function makeSmoother(size) {
+  /**
+   * 0 ≈ typical male averages, 1 ≈ typical female averages, for one vowel.
+   * Running speech mixes vowels with different natural resonances, so the
+   * page measures one vowel at a time (held, or in words built on it).
+   */
+  function brightness(f, vowel) {
+    if (!f) return null;
+    const ref = REF[vowel] || REF.ee;
+    return score(f, ref, ref.weights);
+  }
+
+  /**
+   * The 0-100 number shown on screen. It's linear in the middle and eases
+   * off past the typical ranges, so the needle keeps moving instead of
+   * sticking at either end.
+   */
+  function display(b) {
+    if (b == null) return null;
+    return 100 / (1 + Math.exp(-(b * 100 - 50) / 24));
+  }
+
+  /** Median smoother over recent formant triples; short gaps don't reset it. */
+  function makeSmoother(size, holdFrames) {
     const win = [];
+    let missed = 0;
+    const hold = holdFrames == null ? 8 : holdFrames;
     return function (f) {
-      if (!f) { win.length = 0; return null; }
+      if (!f) { if (++missed > hold) win.length = 0; return null; }
+      missed = 0;
       win.push(f);
       if (win.length > size) win.shift();
-      if (win.length < 3) return null;
+      if (win.length < 2) return null;
       return [0, 1, 2].map(function (i) {
-        const v = win.map(function (t) { return t[i]; }).sort(function (a, b) { return a - b; });
-        return v[Math.floor(v.length / 2)];
+        const v = win.map(function (t) { return t[i]; }).filter(function (x) { return x; }).sort(function (a, b) { return a - b; });
+        return v.length ? v[Math.floor(v.length / 2)] : null;
       });
     };
   }
 
-  global.TendrilFormants = { analyze: analyze, brightness: brightness, makeSmoother: makeSmoother, REF: REF };
+  global.TendrilFormants = { analyze: analyze, brightness: brightness, display: display, makeSmoother: makeSmoother, REF: REF };
 })(window);

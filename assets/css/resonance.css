@@ -38,7 +38,7 @@
   background: var(--ink);
   box-shadow: 0 0 0 2px var(--bg);
   left: 50%;
-  transition: left 0.12s linear, opacity 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 .meter-needle.off { opacity: 0.25; }
 .meter-labels { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted); font-weight: 700; }
@@ -62,3 +62,5 @@
 .res-word[data-word="bright"] { color: var(--pink-text); }
 .res-word[data-word="mid"] { color: #B58CF0; }
 .res-word[data-word="dark"] { color: var(--link); }
+#vowel-pills small { font-weight: 600; color: var(--muted); margin-left: 4px; }
+.ex-say { letter-spacing: 0.01em; }
