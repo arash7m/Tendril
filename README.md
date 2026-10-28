@@ -11,7 +11,7 @@ Everything runs in the browser and is stored on the user's own device. There is 
 | `index.html` | Welcome page for first-time visitors; once anything is saved it becomes the hub (`assets/js/hub.js`): greeting, doses due with one-tap logging, next appointment, milestone, mood check-in, voice week, latest photo, labs, jar, all tools. Cards can be hidden and reordered; discreet mode covers sensitive cards until tapped |
 | `timeline.html` | Journal entries with mood and tags, milestones with day counts, private photo diary with in-app camera (pose outline, timer), photo viewer and before/after compare; voice sessions appear in the feed |
 | `voice.html` | Pitch trainer: live graph, target range, read-aloud prompts, recording analysis, session history with audio playback |
-| `resonance.html` | Resonance trainer: live brighter/darker meter from formants (LPC, `assets/js/formants.js`) measured on one vowel at a time (“ee” or “ah”, held or in words), target zones, guided exercises, session history. Mixed sentences aren't scored: F3 can't be tracked reliably across vowel changes |
+| `resonance.html` | Resonance trainer: live brighter/darker meter from formants (LPC, `assets/js/formants.js`) measured on one vowel at a time (“ee” or “ah”, held or in words), target zones, guided exercises, session history. Mixed sentences aren't scored: F3 can't be tracked reliably across vowel changes. Sessions save audio for playback like the pitch page |
 | `doses.html` | Dose tracker: medications, dose log, next due, doses left, injection/patch site rotation on a body map, calendar reminders (.ics) |
 | `labs.html` | Lab results: markers with unit conversion (`assets/js/labs-core.js`), per-marker charts with the doctor's range, test history |
 | `visits.html` | Appointments and blood tests with countdowns and calendar export (`assets/js/visits-core.js`) |
@@ -30,7 +30,7 @@ assets/css/*.css         one stylesheet per page
 assets/js/common.js      storage wrapper, quick exit, toast, download, date helpers
 assets/js/pitch.js       YIN pitch detection
 assets/js/bodymap.js     body map picker and site rotation
-assets/js/trace.js       smooth, continuous line drawing for the voice graphs
+assets/js/trace.js       one continuous line for the voice graphs: follows the voice, rests on a floor in silence
 assets/js/<page>.js      one script per page
 ```
 

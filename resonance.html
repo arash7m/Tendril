@@ -80,6 +80,11 @@
       <div class="graph-box">
         <canvas id="graph" aria-label="Brightness over time, with your target zone shaded" role="img"></canvas>
       </div>
+      <div class="player" id="player" hidden>
+        <audio id="player-audio" controls preload="metadata" hidden></audio>
+        <p class="small muted" id="player-none" hidden></p>
+        <button class="btn btn-soft btn-small" type="button" id="delete-session">Delete session</button>
+      </div>
 
       <fieldset class="field vowel-field">
         <legend>What you’ll say</legend>
@@ -98,6 +103,10 @@
         <button class="btn btn-pink" id="stop" type="button" hidden>Stop and save</button>
         <button class="btn btn-soft btn-small" id="details-btn" type="button" aria-pressed="false">Show numbers</button>
       </div>
+      <label class="keep-audio" for="keep-audio">
+        <input type="checkbox" id="keep-audio" checked>
+        <span>Save the audio so I can listen back <span class="muted">(kept only on this device)</span></span>
+      </label>
       <p class="res-details small muted" id="res-details" hidden>Pitch — · F1 — · F2 — · F3 —</p>
       <p class="notice" id="notice" role="alert" hidden></p>
 

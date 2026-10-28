@@ -138,12 +138,14 @@ Tendril.ready(function () {
       g.fillText(s + "s", x(s), h - padB + 6);
     }
 
-    // Pitch trace in the target's color: one smooth line, solid inside
-    // the target band and faded outside it. Short silences are bridged.
+    // Pitch trace in the target's color: one continuous line that follows
+    // your voice and rests on the floor when you're quiet. Solid inside the
+    // target band, faded outside it.
     const clampHz = function (hz) { return y(Math.max(Y_MIN, Math.min(Y_MAX, hz))); };
-    window.TendrilTrace.draw(g, points, {
+    const tip = window.TendrilTrace.draw(g, points, {
       key: "hz", t0: t0, x: x, y: clampHz, color: tone,
-      left: padL, right: w - padR,
+      left: padL, right: w - padR, floor: Y_MIN,
+      extendTo: mode === "live" ? nowT : null,
       band: { top: y(hi), bottom: y(lo) }
     });
 
@@ -158,23 +160,18 @@ Tendril.ready(function () {
       g.stroke();
     }
 
-    // A glowing dot that glides to your current pitch while live
-    const shown = ease.get();
-    if (mode === "live" && shown != null && heldHz != null) {
-      const cx = x(nowT), cy = clampHz(shown);
+    // The line's leading dot, riding the line while live
+    if (mode === "live" && tip) {
+      const cx = x(nowT), cy = clampHz(tip.v);
+      const speaking = heldHz != null;
       g.save();
       g.fillStyle = tone;
-      g.globalAlpha = 0.25;
-      g.beginPath();
-      g.arc(cx, cy, 11, 0, Math.PI * 2);
-      g.fill();
-      g.globalAlpha = 1;
+      g.globalAlpha = speaking ? 0.25 : 0.12;
+      g.beginPath(); g.arc(cx, cy, speaking ? 11 : 8, 0, Math.PI * 2); g.fill();
+      g.globalAlpha = speaking ? 1 : 0.6;
       g.strokeStyle = cssVar("--deep");
       g.lineWidth = 2;
-      g.beginPath();
-      g.arc(cx, cy, 5.5, 0, Math.PI * 2);
-      g.fill();
-      g.stroke();
+      g.beginPath(); g.arc(cx, cy, speaking ? 5.5 : 4, 0, Math.PI * 2); g.fill(); g.stroke();
       g.restore();
     }
   }
@@ -736,8 +733,8 @@ Tendril.ready(function () {
   clearBtn.addEventListener("click", function () { confirmBox.hidden = false; clearBtn.hidden = true; });
   $("confirm-no").addEventListener("click", function () { confirmBox.hidden = true; clearBtn.hidden = false; });
   $("confirm-yes").addEventListener("click", function () {
+    T.store.get("voice.history", []).forEach(function (h) { if (h.id) T.blobs.del(h.id).catch(function () { /* none */ }); });
     T.store.remove("voice.history");
-    T.blobs.clear().catch(function () { /* nothing stored */ });
     if (openId) leaveSession();
     confirmBox.hidden = true;
     renderHistory();

@@ -40,11 +40,44 @@
   }
 
   /**
+   * Turn readings into one continuous line: while you speak it follows your
+   * voice; brief silences (consonants, short breaths) hold the last value;
+   * longer silences glide down to the floor and stay flat until you speak
+   * again, when the line rises back up.
+   */
+  function continuous(points, key, floor, opts) {
+    const o = opts || {};
+    const hold = o.hold != null ? o.hold : 0.25;   // seconds a value is held through silence
+    const tauUp = o.tauUp || 0.05;                 // how quickly it rises to your voice
+    const tauDown = o.tauDown || 0.14;             // how quickly it falls to the floor
+    const out = [];
+    let v = floor, lastVal = null, lastT = -Infinity, prevT = null;
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i];
+      const raw = p[key];
+      let target;
+      if (raw != null) { target = raw; lastVal = raw; lastT = p.t; }
+      else if (lastVal != null && p.t - lastT <= hold) target = lastVal;
+      else target = floor;
+      if (prevT == null) v = raw != null ? raw : floor;
+      else {
+        const dt = Math.max(0.001, p.t - prevT);
+        const tau = target > v ? tauUp : tauDown;
+        // Rising from the floor is quick, so the line jumps up when you speak.
+        v += (target - v) * (1 - Math.exp(-dt / (v === floor && target > floor ? tauUp * 0.6 : tau)));
+      }
+      prevT = p.t;
+      out.push({ t: p.t, v: v, voiced: raw != null || (lastVal != null && p.t - lastT <= hold) });
+    }
+    return out;
+  }
+
+  /**
    * opts: { key, x(t), y(v), t0, color, band: { top, bottom } in pixels,
-   *         left, right (plot edges in pixels), maxGap, width }
+   *         left, right (plot edges in pixels), floor, width, extendTo }
+   * With opts.floor set, draws one unbroken line (see continuous()).
    */
   function draw(g, points, opts) {
-    const rs = runs(points, opts.key, opts.t0, opts.maxGap || 0.6);
     g.save();
     g.beginPath();
     g.rect(opts.left, 0, opts.right - opts.left, g.canvas.height);
@@ -53,6 +86,20 @@
     g.lineJoin = "round";
     g.lineCap = "round";
     g.strokeStyle = opts.color;
+
+    let rs;
+    if (opts.floor != null) {
+      const line = continuous(points, opts.key, opts.floor, opts).filter(function (p) { return p.t >= opts.t0 - 0.5; });
+      if (opts.extendTo != null && line.length) {
+        // Keep the line reaching the right edge between readings.
+        const last = line[line.length - 1];
+        if (opts.extendTo > last.t) line.push({ t: opts.extendTo, v: last.v });
+      }
+      rs = line.length ? [line] : [];
+      opts = Object.assign({}, opts, { key: "v" });
+    } else {
+      rs = runs(points, opts.key, opts.t0, opts.maxGap || 0.6);
+    }
 
     // Everything, faded
     g.globalAlpha = 0.32;
@@ -69,6 +116,8 @@
       g.restore();
     }
     g.restore();
+    const lastRun = rs[rs.length - 1];
+    return lastRun ? lastRun[lastRun.length - 1] : null;
   }
 
   /** Eases a displayed number toward a target each animation frame. */
@@ -85,5 +134,5 @@
     };
   }
 
-  global.TendrilTrace = { draw: draw, easer: easer };
+  global.TendrilTrace = { draw: draw, easer: easer, continuous: continuous };
 })(window);

@@ -91,6 +91,15 @@
       if (bestC > 0 && d[bestC] < Math.min(0.35, d[tau] + 0.15)) { tau = bestC; break; }
     }
 
+    // Octave-too-high check: if twice this lag is a much deeper dip, this
+    // was the second harmonic, which happens at the start of a syllable.
+    const t2 = tau * 2;
+    if (t2 + 1 < maxTau) {
+      let b2 = t2;
+      for (let t = Math.max(minTau, t2 - 2); t <= Math.min(maxTau - 1, t2 + 2); t++) if (d[t] < d[b2]) b2 = t;
+      if (d[tau] > 0.12 && d[b2] < d[tau] * 0.4) tau = b2;
+    }
+
     let better = tau;
     if (tau > 1 && tau < maxTau) {
       const a = d[tau - 1], b = d[tau], c = d[tau + 1];
@@ -133,14 +142,26 @@
    */
   function makeSmoother(size, holdFrames) {
     const win = [];
-    let missed = 0, jumps = [];
+    let missed = 0, jumps = [], lastRef = null, lastAt = 0, n = 0;
     const hold = holdFrames == null ? 8 : holdFrames;
     return function (hz) {
+      n++;
       if (hz == null) {
-        if (++missed > hold) win.length = 0;
+        if (++missed > hold && win.length) {
+          lastRef = win.slice().sort(function (a, b) { return a - b; })[Math.floor(win.length / 2)];
+          lastAt = n;
+          win.length = 0;
+        }
         return null;
       }
       missed = 0;
+      // A new phrase usually starts near your recent pitch; fold an octave
+      // slip at the very start back toward it (for up to ~10 s of pause).
+      if (!win.length && lastRef && n - lastAt < 300) {
+        const r = hz / lastRef;
+        if (r > 1.75 && r < 2.3) hz /= 2;
+        else if (r > 0.43 && r < 0.57) hz *= 2;
+      }
       if (win.length >= 3) {
         const ref = win.slice().sort(function (a, b) { return a - b; })[Math.floor(win.length / 2)];
         const r = hz / ref;
@@ -158,6 +179,15 @@
           return hz;
         }
         jumps = [];
+      }
+      // The start of a phrase isn't checked against anything yet, so wait for
+      // three readings that agree (about 0.07 s) before showing a value.
+      if (win.length < 3) {
+        win.push(hz);
+        if (win.length < 3) return null;
+        const sorted3 = win.slice().sort(function (a, b) { return a - b; });
+        if (sorted3[2] / sorted3[0] > 1.25) { win.shift(); return null; }
+        return sorted3[1];
       }
       win.push(hz);
       if (win.length > size) win.shift();

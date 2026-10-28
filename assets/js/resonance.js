@@ -45,6 +45,8 @@ Tendril.ready(function () {
   let gate = P.makeNoiseGate(), gateLevel = 0.006;
   const ease = window.TendrilTrace.easer(0.18);
   let heldV = null, heldAt = 0;
+  let keepAudio = T.store.get("voice.keepAudio", true);
+  let recorder = null, chunks = [];
   let showNumbers = false;
   let exIndex = 0;
 
@@ -107,23 +109,36 @@ Tendril.ready(function () {
     for (let s = Math.ceil(t0 / step) * step; s <= t1; s += step) g.fillText(s + "s", x(s), h - padB + 6);
 
     const tone = cssVar("--tone");
-    window.TendrilTrace.draw(g, points, {
+    const tip = window.TendrilTrace.draw(g, points, {
       key: "v", t0: t0, x: x, y: y, color: tone,
-      left: padL, right: w - padR,
+      left: padL, right: w - padR, floor: Y_MIN,
+      extendTo: mode === "live" ? nowT : null,
       band: { top: y(Math.min(Y_MAX, z.high)), bottom: y(Math.max(Y_MIN, z.low)) }
     });
 
-    const shown = ease.get();
-    if (mode === "live" && shown != null && heldV != null) {
-      const cx = x(nowT), cy = y(shown);
-      g.save();
-      g.fillStyle = tone;
-      g.globalAlpha = 0.25;
-      g.beginPath(); g.arc(cx, cy, 11, 0, Math.PI * 2); g.fill();
-      g.globalAlpha = 1;
+    // Playhead while listening back
+    if (mode === "session" && playerUrl && !fixingDuration && player.currentTime > 0) {
+      const px = x(Math.min(player.currentTime, t1));
       g.strokeStyle = cssVar("--deep");
       g.lineWidth = 2;
-      g.beginPath(); g.arc(cx, cy, 5.5, 0, Math.PI * 2); g.fill(); g.stroke();
+      g.beginPath();
+      g.moveTo(px, padT);
+      g.lineTo(px, padT + plotH);
+      g.stroke();
+    }
+
+    // The line's leading dot, riding the line while live
+    if (mode === "live" && tip) {
+      const cx = x(nowT), cy = y(tip.v);
+      const speaking = heldV != null;
+      g.save();
+      g.fillStyle = tone;
+      g.globalAlpha = speaking ? 0.25 : 0.12;
+      g.beginPath(); g.arc(cx, cy, speaking ? 11 : 8, 0, Math.PI * 2); g.fill();
+      g.globalAlpha = speaking ? 1 : 0.6;
+      g.strokeStyle = cssVar("--deep");
+      g.lineWidth = 2;
+      g.beginPath(); g.arc(cx, cy, speaking ? 5.5 : 4, 0, Math.PI * 2); g.fill(); g.stroke();
       g.restore();
     }
   }
@@ -217,6 +232,7 @@ Tendril.ready(function () {
     analyser.fftSize = 2048;
     source.connect(analyser);
     audio = { ctx: ctx, stream: stream, analyser: analyser, buf: new Float32Array(2048) };
+    startRecorder(stream);
     pitchSmooth = P.makeSmoother(5, 12);
     formSmooth = F.makeSmoother(7, 12);
     gate = P.makeNoiseGate();
@@ -225,7 +241,7 @@ Tendril.ready(function () {
     heldV = null;
     mode = "live";
     sessionZone = null;
-    openId = null;
+    leaveSession();
     paintZone();
     points = [];
     frame = 0;
@@ -270,9 +286,64 @@ Tendril.ready(function () {
     draw();
   }
 
+  function pickMime() {
+    if (!window.MediaRecorder || !MediaRecorder.isTypeSupported) return "";
+    const types = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg;codecs=opus"];
+    for (let i = 0; i < types.length; i++) if (MediaRecorder.isTypeSupported(types[i])) return types[i];
+    return "";
+  }
+
+  function startRecorder(stream) {
+    recorder = null;
+    chunks = [];
+    if (!keepAudio || !window.MediaRecorder) return;
+    try {
+      const mime = pickMime();
+      const opts = { audioBitsPerSecond: 32000 };
+      if (mime) opts.mimeType = mime;
+      recorder = new MediaRecorder(stream, opts);
+      recorder.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+      recorder.start(1000);
+    } catch (e) {
+      recorder = null;
+    }
+  }
+
+  /** Stop the recorder and store its audio under the session id (or discard it). */
+  function finishRecorder(entry) {
+    const rec = recorder, got = chunks;
+    recorder = null;
+    chunks = [];
+    if (!rec) return;
+    const store = function () {
+      if (!entry) return;
+      const blob = new Blob(got, { type: rec.mimeType || "audio/webm" });
+      if (!blob.size) return;
+      T.blobs.put(entry.id, blob).then(function () {
+        markAudio(entry.id);
+        if (openId === entry.id) loadPlayer(entry.id);
+      }).catch(function () { T.toast("The graph was saved, but the audio couldn’t be stored on this device"); });
+    };
+    if (rec.state !== "inactive") {
+      rec.onstop = store;
+      try { rec.stop(); } catch (e) { store(); }
+    } else {
+      store();
+    }
+  }
+
+  function markAudio(id) {
+    const history = T.store.get("resonance.history", []);
+    const h = history.find(function (x) { return x.id === id; });
+    if (!h) return;
+    h.hasAudio = true;
+    T.store.set("resonance.history", history);
+  }
+
   function stop() {
     cancelAnimationFrame(rafId);
     const entry = saveSession();
+    finishRecorder(entry);
     if (audio) {
       audio.stream.getTracks().forEach(function (tr) { tr.stop(); });
       audio.ctx.close();
@@ -378,8 +449,108 @@ Tendril.ready(function () {
     renderStats();
     draw();
     renderHistory();
+    $("player").hidden = false;
+    loadPlayer(h.id);
     if (!opts || opts.scroll !== false) document.querySelector(".monitor").scrollIntoView({ behavior: "smooth", block: "start" });
   }
+
+  function leaveSession() {
+    openId = null;
+    unloadPlayer();
+    $("player").hidden = true;
+    renderHistory();
+  }
+
+  // ---------------- Playback ----------------
+  const player = $("player-audio");
+  let playerUrl = null, playRaf = 0, fixingDuration = false;
+
+  function loadPlayer(id) {
+    unloadPlayer();
+    $("player-none").hidden = true;
+    T.blobs.get(id).then(function (blob) {
+      if (openId !== id) return;
+      if (!blob) {
+        player.hidden = true;
+        $("player-none").hidden = false;
+        $("player-none").textContent = keepAudio
+          ? "No audio was saved for this session, only its graph."
+          : "Audio saving is off, so only the graph was kept.";
+        return;
+      }
+      playerUrl = URL.createObjectURL(blob);
+      player.src = playerUrl;
+      player.hidden = false;
+      // Recordings made in Chrome don't state their length; jumping far ahead
+      // once makes the browser work it out so the seek bar appears.
+      player.addEventListener("loadedmetadata", function fixDuration() {
+        player.removeEventListener("loadedmetadata", fixDuration);
+        if (player.duration !== Infinity) return;
+        fixingDuration = true;
+        player.currentTime = 1e101;
+        player.addEventListener("timeupdate", function back() {
+          player.removeEventListener("timeupdate", back);
+          player.currentTime = 0;
+          fixingDuration = false;
+          draw();
+        });
+      });
+    }).catch(function () {
+      player.hidden = true;
+      $("player-none").hidden = false;
+      $("player-none").textContent = "Audio can’t be played in this browser.";
+    });
+  }
+
+  function unloadPlayer() {
+    cancelAnimationFrame(playRaf);
+    try { player.pause(); } catch (e) { /* ignore */ }
+    player.removeAttribute("src");
+    player.load();
+    player.hidden = true;
+    if (playerUrl) { URL.revokeObjectURL(playerUrl); playerUrl = null; }
+  }
+
+  function playheadLoop() {
+    draw();
+    if (!player.paused) playRaf = requestAnimationFrame(playheadLoop);
+  }
+  player.addEventListener("play", function () { cancelAnimationFrame(playRaf); playheadLoop(); });
+  player.addEventListener("seeked", draw);
+  player.addEventListener("pause", draw);
+  player.addEventListener("ended", draw);
+
+  const delBtn = $("delete-session");
+  delBtn.addEventListener("click", function () {
+    if (!delBtn.dataset.armed) {
+      delBtn.dataset.armed = "1";
+      delBtn.textContent = "Tap again to delete";
+      delBtn.classList.add("danger");
+      setTimeout(function () {
+        delete delBtn.dataset.armed;
+        delBtn.textContent = "Delete session";
+        delBtn.classList.remove("danger");
+      }, 3000);
+      return;
+    }
+    const id = openId;
+    T.store.set("resonance.history", T.store.get("resonance.history", []).filter(function (h) { return h.id !== id; }));
+    T.blobs.del(id).catch(function () { /* nothing stored */ });
+    delete delBtn.dataset.armed;
+    delBtn.textContent = "Delete session";
+    delBtn.classList.remove("danger");
+    sessionZone = null;
+    leaveSession();
+    mode = "done";
+    points = [];
+    $("graph-label").textContent = "Session deleted";
+    $("timer").textContent = "0:00";
+    paintZone();
+    setReadout(null);
+    renderStats();
+    draw();
+    T.toast("Session deleted");
+  });
 
   // ---------------- Target, vowel, exercises ----------------
   function applyTarget(preset, save) {
@@ -456,10 +627,16 @@ Tendril.ready(function () {
   clearBtn.addEventListener("click", function () { confirmBox.hidden = false; clearBtn.hidden = true; });
   $("confirm-no").addEventListener("click", function () { confirmBox.hidden = true; clearBtn.hidden = false; });
   $("confirm-yes").addEventListener("click", function () {
+    T.store.get("resonance.history", []).forEach(function (h) { T.blobs.del(h.id).catch(function () { /* none */ }); });
     T.store.remove("resonance.history");
     confirmBox.hidden = true;
-    openId = null;
-    renderHistory();
+    if (openId) leaveSession(); else renderHistory();
+  });
+  const keepBox = $("keep-audio");
+  keepBox.checked = keepAudio;
+  keepBox.addEventListener("change", function () {
+    keepAudio = keepBox.checked;
+    T.store.set("voice.keepAudio", keepAudio);
   });
   document.addEventListener("visibilitychange", function () { if (document.visibilityState === "hidden" && audio) stop(); });
   window.addEventListener("pagehide", function () { if (audio) stop(); });
