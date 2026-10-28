@@ -20,6 +20,8 @@ Tendril.ready(function () {
     if (short.length) out.push(["Name shortlist", short.length + plural(short.length, " name", " names")]);
     const entries = data["timeline.entries"] || [];
     if (entries.length) out.push(["Timeline", entries.length + plural(entries.length, " entry", " entries")]);
+    const labTests = data["labs.tests"] || [];
+    if (labTests.length) out.push(["Lab results", labTests.length + plural(labTests.length, " test", " tests")]);
     const res = data["resonance.history"] || [];
     if (res.length) out.push(["Resonance practice", res.length + plural(res.length, " session", " sessions")]);
     const jar = data["jar.notes"] || [];

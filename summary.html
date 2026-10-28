@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{if(localStorage.getItem("tendril:__lock"))document.documentElement.classList.add("is-locked")}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>For your doctor · Tendril</title>
+<meta name="description" content="A printable summary of your medications, lab results, mood and questions.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#070A1F">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tendril">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/tendril.css">
+
+<link rel="stylesheet" href="assets/css/labs.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Tendril home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 29c0-8 2-13 7-16 4-2.5 7-1 7 2s-3 4-5 2.5" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M15 14c-1-5 2-9 7-10-0.5 5-3 8.5-7 10z" fill="var(--secondary)"/></svg>
+      Tendril
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="timeline.html">Timeline</a>
+      <a class="navlink" href="voice.html">Voice</a>
+      <a class="navlink" href="doses.html" aria-current="page">Health</a>
+      <a class="navlink" href="jar.html">Jar</a>
+      <a class="navlink" href="names.html">Names</a>
+      <a class="navlink" href="guides.html">Guides</a>
+      <a class="navlink" href="data.html">Your data</a>
+    </nav>
+    <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
+  </div>
+</header>
+
+<main class="wrap page summary">
+  <section class="page-intro no-print">
+    <p class="eyebrow">Health</p>
+    <h1>For your doctor</h1>
+    <p class="lede">A one-page summary of your medications, lab results, how you’ve been feeling, and your questions, ready to show or print at an appointment. You choose what goes in.</p>
+  </section>
+
+  <nav class="voice-tabs health-tabs no-print" aria-label="Health">
+    <a href="doses.html">Doses</a>
+    <a href="labs.html">Lab results</a>
+    <a href="summary.html" aria-current="page">For your doctor</a>
+  </nav>
+
+  <div class="sum-layout">
+    <form class="panel sum-controls no-print" id="sum-form" autocomplete="off">
+      <h2>What to include</h2>
+      <label class="field">
+        <span>Covering</span>
+        <select class="input" id="period">
+          <option value="1">The last month</option>
+          <option value="3" selected>The last 3 months</option>
+          <option value="6">The last 6 months</option>
+          <option value="12">The last year</option>
+        </select>
+      </label>
+      <div class="grid-2">
+        <label class="field"><span>Your name <span class="hint">optional</span></span><input class="input" type="text" id="sum-name" maxlength="40"></label>
+        <label class="field"><span>Pronouns <span class="hint">optional</span></span><input class="input" type="text" id="sum-pron" maxlength="20" placeholder="she/her"></label>
+      </div>
+      <div class="checks" id="sections">
+        <label><input type="checkbox" value="meds" checked><span>Medications and doses taken</span></label>
+        <label><input type="checkbox" value="labs" checked><span>Lab results</span></label>
+        <label><input type="checkbox" value="mood" checked><span>Mood over this time</span></label>
+        <label><input type="checkbox" value="notes" checked><span>Journal notes I pick below</span></label>
+        <label><input type="checkbox" value="voice"><span>Voice practice</span></label>
+        <label><input type="checkbox" value="questions" checked><span>My questions</span></label>
+      </div>
+
+      <div class="field" id="notes-field">
+        <span>Journal notes to share <span class="hint">entries tagged health, body, skin or energy are ticked</span></span>
+        <div class="note-picks" id="note-picks"></div>
+        <p class="small muted" id="no-notes" hidden>No journal entries in this period.</p>
+      </div>
+
+      <label class="field">
+        <span>Questions for your doctor <span class="hint">one per line</span></span>
+        <textarea class="input" id="questions" rows="5" placeholder="Should we check my levels again soon?"></textarea>
+      </label>
+      <button class="btn btn-soft btn-small" type="button" id="suggest-q">Add suggested questions</button>
+    </form>
+
+    <section class="sum-preview" aria-labelledby="doc-title">
+      <div class="row no-print sum-actions">
+        <button class="btn btn-primary" type="button" id="print">Print or save as PDF</button>
+        <button class="btn btn-soft" type="button" id="copy-text">Copy as text</button>
+      </div>
+      <article class="doc" id="doc"></article>
+      <p class="small muted no-print">This summary contains private health information. Close it when you’re done showing it.</p>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer no-print">
+  <div class="wrap">
+    <p>Everything in this summary comes from what you saved in Tendril on this device.</p>
+    <p>Press <kbd>Esc</kbd> twice to leave quickly.</p>
+  </div>
+</footer>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/labs-core.js"></script>
+<script src="assets/js/summary.js"></script>
+</body>
+</html>

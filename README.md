@@ -13,6 +13,8 @@ Everything runs in the browser and is stored on the user's own device. There is 
 | `voice.html` | Pitch trainer: live graph, target range, read-aloud prompts, recording analysis, session history with audio playback |
 | `resonance.html` | Resonance trainer: live brighter/darker meter from formants (LPC, `assets/js/formants.js`), target zones, vowel-aware scoring, guided exercises, session history |
 | `doses.html` | Dose tracker: medications, dose log, next due, doses left, injection/patch site rotation on a body map, calendar reminders (.ics) |
+| `labs.html` | Lab results: markers with unit conversion (`assets/js/labs-core.js`), per-marker charts with the doctor's range, test history |
+| `summary.html` | Doctor summary: medications with doses taken, latest labs, mood, chosen journal notes, voice, questions; print/PDF or copy as text |
 | `jar.html` | Euphoria jar: save moments, pick one at random (includes timeline entries tagged euphoria) |
 | `comingout.html` | Coming-out helper: builds an editable letter, talking points or short text from a few choices; saved drafts |
 | `names.html` | Name & pronoun sandbox: everyday sentences, read-aloud, private shortlist |
@@ -51,6 +53,8 @@ Everything is stored in the browser's localStorage under keys starting with `ten
 | `names.shortlist` | Saved names and pronouns |
 | `guides.checklist` | Ticked name-change items |
 | `resonance.target`, `resonance.vowel`, `resonance.history` | Resonance zone, chosen vowel, session summaries and traces |
+| `labs.tests`, `labs.ranges`, `labs.units` | Blood tests, target ranges from the doctor, last unit used per marker |
+| `summary.settings` | Doctor summary choices and questions |
 | `jar.notes`, `jar.seen` | Euphoria jar moments, when each was last shown |
 | `comingout.drafts` | Saved coming-out drafts |
 | `timeline.entries` | Journal entries and milestones (photo ids only) |

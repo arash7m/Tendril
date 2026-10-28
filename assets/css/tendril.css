@@ -253,6 +253,24 @@ body::before {
   white-space: nowrap;
 }
 
+/* ---------- Section tabs (Voice, Health) ---------- */
+.voice-tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--surface);
+  justify-self: start;
+}
+.voice-tabs a {
+  text-decoration: none;
+  font-weight: 800;
+  padding: 8px 22px;
+  border-radius: 999px;
+  color: var(--ink);
+}
+.voice-tabs a[aria-current="page"] { background: var(--primary); color: var(--on-primary); box-shadow: 0 3px 0 var(--primary-dark); }
+
 /* ---------- Page scaffolding ---------- */
 .page { padding-block: 28px 0; display: grid; gap: 24px; }
 .page-intro { display: grid; gap: 10px; max-width: 62ch; }

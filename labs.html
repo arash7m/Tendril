@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{if(localStorage.getItem("tendril:__lock"))document.documentElement.classList.add("is-locked")}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lab results · Tendril</title>
+<meta name="description" content="Log blood test results and see them over time, with the ranges your doctor gave you.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#070A1F">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tendril">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/tendril.css">
+
+<link rel="stylesheet" href="assets/css/labs.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Tendril home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 29c0-8 2-13 7-16 4-2.5 7-1 7 2s-3 4-5 2.5" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M15 14c-1-5 2-9 7-10-0.5 5-3 8.5-7 10z" fill="var(--secondary)"/></svg>
+      Tendril
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="timeline.html">Timeline</a>
+      <a class="navlink" href="voice.html">Voice</a>
+      <a class="navlink" href="doses.html" aria-current="page">Health</a>
+      <a class="navlink" href="jar.html">Jar</a>
+      <a class="navlink" href="names.html">Names</a>
+      <a class="navlink" href="guides.html">Guides</a>
+      <a class="navlink" href="data.html">Your data</a>
+    </nav>
+    <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
+  </div>
+</header>
+
+<main class="wrap page labs">
+  <section class="page-intro">
+    <p class="eyebrow">Health</p>
+    <h1>Lab results</h1>
+    <p class="lede">Log your blood test results and see how they change over time. Add the target ranges your doctor gave you, and Tendril shows them on each chart.</p>
+  </section>
+
+  <nav class="voice-tabs health-tabs" aria-label="Health">
+    <a href="doses.html">Doses</a>
+    <a href="labs.html" aria-current="page">Lab results</a>
+    <a href="summary.html">For your doctor</a>
+  </nav>
+
+  <div class="example-banner callout soft" id="example-banner" hidden>
+    <p><strong>You’re looking at example data.</strong> These numbers are made up and aren’t a guide to what yours should be.</p>
+    <div class="row"><button class="btn btn-soft btn-small" id="clear-examples" type="button">Clear example data</button></div>
+  </div>
+
+  <section class="labs-section" aria-labelledby="markers-h">
+    <div class="spread">
+      <h2 id="markers-h">Latest results</h2>
+      <button class="btn btn-primary btn-small" id="add-test" type="button">Add results</button>
+    </div>
+    <div class="marker-grid" id="marker-grid"></div>
+    <div class="empty" id="labs-empty" hidden>
+      <h3>No results yet</h3>
+      <p class="muted">When you get blood test results, add them here with the date. Over a few tests you’ll see how your levels change, and you can show the charts at appointments.</p>
+      <div class="row">
+        <button class="btn btn-primary" id="add-first" type="button">Add your first results</button>
+        <button class="btn btn-soft" id="load-examples" type="button">Show me an example</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="tests-h" id="tests-panel" hidden>
+    <h2 id="tests-h">All tests</h2>
+    <ol class="test-list" id="test-list"></ol>
+  </section>
+
+  <aside class="callout">
+    <h3>Good to know</h3>
+    <p>Tendril doesn’t judge whether a result is good or bad, because the right levels depend on you, your treatment and your doctor. Ask your doctor what ranges they’re aiming for and add them to each marker.</p>
+    <p>Lab units differ between countries. Pick the unit printed on your report; Tendril converts common ones so charts stay consistent.</p>
+  </aside>
+</main>
+
+<!-- Add or edit a test -->
+<dialog class="sheet" id="test-sheet" aria-labelledby="test-title">
+  <form class="sheet-body" id="test-form" method="dialog">
+    <div class="sheet-head">
+      <h2 id="test-title">Add results</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <label class="field">
+      <span>Date of the blood test</span>
+      <input class="input" type="date" id="test-date" required>
+    </label>
+    <div class="field">
+      <span>Results</span>
+      <div class="result-rows" id="result-rows"></div>
+      <button class="btn btn-soft btn-small" type="button" id="add-row">Add another marker</button>
+    </div>
+    <label class="field">
+      <span>Note <span class="hint">optional</span></span>
+      <input class="input" type="text" id="test-note" maxlength="140" placeholder="Taken 3 days after injection">
+    </label>
+    <div class="spread">
+      <div class="row">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <button class="btn btn-soft" type="button" data-close>Cancel</button>
+      </div>
+      <button class="btn btn-soft btn-small" type="button" id="test-delete" hidden>Delete test</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- One marker in detail -->
+<dialog class="sheet marker-sheet" id="marker-sheet" aria-labelledby="marker-title">
+  <div class="sheet-body">
+    <div class="sheet-head">
+      <h2 id="marker-title">Estradiol</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="chart-box"><canvas id="marker-chart" role="img" aria-label="Results over time"></canvas></div>
+    <p class="small muted" id="marker-unit-note"></p>
+    <form class="range-form" id="range-form">
+      <p class="range-h">Your doctor’s target range <span class="hint" id="range-unit"></span></p>
+      <div class="row">
+        <label class="field inline"><span>From</span><input class="input num" type="number" step="any" inputmode="decimal" id="range-low"></label>
+        <label class="field inline"><span>to</span><input class="input num" type="number" step="any" inputmode="decimal" id="range-high"></label>
+        <button class="btn btn-soft btn-small" type="submit">Save range</button>
+        <button class="btn btn-soft btn-small" type="button" id="range-clear">Clear</button>
+      </div>
+    </form>
+    <table class="marker-table">
+      <thead><tr><th scope="col">Date</th><th scope="col">Result</th><th scope="col">Change</th></tr></thead>
+      <tbody id="marker-rows"></tbody>
+    </table>
+  </div>
+</dialog>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Lab results are stored only on this device. Tendril isn’t medical advice; talk to your doctor about your results.</p>
+    <p>Press <kbd>Esc</kbd> twice to leave quickly.</p>
+  </div>
+</footer>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/labs-core.js"></script>
+<script src="assets/js/labs.js"></script>
+</body>
+</html>
