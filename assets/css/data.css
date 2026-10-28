@@ -22,3 +22,15 @@
 
 .danger-zone { border: 2px solid var(--secondary-light); box-shadow: none; }
 .wipe-confirm { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; font-weight: 700; }
+
+/* App lock settings */
+.lock-panel .chip.on { background: var(--primary); color: var(--on-primary); }
+.lock-form { display: grid; gap: 14px; }
+.pin-input { font-family: var(--font-mono); letter-spacing: 0.3em; font-size: 1.1rem; }
+.inline-field { grid-auto-flow: column; align-items: center; gap: 10px; }
+.inline-field .input { width: auto; }
+.lock-more { border-top: 2px solid var(--line); padding-top: 12px; }
+.lock-more summary { cursor: pointer; font-weight: 800; color: var(--link); padding: 4px 0; }
+.lock-more[open] summary { margin-bottom: 12px; }
+#lock-off, #lock-on { display: grid; gap: 14px; }
+#lock-off[hidden], #lock-on[hidden] { display: none; }

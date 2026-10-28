@@ -1,6 +1,6 @@
 /* Tendril backup, restore and delete. Backups can be encrypted with a password
    (PBKDF2 + AES-GCM via the browser's Web Crypto API). Nothing leaves the device. */
-(function () {
+Tendril.ready(function () {
   "use strict";
 
   const T = window.Tendril;
@@ -181,13 +181,111 @@
   $("wipe").addEventListener("click", function () { $("wipe").hidden = true; $("wipe-confirm").hidden = false; });
   $("wipe-no").addEventListener("click", function () { $("wipe").hidden = false; $("wipe-confirm").hidden = true; });
   $("wipe-yes").addEventListener("click", function () {
-    T.store.keys().forEach(function (k) { T.store.remove(k); });
-    T.blobs.clear().catch(function () { /* nothing stored */ });
-    $("wipe").hidden = false;
-    $("wipe-confirm").hidden = true;
-    renderStored();
-    T.toast("All Tendril data deleted from this device");
+    T.lock.eraseAll().then(function () {
+      $("wipe").hidden = false;
+      $("wipe-confirm").hidden = true;
+      renderStored();
+      renderLock();
+      T.toast("All Tendril data deleted from this device");
+    });
   });
 
+  // ---------------- App lock ----------------
+  function renderLock() {
+    const on = T.lock.enabled();
+    $("lock-off").hidden = on;
+    $("lock-on").hidden = !on;
+    $("lock-status").textContent = on ? "On" : "Off";
+    $("lock-status").classList.toggle("on", on);
+    if (on) $("pin-grace-on").value = String(T.lock.settings().grace);
+  }
+
+  function pinProblem(a, b) {
+    if (!/^[0-9]{4,8}$/.test(a)) return "Use 4 to 8 digits, numbers only.";
+    if (a !== b) return "The two PINs don’t match.";
+    if (/^(\d)\1+$/.test(a) || "0123456789".indexOf(a) >= 0 || "9876543210".indexOf(a) >= 0) return "That PIN is easy to guess. Try something less predictable.";
+    return "";
+  }
+  function showErr(id, msg) { $(id).textContent = msg; $(id).hidden = !msg; }
+  function busy(btn, label) {
+    btn.disabled = !!label;
+    if (label) { btn.dataset.label = btn.textContent; btn.textContent = label; }
+    else if (btn.dataset.label) btn.textContent = btn.dataset.label;
+  }
+
+  $("lock-on-form").addEventListener("submit", async function (ev) {
+    ev.preventDefault();
+    const a = $("pin-new").value, b = $("pin-new2").value;
+    const problem = pinProblem(a, b);
+    showErr("lock-on-error", problem);
+    if (problem) return;
+    if (!window.crypto || !crypto.subtle) { showErr("lock-on-error", "This browser can’t encrypt data, so the lock isn’t available here."); return; }
+    busy($("lock-on-btn"), "Encrypting your data…");
+    try {
+      await T.lock.enable(a, parseInt($("pin-grace").value, 10));
+      $("pin-new").value = $("pin-new2").value = "";
+      T.toast("App lock is on");
+    } catch (e) {
+      showErr("lock-on-error", "Couldn’t turn on the lock. Nothing was changed.");
+    }
+    busy($("lock-on-btn"), null);
+    renderLock();
+    renderStored();
+  });
+
+  $("pin-grace-on").addEventListener("change", function () {
+    T.lock.setGrace(parseInt($("pin-grace-on").value, 10));
+    T.toast("Saved");
+  });
+
+  $("lock-now").addEventListener("click", function () { T.lock.lockNow(); });
+
+  $("lock-change-form").addEventListener("submit", async function (ev) {
+    ev.preventDefault();
+    showErr("lock-chg-error", "");
+    const a = $("pin-chg").value, b = $("pin-chg2").value;
+    const problem = pinProblem(a, b);
+    if (problem) { showErr("lock-chg-error", problem); return; }
+    busy($("lock-chg-btn"), "Checking…");
+    const ok = await T.lock.check($("pin-cur").value);
+    if (!ok) { busy($("lock-chg-btn"), null); showErr("lock-chg-error", "Your current PIN isn’t right."); return; }
+    $("lock-chg-btn").textContent = "Re-encrypting…";
+    try {
+      await T.lock.changePin(a);
+      ["pin-cur", "pin-chg", "pin-chg2"].forEach(function (id) { $(id).value = ""; });
+      T.toast("PIN changed");
+    } catch (e) {
+      showErr("lock-chg-error", "Couldn’t change the PIN. Your old PIN still works.");
+    }
+    busy($("lock-chg-btn"), null);
+  });
+
+  const offBtn = $("lock-off-btn");
+  offBtn.addEventListener("click", async function () {
+    showErr("lock-chg-error", "");
+    const cur = $("pin-cur").value;
+    if (!cur) { showErr("lock-chg-error", "Enter your current PIN to turn the lock off."); $("pin-cur").focus(); return; }
+    if (!offBtn.dataset.armed) {
+      offBtn.dataset.armed = "1";
+      offBtn.textContent = "Tap again: data will be stored unencrypted";
+      setTimeout(function () { delete offBtn.dataset.armed; offBtn.textContent = "Turn off app lock"; }, 4000);
+      return;
+    }
+    delete offBtn.dataset.armed;
+    busy(offBtn, "Checking…");
+    if (!(await T.lock.check(cur))) { busy(offBtn, null); offBtn.textContent = "Turn off app lock"; showErr("lock-chg-error", "Your current PIN isn’t right."); return; }
+    try {
+      await T.lock.disable();
+      $("pin-cur").value = "";
+      T.toast("App lock is off");
+    } catch (e) {
+      showErr("lock-chg-error", "Couldn’t turn off the lock.");
+    }
+    busy(offBtn, null);
+    offBtn.textContent = "Turn off app lock";
+    renderLock();
+  });
+
+  renderLock();
   renderStored();
-})();
+});

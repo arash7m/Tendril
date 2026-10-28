@@ -1,6 +1,6 @@
 /* Tendril voice practice: live pitch graph, target range, prompts and session history.
    Depends on pitch.js and common.js. All processing happens on this device. */
-(function () {
+Tendril.ready(function () {
   "use strict";
 
   const P = window.TendrilPitch;
@@ -760,4 +760,4 @@
   if (ex) { setReadout(ex.avg); statusEl.textContent = "Example"; statusEl.dataset.state = "idle"; }
   resizeCanvas();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
-})();
+});

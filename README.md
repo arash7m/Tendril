@@ -49,6 +49,16 @@ Everything is stored in the browser's localStorage under keys starting with `ten
 
 Backups are JSON files. With a password they're encrypted with AES-GCM using a key derived by PBKDF2 (SHA-256, 250,000 iterations).
 
+## App lock
+
+Optional PIN lock (set up on the Your data page). When it's on:
+
+- All app data is kept as one AES-GCM encrypted entry (`tendril:__vault`); nothing readable stays in localStorage. Settings live in `tendril:__lock`.
+- The key is derived from the PIN with PBKDF2 (SHA-256, 600,000 iterations). Recordings in IndexedDB are encrypted with the same key.
+- After unlocking, the key is kept in sessionStorage so moving between pages doesn't ask again. Leaving the app starts a timer (right away, 1 or 5 minutes); coming back after it ran out locks.
+- Page scripts start through `Tendril.ready(fn)`, which waits until data is readable. New pages must do the same.
+- Five wrong PINs add a growing wait. A forgotten PIN can't be recovered; the lock screen offers to erase everything.
+
 ## App and offline
 
 Tendril is a Progressive Web App. People can install it from the browser ("Add to Home Screen" on iPhone, "Install app" on Android and desktop). Once installed it opens full screen and works with no connection.

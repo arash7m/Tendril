@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>try{if(localStorage.getItem("tendril:__lock"))document.documentElement.classList.add("is-locked")}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Your data · Tendril</title>
 <meta name="description" content="Back up, restore or delete everything Tendril has saved on this device.">
@@ -49,6 +50,67 @@
     <h2 id="stored-h">Saved on this device</h2>
     <ul class="stored" id="stored"></ul>
     <p class="notice-line" id="storage-off" hidden>This browser is blocking storage, so Tendril can’t save anything here. Private or incognito windows often do this.</p>
+  </section>
+
+  <section class="panel lock-panel" aria-labelledby="lock-h">
+    <div class="spread">
+      <h2 id="lock-h">App lock</h2>
+      <span class="chip" id="lock-status">Off</span>
+    </div>
+
+    <div id="lock-off">
+      <p class="muted">Lock Tendril with a PIN. Everything it saves, including recordings, is encrypted with your PIN, and the app locks when you leave it.</p>
+      <form class="lock-form" id="lock-on-form" autocomplete="off">
+        <div class="grid-2">
+          <label class="field"><span>New PIN <span class="hint">4 to 8 digits</span></span>
+            <input class="input pin-input" type="password" id="pin-new" inputmode="numeric" pattern="[0-9]*" minlength="4" maxlength="8" autocomplete="new-password" required></label>
+          <label class="field"><span>Type it again</span>
+            <input class="input pin-input" type="password" id="pin-new2" inputmode="numeric" pattern="[0-9]*" minlength="4" maxlength="8" autocomplete="new-password" required></label>
+        </div>
+        <label class="field"><span>Lock when I leave the app</span>
+          <select class="input" id="pin-grace">
+            <option value="10">Right away</option>
+            <option value="60" selected>After 1 minute</option>
+            <option value="300">After 5 minutes</option>
+          </select></label>
+        <p class="small muted">There’s no way to recover a forgotten PIN: the only option is to erase Tendril and start over. Make a backup first if you’re worried about that.</p>
+        <p class="notice-line" id="lock-on-error" role="alert" hidden></p>
+        <div class="row"><button class="btn btn-primary" type="submit" id="lock-on-btn">Turn on app lock</button></div>
+      </form>
+    </div>
+
+    <div id="lock-on" hidden>
+      <p class="muted">Tendril is locked with a PIN and your data is encrypted on this device.</p>
+      <div class="row">
+        <button class="btn btn-primary" type="button" id="lock-now">Lock now</button>
+        <label class="field inline-field"><span>Lock when I leave</span>
+          <select class="input" id="pin-grace-on">
+            <option value="10">Right away</option>
+            <option value="60">After 1 minute</option>
+            <option value="300">After 5 minutes</option>
+          </select></label>
+      </div>
+      <details class="lock-more">
+        <summary>Change PIN or turn off</summary>
+        <form class="lock-form" id="lock-change-form" autocomplete="off">
+          <label class="field"><span>Current PIN</span>
+            <input class="input pin-input" type="password" id="pin-cur" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="current-password" required></label>
+          <div class="grid-2">
+            <label class="field"><span>New PIN <span class="hint">4 to 8 digits</span></span>
+              <input class="input pin-input" type="password" id="pin-chg" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="new-password"></label>
+            <label class="field"><span>Type it again</span>
+              <input class="input pin-input" type="password" id="pin-chg2" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="new-password"></label>
+          </div>
+          <p class="notice-line" id="lock-chg-error" role="alert" hidden></p>
+          <div class="row">
+            <button class="btn btn-primary btn-small" type="submit" id="lock-chg-btn">Change PIN</button>
+            <button class="btn btn-soft btn-small" type="button" id="lock-off-btn">Turn off app lock</button>
+          </div>
+        </form>
+      </details>
+    </div>
+
+    <p class="small muted">The lock keeps out people who pick up your phone and stops anyone reading Tendril’s files. A short PIN isn’t as strong as a long password against someone with special tools, so use 6 or more digits if that worries you.</p>
   </section>
 
   <div class="data-grid">

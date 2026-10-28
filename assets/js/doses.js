@@ -1,5 +1,5 @@
 /* Tendril dose tracker. Data lives in localStorage under tendril:doses.meds and tendril:doses.log. */
-(function () {
+Tendril.ready(function () {
   "use strict";
 
   const T = window.Tendril, BM = window.TendrilBodyMap;
@@ -419,4 +419,4 @@
   });
 
   render();
-})();
+});

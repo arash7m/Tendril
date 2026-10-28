@@ -1,5 +1,5 @@
 /* Tendril name & pronoun sandbox. Only the shortlist is saved (tendril:names.shortlist). */
-(function () {
+Tendril.ready(function () {
   "use strict";
 
   const T = window.Tendril;
@@ -212,4 +212,4 @@
   renderPills();
   renderShortlist();
   render();
-})();
+});

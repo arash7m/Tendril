@@ -1,5 +1,5 @@
 /* Tendril guides: the name-change checklist (tendril:guides.checklist). */
-(function () {
+Tendril.ready(function () {
   "use strict";
 
   const T = window.Tendril;
@@ -91,4 +91,4 @@
   });
 
   render();
-})();
+});

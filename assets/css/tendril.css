@@ -365,3 +365,41 @@ kbd {
 }
 
 .update-bar { display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 18px; }
+
+/* ---------- App lock ---------- */
+html.is-locked body > *:not(#lock):not(.toast) { visibility: hidden; }
+.lock {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--bg);
+  display: grid;
+  place-items: center;
+  padding: max(24px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  overflow-y: auto;
+}
+.lock-inner { width: min(320px, 100%); display: grid; justify-items: center; gap: 18px; text-align: center; }
+.lock-logo { width: 44px; height: 44px; }
+.lock-title { font-size: 1.5rem; }
+.lock-dots { display: flex; gap: 12px; min-height: 16px; }
+.lock-dots span { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--muted); }
+.lock-dots span.on { background: var(--secondary); border-color: var(--secondary); }
+.lock-msg { min-height: 1.4em; font-size: 0.9rem; color: var(--pink-text); font-weight: 700; }
+.lock-pad { display: grid; grid-template-columns: repeat(3, 72px); gap: 14px; }
+.lock-pad button {
+  width: 72px; height: 72px; border-radius: 50%;
+  appearance: none; border: 0; cursor: pointer;
+  background: var(--surface-2); color: var(--ink);
+  font-family: var(--font-display); font-size: 1.6rem; font-weight: 500;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .08s ease, background .12s ease;
+}
+.lock-pad button:active { transform: scale(0.94); background: var(--primary-light); }
+.lock-pad .lock-quiet { background: transparent; font-size: 1.1rem; font-family: var(--font-body); font-weight: 800; color: var(--muted); }
+.lock-foot { display: flex; gap: 14px; align-items: center; justify-content: center; flex-wrap: wrap; }
+.lock-link { appearance: none; border: 0; background: none; color: var(--link); font: inherit; font-weight: 700; cursor: pointer; padding: 6px; }
+.lock-forgot { display: grid; gap: 12px; justify-items: center; font-size: 0.9rem; color: var(--muted); background: var(--surface); border-radius: var(--r-md); padding: 16px; }
+.lock.busy .lock-pad { opacity: 0.5; pointer-events: none; }
+.lock.shake .lock-dots { animation: lock-shake .35s ease; }
+@keyframes lock-shake { 25% { transform: translateX(-8px); } 50% { transform: translateX(8px); } 75% { transform: translateX(-4px); } }
+@media (max-height: 640px) { .lock-pad { grid-template-columns: repeat(3, 60px); gap: 10px; } .lock-pad button { width: 60px; height: 60px; } }
