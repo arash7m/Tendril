@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{if(localStorage.getItem("tendril:__lock"))document.documentElement.classList.add("is-locked")}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Euphoria jar · Tendril</title>
+<meta name="description" content="Keep compliments and good moments, and pull one out on a hard day.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#070A1F">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tendril">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/tendril.css">
+
+<link rel="stylesheet" href="assets/css/jar.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Tendril home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 29c0-8 2-13 7-16 4-2.5 7-1 7 2s-3 4-5 2.5" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M15 14c-1-5 2-9 7-10-0.5 5-3 8.5-7 10z" fill="var(--secondary)"/></svg>
+      Tendril
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="timeline.html">Timeline</a>
+      <a class="navlink" href="voice.html">Voice</a>
+      <a class="navlink" href="doses.html">Doses</a>
+      <a class="navlink" href="jar.html" aria-current="page">Jar</a>
+      <a class="navlink" href="names.html">Names</a>
+      <a class="navlink" href="guides.html">Guides</a>
+      <a class="navlink" href="data.html">Your data</a>
+    </nav>
+    <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
+  </div>
+</header>
+
+<main class="wrap page jar-page">
+  <section class="page-intro">
+    <p class="eyebrow">Euphoria jar</p>
+    <h1>Keep the good moments</h1>
+    <p class="lede">Drop in compliments, times you were seen as you, and little wins. On a hard day, pull one out and remember how those felt.</p>
+  </section>
+
+  <div class="jar-layout">
+    <section class="jar-stage" aria-labelledby="jar-count">
+      <svg class="jar-svg" id="jar-svg" viewBox="0 0 240 300" role="img" aria-labelledby="jar-count"></svg>
+      <p class="jar-count" id="jar-count">Your jar is empty</p>
+      <div class="row jar-buttons">
+        <button class="btn btn-primary" type="button" id="add-note">Add a moment</button>
+        <button class="btn btn-pink" type="button" id="pick-note">Pick one for me</button>
+      </div>
+    </section>
+
+    <section class="panel picked" id="picked" aria-live="polite" hidden>
+      <span class="chip" id="picked-kind"></span>
+      <blockquote class="picked-text" id="picked-text"></blockquote>
+      <p class="picked-meta" id="picked-meta"></p>
+      <div class="row">
+        <button class="btn btn-soft btn-small" type="button" id="pick-again">Another one</button>
+        <button class="btn btn-soft btn-small" type="button" id="pick-close">Put it back</button>
+      </div>
+    </section>
+
+    <section class="panel ideas" id="ideas" aria-labelledby="ideas-h">
+      <h2 id="ideas-h">Ideas for your jar</h2>
+      <ul>
+        <li>A stranger called you “ma’am”, “sir”, or used the right pronouns without thinking.</li>
+        <li>A friend said your new name sounded right.</li>
+        <li>You saw yourself in a mirror or photo and smiled.</li>
+        <li>Your voice came out the way you wanted on a phone call.</li>
+        <li>An outfit, a haircut, or a small change that felt like you.</li>
+      </ul>
+    </section>
+  </div>
+
+  <section class="notes-section" aria-labelledby="notes-h" id="notes-section" hidden>
+    <div class="spread">
+      <h2 id="notes-h">Everything in your jar</h2>
+      <div class="pills" role="group" aria-label="Show" id="note-filter"></div>
+    </div>
+    <ol class="notes" id="notes"></ol>
+  </section>
+</main>
+
+<dialog class="sheet" id="note-sheet" aria-labelledby="note-title">
+  <form class="sheet-body" id="note-form" method="dialog">
+    <div class="sheet-head">
+      <h2 id="note-title">Add a moment</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <fieldset class="field">
+      <legend>What kind of moment?</legend>
+      <div class="pills" id="kind-pills"></div>
+    </fieldset>
+    <label class="field">
+      <span>What happened, or what was said?</span>
+      <textarea class="input" id="note-text" rows="4" maxlength="1000" required placeholder="The barista said “have a good one, miss” and I grinned the whole way home."></textarea>
+    </label>
+    <div class="grid-2">
+      <label class="field">
+        <span>Who <span class="hint">optional</span></span>
+        <input class="input" type="text" id="note-from" maxlength="40" placeholder="My sister">
+      </label>
+      <label class="field">
+        <span>When</span>
+        <input class="input" type="date" id="note-date" required>
+      </label>
+    </div>
+    <div class="spread">
+      <div class="row">
+        <button class="btn btn-primary" type="submit">Drop it in</button>
+        <button class="btn btn-soft" type="button" data-close>Cancel</button>
+      </div>
+      <button class="btn btn-soft btn-small" type="button" id="note-delete" hidden>Delete</button>
+    </div>
+  </form>
+</dialog>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Your jar is stored only on this device. Moments you tag <em>euphoria</em> in your <a href="timeline.html">timeline</a> can come up here too.</p>
+    <p>Press <kbd>Esc</kbd> twice to leave quickly.</p>
+  </div>
+</footer>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/jar.js"></script>
+</body>
+</html>

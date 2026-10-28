@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{if(localStorage.getItem("tendril:__lock"))document.documentElement.classList.add("is-locked")}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Coming-out helper · Tendril</title>
+<meta name="description" content="Draft a coming-out letter, message or talking points, privately.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#070A1F">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tendril">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/tendril.css">
+
+<link rel="stylesheet" href="assets/css/comingout.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Tendril home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 29c0-8 2-13 7-16 4-2.5 7-1 7 2s-3 4-5 2.5" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M15 14c-1-5 2-9 7-10-0.5 5-3 8.5-7 10z" fill="var(--secondary)"/></svg>
+      Tendril
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="timeline.html">Timeline</a>
+      <a class="navlink" href="voice.html">Voice</a>
+      <a class="navlink" href="doses.html">Doses</a>
+      <a class="navlink" href="jar.html">Jar</a>
+      <a class="navlink" href="names.html">Names</a>
+      <a class="navlink" href="guides.html" aria-current="page">Guides</a>
+      <a class="navlink" href="data.html">Your data</a>
+    </nav>
+    <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
+  </div>
+</header>
+
+<main class="wrap page comingout">
+  <section class="page-intro">
+    <p class="eyebrow">Coming-out helper</p>
+    <h1>Find your words</h1>
+    <p class="lede">Answer a few questions and Tendril drafts a letter, a message, or talking points. Change anything you like; it’s your story. Nothing leaves your device unless you copy it.</p>
+  </section>
+
+  <aside class="callout safety" aria-labelledby="safety-h">
+    <h2 id="safety-h">Think about safety first</h2>
+    <p>If someone might react with violence, or you depend on them for a home or money, it’s okay to wait. If you do tell them, consider a public place, a supportive person nearby, or a plan for where you could go.</p>
+    <p>You don’t owe anyone a coming out. Share as much or as little as you want, when you’re ready.</p>
+  </aside>
+
+  <div class="co-layout">
+    <form class="panel co-form" id="co-form" autocomplete="off">
+      <fieldset class="field">
+        <legend>Who are you telling?</legend>
+        <div class="pills" id="who-pills">
+          <label><input type="radio" name="who" value="parent" checked><span>Parent</span></label>
+          <label><input type="radio" name="who" value="sibling"><span>Sibling</span></label>
+          <label><input type="radio" name="who" value="family"><span>Other family</span></label>
+          <label><input type="radio" name="who" value="partner"><span>Partner</span></label>
+          <label><input type="radio" name="who" value="friend"><span>Friend</span></label>
+          <label><input type="radio" name="who" value="manager"><span>Manager or HR</span></label>
+          <label><input type="radio" name="who" value="team"><span>Coworkers</span></label>
+          <label><input type="radio" name="who" value="school"><span>Teacher or school</span></label>
+        </div>
+      </fieldset>
+
+      <label class="field">
+        <span>What do you call them? <span class="hint">optional</span></span>
+        <input class="input" type="text" id="them" maxlength="40" placeholder="Mom">
+      </label>
+
+      <fieldset class="field">
+        <legend>How will you tell them?</legend>
+        <div class="pills" id="format-pills">
+          <label><input type="radio" name="format" value="letter" checked><span>Letter or email</span></label>
+          <label><input type="radio" name="format" value="points"><span>Talking points</span></label>
+          <label><input type="radio" name="format" value="text"><span>Short text</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="field">
+        <legend>Tone</legend>
+        <div class="pills" id="tone-pills">
+          <label><input type="radio" name="tone" value="warm" checked><span>Warm</span></label>
+          <label><input type="radio" name="tone" value="direct"><span>Straightforward</span></label>
+          <label><input type="radio" name="tone" value="light"><span>Light</span></label>
+        </div>
+      </fieldset>
+
+      <div class="grid-2">
+        <label class="field">
+          <span>How you describe yourself</span>
+          <input class="input" type="text" id="identity" maxlength="40" value="trans" list="identity-list">
+          <datalist id="identity-list">
+            <option value="trans"><option value="a trans woman"><option value="a trans man"><option value="non-binary"><option value="genderqueer"><option value="genderfluid">
+          </datalist>
+        </label>
+        <label class="field">
+          <span>Your name <span class="hint">optional</span></span>
+          <input class="input" type="text" id="myname" maxlength="30" list="name-list">
+          <datalist id="name-list"></datalist>
+        </label>
+      </div>
+
+      <label class="field">
+        <span>Your pronouns <span class="hint">optional</span></span>
+        <input class="input" type="text" id="pronouns" maxlength="20" list="pron-list" placeholder="she/her">
+        <datalist id="pron-list">
+          <option value="she/her"><option value="he/him"><option value="they/them"><option value="xe/xem"><option value="ze/hir">
+        </datalist>
+      </label>
+
+      <fieldset class="field">
+        <legend>What to include</legend>
+        <div class="checks" id="include">
+          <label><input type="checkbox" value="name" checked><span>My name and pronouns</span></label>
+          <label><input type="checkbox" value="medical"><span>That I’ve started medical transition</span></label>
+          <label data-personal><input type="checkbox" value="same" checked><span>That I’m still the same person</span></label>
+          <label><input type="checkbox" value="questions" checked><span>That questions are welcome</span></label>
+          <label data-personal><input type="checkbox" value="time" checked><span>That it’s okay to need time</span></label>
+          <label><input type="checkbox" value="private"><span>Please keep this private for now</span></label>
+          <label data-work><input type="checkbox" value="records" checked><span>Updating my email, badge and records</span></label>
+          <label data-work><input type="checkbox" value="announce" checked><span>How to tell the team</span></label>
+        </div>
+      </fieldset>
+    </form>
+
+    <section class="panel co-draft" aria-labelledby="draft-h">
+      <div class="spread">
+        <h2 id="draft-h">Your draft</h2>
+        <span class="chip" id="draft-state">Updates as you choose</span>
+      </div>
+      <label class="visually-hidden" for="draft">Draft text</label>
+      <textarea class="input draft" id="draft" rows="16"></textarea>
+      <div class="row">
+        <button class="btn btn-primary" type="button" id="copy">Copy</button>
+        <button class="btn btn-soft" type="button" id="save-draft">Save draft</button>
+        <button class="btn btn-soft btn-small" type="button" id="regen" hidden>Rewrite from my choices</button>
+      </div>
+      <div class="co-tip" id="co-tip"></div>
+    </section>
+  </div>
+
+  <section class="panel" aria-labelledby="saved-h" id="saved-section" hidden>
+    <h2 id="saved-h">Saved drafts</h2>
+    <ol class="saved-list" id="saved-list"></ol>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Drafts are stored only on this device. See also the <a href="guides.html">guides</a>.</p>
+    <p>Press <kbd>Esc</kbd> twice to leave quickly.</p>
+  </div>
+</footer>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/comingout.js"></script>
+</body>
+</html>

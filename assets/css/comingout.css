@@ -1,0 +1,40 @@
+/* Coming-out helper */
+
+.safety { max-width: 72ch; }
+.safety h2 { font-size: 1.1rem; }
+
+.co-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 860px) { .co-layout { grid-template-columns: minmax(0, 1fr); } }
+
+.co-form { display: grid; gap: 18px; }
+.checks { display: grid; gap: 8px; }
+.checks label { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 0.95rem; }
+.checks input { width: 18px; height: 18px; margin-top: 3px; flex: none; accent-color: var(--primary); }
+
+.co-draft { display: grid; gap: 14px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 110px); }
+@media (max-width: 860px) { .co-draft { position: static; } }
+.draft {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  min-height: 320px;
+  resize: vertical;
+  white-space: pre-wrap;
+}
+.co-tip { font-size: 0.9rem; color: var(--muted); background: var(--surface-2); border-radius: var(--r-sm); padding: 10px 14px; }
+.co-tip:empty { display: none; }
+
+.saved-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.saved-list li { display: flex; gap: 8px; align-items: center; }
+.saved-open {
+  flex: 1; min-width: 0;
+  appearance: none; border: 0; cursor: pointer; text-align: left; font: inherit; color: var(--ink);
+  background: var(--surface-2); border-radius: var(--r-sm); padding: 10px 14px;
+  display: grid; gap: 2px;
+}
+.saved-open span { font-size: 0.82rem; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

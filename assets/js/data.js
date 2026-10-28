@@ -20,6 +20,12 @@ Tendril.ready(function () {
     if (short.length) out.push(["Name shortlist", short.length + plural(short.length, " name", " names")]);
     const entries = data["timeline.entries"] || [];
     if (entries.length) out.push(["Timeline", entries.length + plural(entries.length, " entry", " entries")]);
+    const res = data["resonance.history"] || [];
+    if (res.length) out.push(["Resonance practice", res.length + plural(res.length, " session", " sessions")]);
+    const jar = data["jar.notes"] || [];
+    if (jar.length) out.push(["Euphoria jar", jar.length + plural(jar.length, " moment", " moments")]);
+    const drafts = data["comingout.drafts"] || [];
+    if (drafts.length) out.push(["Coming-out drafts", drafts.length + plural(drafts.length, " draft", " drafts")]);
     const checks = data["guides.checklist"] ? Object.keys(data["guides.checklist"]).length : 0;
     if (checks) out.push(["Name-change checklist", checks + " ticked"]);
     return out;

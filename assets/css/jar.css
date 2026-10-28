@@ -1,0 +1,71 @@
+/* Euphoria jar */
+
+.jar-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 760px) { .jar-layout { grid-template-columns: minmax(0, 1fr); } }
+
+.jar-stage { display: grid; justify-items: center; gap: 12px; grid-row: span 2; }
+.jar-svg { width: min(260px, 70vw); height: auto; }
+.jar-glass { fill: rgba(124, 196, 255, 0.07); stroke: var(--muted); stroke-width: 3; }
+.jar-shine { fill: none; stroke: rgba(255, 255, 255, 0.25); stroke-width: 5; stroke-linecap: round; }
+.jar-neck { fill: var(--surface-2); stroke: var(--muted); stroke-width: 2; }
+.jar-lid { fill: var(--accent); }
+.slip { stroke: rgba(7, 10, 31, 0.35); stroke-width: 1; }
+.slip-pink { fill: var(--secondary); }
+.slip-purple { fill: var(--accent); }
+.slip-blue { fill: var(--primary); }
+.slip-new { animation: slip-drop 0.7s cubic-bezier(.3, 1.4, .5, 1) both; transform-box: fill-box; }
+@keyframes slip-drop { from { translate: 0 calc(var(--drop, 200px) * -1); opacity: 0; } to { translate: 0 0; opacity: 1; } }
+.jar-count { font-family: var(--font-display); font-weight: 500; font-size: 1.15rem; color: var(--deep); }
+.jar-buttons { justify-content: center; }
+
+/* The picked moment */
+.picked { display: grid; gap: 12px; border: 2px solid var(--secondary); }
+.picked-purple { border-color: var(--accent); }
+.picked-blue { border-color: var(--primary); }
+.picked.reveal { animation: picked-in 0.45s ease both; }
+@keyframes picked-in { from { opacity: 0; transform: translateY(12px) scale(0.98); } to { opacity: 1; transform: none; } }
+.picked .chip { justify-self: start; }
+.picked-text {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.25rem, 4vw, 1.6rem);
+  line-height: 1.35;
+  color: var(--deep);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.picked-meta { color: var(--muted); font-size: 0.9rem; }
+
+.ideas { display: grid; gap: 10px; }
+.ideas ul { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; color: var(--muted); }
+
+/* All notes */
+.notes-section { display: grid; gap: 14px; }
+.notes {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+}
+.note-btn {
+  width: 100%; height: 100%;
+  appearance: none; cursor: pointer; text-align: left; font: inherit;
+  display: grid; gap: 8px; align-content: start;
+  padding: 14px 16px;
+  border-radius: var(--r-md);
+  border: 0;
+  border-top: 6px solid var(--secondary);
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+.note-purple .note-btn { border-top-color: var(--accent); }
+.note-blue .note-btn { border-top-color: var(--primary); }
+.note-kind { font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.note-text { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.5; }
+.note-meta { font-size: 0.8rem; color: var(--muted); }
