@@ -8,10 +8,10 @@ Tendril.ready(function () {
 
   const CARDS = [
     { id: "next", label: "Up next: doses", sensitive: true },
-    { id: "visit", label: "Next appointment", sensitive: true },
+    { id: "voice", label: "Voice practice", sensitive: false },
     { id: "milestone", label: "Milestone", sensitive: true },
     { id: "checkin", label: "Mood check-in", sensitive: false },
-    { id: "voice", label: "Voice practice", sensitive: false },
+    { id: "visit", label: "Next appointment", sensitive: true },
     { id: "photos", label: "Progress photos", sensitive: true },
     { id: "labs", label: "Lab results", sensitive: true },
     { id: "jar", label: "From your jar", sensitive: true },
@@ -21,6 +21,15 @@ Tendril.ready(function () {
   const KIND = { injection: "Injection", pill: "Pill", patch: "Patch", gel: "Gel", other: "Other" };
 
   let settings = T.store.get("hub.settings", {});
+  // Once: Voice moved up to where Next appointment used to be, for anyone with a saved order.
+  if (!settings.voiceUp) {
+    if (Array.isArray(settings.order)) {
+      const o = settings.order, v = o.indexOf("voice"), a = o.indexOf("visit");
+      if (v > a && a >= 0) { o[a] = "voice"; o[v] = "visit"; }
+    }
+    settings.voiceUp = true;
+    if (T.store.get("hub.settings", null)) T.store.set("hub.settings", settings);
+  }
   const revealed = {}; // cards uncovered this visit while discreet mode is on
 
   // ---------------- Welcome or hub? ----------------
@@ -199,6 +208,12 @@ Tendril.ready(function () {
     f.body.appendChild(today
       ? link("timeline.html", "Today you said " + MOODS[today.mood].toLowerCase() + ". Add a note in your timeline", "hub-link")
       : el("p", "hc-sub", "One tap saves it to your timeline."));
+    if (today && today.mood <= 2) {
+      const soft = el("div", "hc-soft");
+      soft.appendChild(el("span", null, "Sorry today feels heavy."));
+      soft.appendChild(link("hardday.html", "Open hard day mode", "btn btn-soft btn-small"));
+      f.body.appendChild(soft);
+    }
     return f.card;
   }
 
@@ -375,7 +390,7 @@ Tendril.ready(function () {
     const tools = [
       ["timeline.html", "Timeline"], ["voice.html", "Voice"], ["doses.html", "Doses"], ["labs.html", "Labs"],
       ["visits.html", "Appointments"], ["jar.html", "Jar"], ["names.html", "Names"], ["guides.html", "Guides"],
-      ["comingout.html", "Coming out"], ["data.html", "Your data"]
+      ["comingout.html", "Coming out"], ["hardday.html", "Hard day"], ["data.html", "Your data"]
     ];
     const g = el("div", "tool-links");
     tools.forEach(function (t) { g.appendChild(link(t[0], t[1], "tool-link")); });

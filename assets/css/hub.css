@@ -187,3 +187,10 @@ html:not(.hub-mode) .about-body { padding-top: 0; }
 .warm-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .warm-streak { white-space: nowrap; font-size: 0.8rem; font-weight: 800; padding: 4px 12px; border-radius: 999px; background: linear-gradient(120deg, rgba(255, 79, 163, .25), rgba(61, 169, 252, .2)); color: var(--ink); }
 .warm-done { font-size: 0.86rem; font-weight: 800; color: var(--pink-text); }
+.hub-hard {
+  justify-self: start; display: inline-flex; align-items: center; gap: 7px; margin-top: 6px;
+  padding: 6px 14px; border-radius: 999px; text-decoration: none; font-weight: 800; font-size: 0.86rem;
+  color: #FFD0E6; background: rgba(7, 10, 31, 0.5); backdrop-filter: blur(6px); border: 1px solid rgba(255, 179, 214, 0.25);
+}
+.hub-hard:hover { background: rgba(155, 93, 229, 0.3); }
+.hc-soft { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 12px; border-radius: var(--r-sm); background: rgba(155, 93, 229, 0.16); font-size: 0.9rem; }

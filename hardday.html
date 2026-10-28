@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{if(localStorage.getItem("tendril:__lock"))document.documentElement.classList.add("is-locked")}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hard day · Tendril</title>
+<meta name="description" content="A calm space for hard days: breathing, grounding, good reminders and people to reach.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#070A1F">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tendril">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/tendril.css">
+
+<link rel="stylesheet" href="assets/css/hardday.css">
+</head>
+<body class="calm">
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Tendril home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 29c0-8 2-13 7-16 4-2.5 7-1 7 2s-3 4-5 2.5" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M15 14c-1-5 2-9 7-10-0.5 5-3 8.5-7 10z" fill="var(--secondary)"/></svg>
+      Tendril
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="timeline.html">Timeline</a>
+      <a class="navlink" href="voice.html">Voice</a>
+      <a class="navlink" href="doses.html">Health</a>
+      <a class="navlink" href="jar.html">Jar</a>
+      <a class="navlink" href="names.html">Names</a>
+      <a class="navlink" href="guides.html">Guides</a>
+      <a class="navlink" href="data.html">Your data</a>
+    </nav>
+    <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
+  </div>
+</header>
+
+<main class="wrap page hardday">
+  <section class="hd-hello">
+    <p class="eyebrow">Hard day</p>
+    <h1>It’s okay to have a hard day.</h1>
+    <p class="lede">You don’t have to fix anything right now. Pick one small thing below, and we’ll take it from there.</p>
+  </section>
+
+  <nav class="hd-tiles" aria-label="What would help">
+    <button type="button" class="hd-tile" data-open="breathe"><span class="ht-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5"/></g></svg></span><span class="ht-t">Breathe with me</span><span class="ht-s">A slow, guided breath</span></button>
+    <button type="button" class="hd-tile" data-open="ground"><span class="ht-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12V6.5a1.5 1.5 0 0 1 3 0V11M11 10V5a1.5 1.5 0 0 1 3 0v6M14 10.5V7a1.5 1.5 0 0 1 3 0v6.5c0 4-2.5 7-6 7-2.5 0-4-1.3-5.5-3.5L4 14.2a1.5 1.5 0 0 1 2.4-1.8L8 14"/></g></svg></span><span class="ht-t">Ground myself</span><span class="ht-s">Come back to the room, 5-4-3-2-1</span></button>
+    <button type="button" class="hd-tile" data-open="good"><span class="ht-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 6.3L20.5 12l-6.3 2.7L12 21l-2.2-6.3L3.5 12l6.3-2.7z"/></g></svg></span><span class="ht-t">Remind me of good things</span><span class="ht-s">Your jar, your milestones, kind words</span></button>
+    <button type="button" class="hd-tile" data-open="reach"><span class="ht-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h3.5l1.5 4-2 1.5a11 11 0 0 0 6.5 6.5L16 14l4 1.5V19a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z"/></g></svg></span><span class="ht-t">Reach out</span><span class="ht-s">Your people and support lines</span></button>
+    <button type="button" class="hd-tile" data-open="care"><span class="ht-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></g></svg></span><span class="ht-t">Gentle care</span><span class="ht-s">Small things that help a body</span></button>
+    <button type="button" class="hd-tile" data-open="write"><span class="ht-ic" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></g></svg></span><span class="ht-t">Write it out</span><span class="ht-s">Keep it, or let it go</span></button>
+  </nav>
+
+  <!-- Breathe -->
+  <section class="hd-sec panel" id="sec-breathe" hidden aria-labelledby="breathe-h">
+    <div class="hd-sec-head"><h2 id="breathe-h">Breathe with me</h2><button class="icon-btn" type="button" data-close-sec aria-label="Close">×</button></div>
+    <div class="segmented hd-seg" role="group" aria-label="Breathing pattern">
+      <button type="button" data-pattern="calm" aria-pressed="true">Calm · in 4, out 6</button>
+      <button type="button" data-pattern="box" aria-pressed="false">Box · 4-4-4-4</button>
+    </div>
+    <div class="breath-stage">
+      <div class="breath-ring" id="breath-ring"><span class="breath-word" id="breath-word">Tap start</span></div>
+    </div>
+    <p class="hd-center small muted" id="breath-count">Breathe through your nose if you can. There’s no wrong way to do this.</p>
+    <div class="row hd-center-row">
+      <button class="btn btn-primary" type="button" id="breath-go">Start</button>
+      <label class="check-line" id="buzz-line" hidden><input type="checkbox" id="breath-buzz"> Gentle vibration on each change</label>
+    </div>
+  </section>
+
+  <!-- Ground -->
+  <section class="hd-sec panel" id="sec-ground" hidden aria-labelledby="ground-h">
+    <div class="hd-sec-head"><h2 id="ground-h">Ground myself</h2><button class="icon-btn" type="button" data-close-sec aria-label="Close">×</button></div>
+    <div class="ground-dots" id="ground-dots" aria-hidden="true"></div>
+    <p class="ground-n" id="ground-n"></p>
+    <p class="ground-ask" id="ground-ask" aria-live="polite"></p>
+    <p class="small muted" id="ground-hint"></p>
+    <label class="visually-hidden" for="ground-input">Write them down if you like</label>
+    <input class="input" id="ground-input" type="text" autocomplete="off" placeholder="Write them down if you like (not saved)">
+    <div class="row">
+      <button class="btn btn-primary" type="button" id="ground-next">Next</button>
+      <button class="btn btn-soft" type="button" id="ground-restart" hidden>Start again</button>
+    </div>
+  </section>
+
+  <!-- Good things -->
+  <section class="hd-sec panel" id="sec-good" hidden aria-labelledby="good-h">
+    <div class="hd-sec-head"><h2 id="good-h">Remind me of good things</h2><button class="icon-btn" type="button" data-close-sec aria-label="Close">×</button></div>
+    <div class="good-card" id="good-jar"></div>
+    <div class="good-facts" id="good-facts"></div>
+    <div class="good-words">
+      <h3>Kind words</h3>
+      <blockquote class="affirm" id="affirm"></blockquote>
+      <div class="row">
+        <button class="btn btn-soft btn-small" type="button" id="affirm-next">Another one</button>
+      </div>
+      <details class="own-words">
+        <summary>Your own words</summary>
+        <p class="small muted">Things a friend said, or what you’d tell someone you love. They’ll show up with the others.</p>
+        <ul class="words-list" id="words-list"></ul>
+        <form class="row" id="words-form">
+          <label class="visually-hidden" for="words-input">Add your own words</label>
+          <input class="input" id="words-input" maxlength="200" placeholder="You’ve gotten through hard days before.">
+          <button class="btn btn-soft btn-small" type="submit">Add</button>
+        </form>
+      </details>
+    </div>
+  </section>
+
+  <!-- Reach out -->
+  <section class="hd-sec panel" id="sec-reach" hidden aria-labelledby="reach-h">
+    <div class="hd-sec-head"><h2 id="reach-h">Reach out</h2><button class="icon-btn" type="button" data-close-sec aria-label="Close">×</button></div>
+    <p class="muted">Letting someone know is brave, not a burden. A short message is enough.</p>
+
+    <h3>Your people</h3>
+    <ul class="people" id="people"></ul>
+    <p class="small muted" id="people-empty">Add someone you trust, so they’re one tap away on a hard day. Saved only on this device.</p>
+    <details class="add-person">
+      <summary>Add someone</summary>
+      <form class="person-form" id="person-form">
+        <label class="field"><span>Name</span><input class="input" id="person-name" maxlength="40" required placeholder="Sam"></label>
+        <label class="field"><span>Phone number</span><input class="input" id="person-phone" type="tel" maxlength="30" required placeholder="+39 …"></label>
+        <button class="btn btn-primary btn-small" type="submit">Save</button>
+      </form>
+    </details>
+
+    <h3>Message ideas</h3>
+    <ul class="msgs" id="msgs"></ul>
+
+    <h3>Support lines</h3>
+    <label class="field inline-region"><span>Where you are</span>
+      <select class="input" id="region">
+        <option value="it">Italy</option>
+        <option value="uk">United Kingdom</option>
+        <option value="ie">Ireland</option>
+        <option value="us">United States</option>
+        <option value="ca">Canada</option>
+        <option value="other">Somewhere else</option>
+      </select>
+    </label>
+    <ul class="lines" id="lines"></ul>
+    <p class="small muted">Lines and hours were checked in October 2026 and can change. <a href="https://findahelpline.com" target="_blank" rel="noopener noreferrer">findahelpline.com</a> lists free, confidential lines in most countries.</p>
+  </section>
+
+  <!-- Gentle care -->
+  <section class="hd-sec panel" id="sec-care" hidden aria-labelledby="care-h">
+    <div class="hd-sec-head"><h2 id="care-h">Gentle care</h2><button class="icon-btn" type="button" data-close-sec aria-label="Close">×</button></div>
+    <p class="muted">Any one of these counts. They reset tomorrow.</p>
+    <ul class="care-list" id="care-list"></ul>
+    <p class="care-done" id="care-done" hidden></p>
+  </section>
+
+  <!-- Write -->
+  <section class="hd-sec panel" id="sec-write" hidden aria-labelledby="write-h">
+    <div class="hd-sec-head"><h2 id="write-h">Write it out</h2><button class="icon-btn" type="button" data-close-sec aria-label="Close">×</button></div>
+    <p class="muted">Get it out of your head. Nobody else will read this.</p>
+    <label class="visually-hidden" for="write-text">What’s on your mind</label>
+    <textarea class="input write-text" id="write-text" rows="7" maxlength="5000" placeholder="Today is hard because…"></textarea>
+    <div class="row">
+      <button class="btn btn-pink" type="button" id="write-go">Let it go</button>
+      <button class="btn btn-soft" type="button" id="write-keep">Keep it in my timeline</button>
+    </div>
+  </section>
+
+  <aside class="hd-danger" id="hd-danger">
+    <p><strong>In danger, or thinking about ending your life?</strong> <span id="danger-text">Please call your local emergency number now.</span></p>
+    <a class="btn btn-pink btn-small" id="danger-call" href="tel:112">Call 112</a>
+  </aside>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Tendril stores everything in your browser on this device. Nothing is sent to a server.</p>
+    <p>Press <kbd>Esc</kbd> twice to leave quickly.</p>
+  </div>
+</footer>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/days.js"></script>
+<script src="assets/js/hardday.js"></script>
+</body>
+</html>

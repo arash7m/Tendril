@@ -18,6 +18,7 @@ Everything runs in the browser and is stored on the user's own device. There is 
 | `labs.html` | Lab results: markers with unit conversion (`assets/js/labs-core.js`), per-marker charts with the doctor's range, test history |
 | `visits.html` | Appointments and blood tests with countdowns and calendar export (`assets/js/visits-core.js`) |
 | `summary.html` | Doctor summary: medications with doses taken, latest labs, mood, chosen journal notes, voice, questions; print/PDF or copy as text |
+| `hardday.html` | Hard day mode: breathing circle, 5-4-3-2-1 grounding, good reminders (jar, milestones, kind words incl. your own), trusted people with call/text and message ideas, regional support lines, gentle care checklist, write it out (let it go or keep in timeline). Linked from the hub greeting, a low mood check-in, All tools and the jar |
 | `jar.html` | Euphoria jar: save moments, pick one at random (includes timeline entries tagged euphoria) |
 | `comingout.html` | Coming-out helper: builds an editable letter, talking points or short text from a few choices; saved drafts |
 | `names.html` | Name & pronoun sandbox: everyday sentences, read-aloud, private shortlist |
@@ -67,6 +68,7 @@ Everything is stored in the browser's localStorage under keys starting with `ten
 | `read.settings` | Read-along source, text size, scroll speed, your own text |
 | `warmup.log`, `warmup.len` | Warm-up summaries (per-step scores, no audio), chosen length |
 | `games.best`, `games.plays` | Best score per game, list of games played |
+| `hardday.people`, `hardday.words`, `hardday.care`, `hardday.region`, `hardday.breath`, `hardday.buzz` | Trusted people, your own kind words, today's care checklist, support-line region, breathing pattern, vibration |
 | `jar.notes`, `jar.seen` | Euphoria jar moments, when each was last shown |
 | `comingout.drafts` | Saved coming-out drafts |
 | `timeline.entries` | Journal entries and milestones (photo ids only) |
