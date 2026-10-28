@@ -50,7 +50,7 @@
       <div class="readout">
         <div class="readout-main">
           <span class="hz" id="hz" aria-live="off">—</span><span class="unit">Hz</span>
-          <span class="note" id="note"></span>
+          <span class="note" id="note" aria-label="Musical note"></span>
         </div>
         <span class="status" id="status" data-state="idle" role="status">Ready</span>
       </div>
@@ -63,6 +63,7 @@
       <div class="graph-box">
         <canvas id="graph" aria-label="Pitch over time, with your target range shaded" role="img"></canvas>
       </div>
+      <p class="session-range small muted" id="session-range" hidden></p>
       <p class="legend"><span class="sw sw-in"></span>Inside your target <span class="sw sw-out"></span>Outside it (faded) <span class="sw sw-band"></span>Your target zone</p>
 
       <div class="controls">
@@ -129,7 +130,7 @@
         <button class="btn btn-soft btn-small" id="confirm-no" type="button">Keep</button>
       </div>
     </div>
-    <p class="muted" id="history-empty">Sessions you finish are saved here, on this device only, so you can see how your average changes over weeks.</p>
+    <p class="muted" id="history-empty">Sessions you finish are saved here, on this device only, so you can see how your average changes over weeks. Tap a session to see its graph again.</p>
     <ol class="history-list" id="history"></ol>
   </section>
 </main>

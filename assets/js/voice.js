@@ -20,6 +20,8 @@
   const LIVE_WINDOW = 12; // seconds visible while recording
 
   let target = T.store.get("voice.target", { preset: "lighter", low: 165, high: 255 });
+  let sessionTarget = null; // set while viewing a past session
+  function activeTarget() { return sessionTarget || target; }
 
   // ---------------- Prompts ----------------
   const PROMPTS = [
@@ -87,7 +89,8 @@
     const y = function (hz) { return padT + plotH * (1 - (hz - Y_MIN) / (Y_MAX - Y_MIN)); };
 
     // Target band
-    const lo = Math.max(Y_MIN, target.low), hi = Math.min(Y_MAX, target.high);
+    const tg = activeTarget();
+    const lo = Math.max(Y_MIN, tg.low), hi = Math.min(Y_MAX, tg.high);
     g.fillStyle = band;
     g.fillRect(padL, y(hi), plotW, y(lo) - y(hi));
 
@@ -141,7 +144,7 @@
       if (p.hz == null) { prev = null; continue; }
       const cy = y(Math.max(Y_MIN, Math.min(Y_MAX, p.hz)));
       if (prev && p.t - prev.t < 0.25) {
-        const inRange = p.hz >= target.low && p.hz <= target.high;
+        const inRange = p.hz >= tg.low && p.hz <= tg.high;
         g.strokeStyle = tone;
         g.globalAlpha = inRange ? 1 : 0.35;
         g.beginPath();
@@ -179,11 +182,12 @@
       statusEl.dataset.state = "idle";
       return;
     }
+    const tg = activeTarget();
     hzEl.textContent = Math.round(hz);
     noteEl.textContent = P.noteName(hz);
-    if (hz < target.low) { statusEl.textContent = "Below your range"; statusEl.dataset.state = "low"; }
-    else if (hz > target.high) { statusEl.textContent = "Above your range"; statusEl.dataset.state = "high"; }
-    else { statusEl.textContent = "In your range"; statusEl.dataset.state = "in"; }
+    if (hz < tg.low) { statusEl.textContent = "Below range"; statusEl.dataset.state = "low"; }
+    else if (hz > tg.high) { statusEl.textContent = "Above range"; statusEl.dataset.state = "high"; }
+    else { statusEl.textContent = "In range"; statusEl.dataset.state = "in"; }
   }
 
   function computeStats(pts) {
@@ -192,12 +196,12 @@
     const sorted = voiced.slice().sort(function (a, b) { return a - b; });
     const pick = function (q) { return sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))]; };
     const avg = voiced.reduce(function (a, b) { return a + b; }, 0) / voiced.length;
-    const inRange = voiced.filter(function (hz) { return hz >= target.low && hz <= target.high; }).length / voiced.length;
+    const tg = activeTarget();
+    const inRange = voiced.filter(function (hz) { return hz >= tg.low && hz <= tg.high; }).length / voiced.length;
+    const span = pts.length > 1 ? pts[pts.length - 1].t / (pts.length - 1) : 0;
     // 5th and 95th percentiles ignore stray glitches.
-    return { avg: avg, inRange: inRange, low: pick(0.05), high: pick(0.95), voicedSec: voiced.length * frameSec() };
+    return { avg: avg, inRange: inRange, low: pick(0.05), high: pick(0.95), voicedSec: voiced.length * span };
   }
-
-  function frameSec() { return mode === "recording" ? HOP / 44100 : 1 / 30; }
 
   function renderStats() {
     const s = computeStats(points);
@@ -253,6 +257,7 @@
     audio = { ctx: ctx, stream: stream, source: source, analyser: analyser, buf: new Float32Array(analyser.fftSize) };
 
     mode = "live";
+    leaveSession();
     $("example-chip").hidden = true;
     points = [];
     startedAt = performance.now();
@@ -326,13 +331,14 @@
       }
       ctx.close();
       mode = "recording";
+      leaveSession();
       $("example-chip").hidden = true;
       points = out;
       graphLabel.textContent = "Recording: " + file.name;
       timerEl.textContent = formatTime(decoded.duration);
       const s = computeStats(points);
       setReadout(s ? s.avg : null);
-      if (s) { statusEl.textContent = "Average shown"; statusEl.dataset.state = s.avg >= target.low && s.avg <= target.high ? "in" : "idle"; }
+      if (s) { statusEl.textContent = "Average"; statusEl.dataset.state = "idle"; }
       else showNotice("I couldn’t find enough voiced sound in that recording. Try one with clear speech and little background noise.");
       renderStats();
       draw();
@@ -344,20 +350,62 @@
   }
 
   // ---------------- History ----------------
+  // Each session keeps a compact copy of its pitch line: one value per time
+  // step (whole Hz, 0 = silence), so it can be opened again later.
+  const MAX_STEPS = 2400;
+
+  function packTrace(pts) {
+    const dur = pts.length ? pts[pts.length - 1].t : 0;
+    let dt = 0.1;
+    while (dur / dt > MAX_STEPS) dt *= 2;
+    const n = Math.max(1, Math.ceil(dur / dt) + 1);
+    const sum = new Float64Array(n), cnt = new Uint16Array(n);
+    pts.forEach(function (p) {
+      if (p.hz == null) return;
+      const k = Math.min(n - 1, Math.round(p.t / dt));
+      sum[k] += p.hz; cnt[k]++;
+    });
+    const hz = [];
+    for (let k = 0; k < n; k++) hz.push(cnt[k] ? Math.round(sum[k] / cnt[k]) : 0);
+    return { dt: dt, hz: hz };
+  }
+
+  function unpackTrace(tr) {
+    return tr.hz.map(function (v, k) { return { t: k * tr.dt, hz: v ? v : null }; });
+  }
+
   function saveSession(kind) {
     const s = computeStats(points);
     if (!s || s.voicedSec < 3) return;
     const history = T.store.get("voice.history", []);
-    history.unshift({
+    const entry = {
+      id: T.uid(),
       at: new Date().toISOString(),
       kind: kind,
       avg: Math.round(s.avg),
       inRange: Math.round(s.inRange * 100),
-      target: [target.low, target.high],
-      seconds: Math.round(points.length ? points[points.length - 1].t : 0)
-    });
-    T.store.set("voice.history", history.slice(0, 60));
+      target: [activeTarget().low, activeTarget().high],
+      seconds: Math.round(points.length ? points[points.length - 1].t : 0),
+      trace: packTrace(points)
+    };
+    history.unshift(entry);
+    let trimmed = history.slice(0, 60);
+    // If storage is full, drop the oldest graphs first, then the oldest sessions.
+    while (!T.store.set("voice.history", trimmed) && trimmed.length > 1) {
+      const withTrace = trimmed.map(function (h, i) { return h.trace ? i : -1; }).filter(function (i) { return i > 0; });
+      if (withTrace.length) delete trimmed[withTrace[withTrace.length - 1]].trace;
+      else trimmed = trimmed.slice(0, -1);
+    }
+    openId = entry.id;
     renderHistory();
+  }
+
+  let openId = null;
+
+  function whenText(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { day: "numeric", month: "short" }) + ", " +
+      d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
   }
 
   function renderHistory() {
@@ -366,27 +414,66 @@
     list.innerHTML = "";
     $("history-empty").hidden = history.length > 0;
     $("clear-history").hidden = history.length === 0;
-    history.slice(0, 12).forEach(function (h) {
+    history.slice(0, 20).forEach(function (h) {
       const li = document.createElement("li");
-      const d = new Date(h.at);
-      const when = d.toLocaleDateString(undefined, { day: "numeric", month: "short" }) + ", " +
-        d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
       li.innerHTML =
-        '<div class="h-when"><strong></strong><span></span></div>' +
-        '<div class="h-num"><span class="h-val"></span><span class="h-lab">average</span></div>' +
-        '<div class="h-num"><span class="h-val"></span><span class="h-lab">in range</span></div>';
-      li.querySelector(".h-when strong").textContent = when;
-      li.querySelector(".h-when span").textContent = h.kind + " · " + formatTime(h.seconds);
+        '<button type="button" class="h-open">' +
+          '<span class="h-when"><strong></strong><span></span></span>' +
+          '<span class="h-num"><span class="h-val"></span><span class="h-lab">average</span></span>' +
+          '<span class="h-num"><span class="h-val"></span><span class="h-lab">in range</span></span>' +
+          '<svg class="h-go" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+        '</button>';
+      const btn = li.querySelector(".h-open");
+      if (h.id && h.id === openId) btn.setAttribute("aria-current", "true");
+      if (!h.trace) btn.classList.add("no-trace");
+      li.querySelector(".h-when strong").textContent = whenText(h.at);
+      li.querySelector(".h-when > span").textContent = h.kind + " · " + formatTime(h.seconds);
       const vals = li.querySelectorAll(".h-val");
       vals[0].textContent = h.avg + " Hz";
       vals[1].textContent = h.inRange + "%";
+      btn.setAttribute("aria-label", "Open session from " + whenText(h.at));
+      btn.addEventListener("click", function () { openSession(h); });
       list.appendChild(li);
     });
+  }
+
+  function openSession(h) {
+    if (!h.trace) {
+      T.toast("This session was saved before graphs were kept, so only its numbers exist");
+      return;
+    }
+    if (audio) stop();
+    hideNotice();
+    mode = "session";
+    openId = h.id;
+    sessionTarget = { low: h.target[0], high: h.target[1] };
+    points = unpackTrace(h.trace);
+    $("example-chip").hidden = true;
+    graphLabel.textContent = h.kind + ", " + whenText(h.at);
+    timerEl.textContent = formatTime(h.seconds);
+    const s = computeStats(points);
+    setReadout(s ? s.avg : null);
+    statusEl.textContent = "Average";
+    statusEl.dataset.state = "idle";
+    $("session-range").textContent = "Shaded zone is the range you had then: " + h.target[0] + "–" + h.target[1] + " Hz";
+    $("session-range").hidden = false;
+    renderStats();
+    draw();
+    renderHistory();
+    document.querySelector(".monitor").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function leaveSession() {
+    sessionTarget = null;
+    openId = null;
+    $("session-range").hidden = true;
+    renderHistory();
   }
 
   // ---------------- Target controls ----------------
   function applyTarget(next, save) {
     target = next;
+    if (save && sessionTarget) { sessionTarget = null; $("session-range").hidden = true; }
     lowIn.value = target.low;
     highIn.value = target.high;
     document.querySelectorAll("[data-preset]").forEach(function (b) {

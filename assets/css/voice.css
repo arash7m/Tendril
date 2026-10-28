@@ -31,14 +31,14 @@
 
 /* Readout */
 .monitor { display: grid; gap: 16px; }
+/* Fixed-size readout so nothing shifts while the numbers and status change. */
 .readout {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
-  flex-wrap: wrap;
 }
-.readout-main { display: flex; align-items: baseline; gap: 6px; }
+.readout-main { display: flex; align-items: baseline; gap: 6px; flex-wrap: nowrap; min-width: 0; }
 .hz {
   font-family: var(--font-display);
   font-weight: 600;
@@ -46,7 +46,9 @@
   line-height: 1;
   color: var(--deep);
   font-variant-numeric: tabular-nums;
-  min-width: 3ch;
+  display: inline-block;
+  width: 3.3ch;
+  text-align: right;
 }
 .unit { font-family: var(--font-mono); color: var(--muted); font-size: 1rem; }
 .note {
@@ -58,9 +60,16 @@
   background: var(--surface-2);
   color: var(--ink);
 }
-.note:empty { display: none; }
+.note { min-width: 3.4em; text-align: center; flex: none; }
+.note:empty { visibility: hidden; }
+.note:empty::before { content: "\00a0"; }
 
 .status {
+  width: 8.6em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+  white-space: nowrap;
   font-weight: 800;
   font-size: 0.9rem;
   padding: 6px 14px;
@@ -181,15 +190,28 @@
 .history-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .confirm { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 0.9rem; font-weight: 700; }
 .history-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.history-list li {
+.h-open {
+  width: 100%;
+  appearance: none;
+  border: 2px solid transparent;
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
   gap: 18px;
   align-items: center;
-  padding: 10px 14px;
+  padding: 10px 10px 10px 14px;
   border-radius: var(--r-sm);
   background: var(--surface-2);
 }
+.h-open:hover { border-color: var(--tone); }
+.h-open[aria-current="true"] { border-color: var(--tone); background: var(--tone-light); }
+.h-open.no-trace .h-go { opacity: 0.3; }
+.h-go { color: var(--muted); }
+.session-range { margin-top: -6px; }
+@media (max-width: 420px) { .h-open { gap: 12px; } }
 .h-when { display: grid; min-width: 0; }
 .h-when span { font-size: 0.82rem; color: var(--muted); }
 .h-num { display: grid; text-align: right; }
