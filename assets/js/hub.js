@@ -202,19 +202,45 @@ Tendril.ready(function () {
     return f.card;
   }
 
-  // Milestone
+  // Milestone and anniversaries
+  let cheered = false;
   function cardMilestone(c) {
-    const f = frame(c, "Milestone", "timeline.html");
-    const ms = T.store.get("timeline.entries", []).filter(function (e) { return e.kind === "milestone"; })
-      .sort(function (a, b) { return new Date(a.at) - new Date(b.at); });
+    const D = window.TendrilDays;
+    const ms = D.milestones(T.store);
+    const todays = D.today(ms);
+    const f = frame(c, todays.length ? "Big day" : "Milestone", "timeline.html");
     if (!ms.length) { emptyLine(f.body, "Mark a day that matters, like starting hormones.", "timeline.html", "Add a milestone"); return f.card; }
-    const now = new Date();
-    const anniv = ms.find(function (e) { const d = new Date(e.at); return d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() < now.getFullYear(); });
-    const pick = anniv || ms[0];
+    const dateText = function (d) { return new Date(d).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }); };
+
+    if (todays.length) {
+      const top = todays[0];
+      f.card.classList.add("is-anniv");
+      f.body.appendChild(el("p", "hc-cheer", "Happy anniversary!"));
+      f.body.appendChild(el("p", "hc-big", top.label));
+      f.body.appendChild(el("p", "hc-ms-title", top.ms.title || "Milestone"));
+      f.body.appendChild(el("p", "hc-sub", "Since " + dateText(top.ms.at) + (todays.length > 1 ? " · and " + (todays.length - 1) + " more today" : "")));
+      const again = el("button", "hub-link", "Celebrate again");
+      again.type = "button";
+      again.addEventListener("click", function () { D.confettiFrom(f.card, { count: 80, stagger: 0.4 }); });
+      f.body.appendChild(again);
+      const covered = f.card.classList.contains("is-covered");
+      if (!cheered && !covered) {
+        cheered = true;
+        const fresh = todays.filter(function (o) { return D.firstTimeToday(T.store, o); }).length > 0;
+        if (fresh) setTimeout(function () { if (f.card.isConnected) D.confettiFrom(f.card, { count: 80, stagger: 0.4 }); }, 600);
+      }
+      return f.card;
+    }
+
+    // Show the day hormones started if there is one, otherwise the first milestone.
+    const pick = D.hrtMilestone(ms) || ms[0];
     f.body.appendChild(el("p", "hc-big", sinceText(pick.at)));
     f.body.appendChild(el("p", "hc-ms-title", pick.title || "Milestone"));
-    f.body.appendChild(el("p", "hc-sub", (daysSince(pick.at) >= 0 ? "Since " : "On ") + new Date(pick.at).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" })));
-    if (anniv) { f.card.classList.add("is-anniv"); f.body.appendChild(el("p", "hc-cheer", "Happy anniversary!")); }
+    f.body.appendChild(el("p", "hc-sub", (daysSince(pick.at) >= 0 ? "Since " : "On ") + dateText(pick.at)));
+    const soon = D.upcoming(ms, 45)[0];
+    if (soon) {
+      f.body.appendChild(el("p", "hc-soon", soon.label + (soon.ms === pick ? "" : " · " + (soon.ms.title || "Milestone")) + " " + D.inText(soon.inDays)));
+    }
     return f.card;
   }
 

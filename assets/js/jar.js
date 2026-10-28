@@ -214,66 +214,9 @@ Tendril.ready(function () {
 
   /* A soft pink, white and blue spray from the jar's mouth. */
   function confetti() {
-    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const jar = $("jar-svg").getBoundingClientRect();
     const visible = jar.width > 0 && jar.bottom > 0 && jar.top < innerHeight;
-    const ox = visible ? jar.left + jar.width / 2 : innerWidth / 2;
-    const oy = visible ? jar.top + jar.height * 0.14 : innerHeight * 0.4;
-
-    const cv = document.createElement("canvas");
-    const dpr = Math.min(2, window.devicePixelRatio || 1);
-    cv.width = innerWidth * dpr; cv.height = innerHeight * dpr;
-    cv.setAttribute("aria-hidden", "true");
-    cv.style.cssText = "position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:60";
-    document.body.appendChild(cv);
-    const g = cv.getContext("2d");
-    g.scale(dpr, dpr);
-
-    const COLORS = ["#FF4FA3", "#FFB3D6", "#FFFFFF", "#FFFFFF", "#3DA9FC", "#A8DBFF"];
-    const scale = Math.min(1, innerWidth / 520) * 0.5 + 0.5;
-    const bits = [];
-    for (let i = 0; i < 64; i++) {
-      const ang = -Math.PI / 2 + (Math.random() - 0.5) * 1.5;      // a fan pointing up
-      const sp = (260 + Math.random() * 300) * scale;
-      bits.push({
-        x: ox + (Math.random() - 0.5) * 30, y: oy,
-        vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
-        rot: Math.random() * 6.3, vr: (Math.random() - 0.5) * 10,
-        w: 4 + Math.random() * 4, h: 7 + Math.random() * 6,
-        round: Math.random() < 0.3,
-        color: COLORS[(Math.random() * COLORS.length) | 0],
-        life: 1.3 + Math.random() * 0.8,
-        wob: Math.random() * 6.3
-      });
-    }
-
-    let last = performance.now(), age = 0;
-    function frame(now) {
-      const dt = Math.min(0.05, (now - last) / 1000);
-      last = now; age += dt;
-      g.clearRect(0, 0, innerWidth, innerHeight);
-      let alive = 0;
-      bits.forEach(function (b) {
-        if (age > b.life) return;
-        alive++;
-        b.vx *= Math.exp(-2.2 * dt);
-        b.vy = b.vy * Math.exp(-2.2 * dt) + 520 * dt;              // drag, then gravity
-        b.x += (b.vx + Math.sin(age * 5 + b.wob) * 22) * dt;       // a little flutter
-        b.y += b.vy * dt;
-        b.rot += b.vr * dt;
-        const fade = Math.min(1, (b.life - age) / 0.45);
-        g.globalAlpha = Math.max(0, fade) * 0.9;
-        g.fillStyle = b.color;
-        g.save();
-        g.translate(b.x, b.y);
-        g.rotate(b.rot);
-        if (b.round) { g.beginPath(); g.arc(0, 0, b.w * 0.55, 0, 6.283); g.fill(); }
-        else g.fillRect(-b.w / 2, -b.h / 2 * Math.abs(Math.cos(b.rot * 1.3)), b.w, b.h * Math.abs(Math.cos(b.rot * 1.3)) + 1);
-        g.restore();
-      });
-      if (alive) requestAnimationFrame(frame); else cv.remove();
-    }
-    requestAnimationFrame(frame);
+    window.TendrilDays.confetti(visible ? jar.left + jar.width / 2 : null, visible ? jar.top + jar.height * 0.14 : null);
   }
 
   $("note-delete").addEventListener("click", function () {

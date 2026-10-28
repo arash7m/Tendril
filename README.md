@@ -9,7 +9,7 @@ Everything runs in the browser and is stored on the user's own device. There is 
 | Page | What it does |
 |---|---|
 | `index.html` | Welcome page for first-time visitors; once anything is saved it becomes the hub (`assets/js/hub.js`): greeting, doses due with one-tap logging, next appointment, milestone, mood check-in, voice week, latest photo, labs, jar, all tools. Cards can be hidden and reordered; discreet mode covers sensitive cards until tapped |
-| `timeline.html` | Journal entries with mood and tags, milestones with day counts, private photo diary with in-app camera (pose outline, timer), photo viewer and before/after compare; voice sessions appear in the feed |
+| `timeline.html` | Journal entries with mood and tags, milestones with day counts and anniversaries (1/3/6/9/18 months, 100/500/1,000 days, every year; a celebration with confetti on the day, a "Coming up" list, yearly calendar reminders, a suggestion to mark the first logged dose as starting hormones), private photo diary with in-app camera (pose outline, timer), photo viewer and before/after compare; voice sessions appear in the feed |
 | `voice.html` | Pitch trainer: live graph, target range, read-along panel (prompts, passages, your own text, scrolls while you speak) with a full-screen focus view, recording analysis, session history with audio playback |
 | `games.html` | Voice games using the pitch target: Glide (steer through gates), Grow (vine grows while in range, 45 s), Echo (copy intonation shapes, scored on shape) |
 | `resonance.html` | Resonance trainer: live brighter/darker meter from formants (LPC, `assets/js/formants.js`) measured on one vowel at a time (“ee” or “ah”, held or in words), target zones, guided exercises, session history. Mixed sentences aren't scored: F3 can't be tracked reliably across vowel changes. Sessions save audio for playback like the pitch page |
@@ -33,6 +33,7 @@ assets/js/pitch.js       YIN pitch detection
 assets/js/bodymap.js     body map picker and site rotation
 assets/js/readalong.js   read-along text panel for the pitch page
 assets/js/voice-engine.js microphone + pitch readings for the games
+assets/js/days.js        milestone anniversaries, confetti, yearly .ics
 assets/js/trace.js       one continuous line for the voice graphs: follows the voice, rests on a floor in silence
 assets/js/<page>.js      one script per page
 ```
@@ -67,6 +68,7 @@ Everything is stored in the browser's localStorage under keys starting with `ten
 | `jar.notes`, `jar.seen` | Euphoria jar moments, when each was last shown |
 | `comingout.drafts` | Saved coming-out drafts |
 | `timeline.entries` | Journal entries and milestones (photo ids only) |
+| `days.celebrated`, `days.hrtTipHidden` | Which anniversaries already got confetti today; whether the "started hormones" suggestion was dismissed |
 
 Photos and voice recordings are stored in IndexedDB (database `tendril`, stores `photos` and `recordings`). Each photo is saved re-encoded through a canvas, which strips location and camera metadata, as a full image (`id`) and a thumbnail (`id:thumb`). Backups can include them.
 

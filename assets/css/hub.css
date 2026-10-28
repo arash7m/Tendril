@@ -183,3 +183,4 @@ html:not(.hub-mode) .about > summary { display: none; }
 html:not(.hub-mode) .about-body { padding-top: 0; }
 
 @media (prefers-reduced-motion: reduce) { .hub-orbs span { animation: none; } }
+.hc-soon { font-size: 0.85rem; font-weight: 800; color: var(--pink-text); }

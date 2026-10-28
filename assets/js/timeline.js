@@ -4,7 +4,7 @@
 Tendril.ready(function () {
   "use strict";
 
-  const T = window.Tendril;
+  const T = window.Tendril, D = window.TendrilDays;
   const $ = function (id) { return document.getElementById(id); };
 
   const TAGS = ["euphoria", "dysphoria", "voice", "body", "skin", "energy", "social", "health"];
@@ -107,9 +107,8 @@ Tendril.ready(function () {
     const years = Math.floor(n / 365.25), rest = Math.floor((n - years * 365.25) / 30.44);
     return years + (years === 1 ? " year" : " years") + (rest ? ", " + rest + (rest === 1 ? " month" : " months") : "");
   }
-  function isAnniversary(d) {
-    const x = new Date(d), now = new Date();
-    return x.getDate() === now.getDate() && x.getMonth() === now.getMonth() && x.getFullYear() < now.getFullYear();
+  function shortDate(d, withYear) {
+    return new Date(d).toLocaleDateString(undefined, withYear ? { day: "numeric", month: "long", year: "numeric" } : { weekday: "short", day: "numeric", month: "short" });
   }
   function monthLabel(d) { return new Date(d).toLocaleDateString(undefined, { month: "long", year: "numeric" }); }
   function timeText(d) {
@@ -251,26 +250,95 @@ Tendril.ready(function () {
   }
 
   function renderMilestones() {
-    const ms = entries.filter(function (e) { return e.kind === "milestone"; })
-      .sort(function (a, b) { return new Date(a.at) - new Date(b.at); });
+    const ms = D.milestones(T.store);
+    const todays = D.today(ms);
     $("milestones").hidden = ms.length === 0;
     const strip = $("ms-strip");
     strip.innerHTML = "";
     ms.forEach(function (e) {
+      const occ = todays.find(function (o) { return o.ms === e; });
+      const nx = occ ? null : D.next(e);
       const d = document.createElement("button");
       d.type = "button";
-      d.className = "ms-card" + (isAnniversary(e.at) ? " is-anniv" : "");
+      d.className = "ms-card" + (occ ? " is-anniv" : "");
       const n = daysSince(e.at);
-      d.innerHTML = '<span class="ms-num"></span><span class="ms-title"></span><span class="ms-sub"></span>';
-      d.querySelector(".ms-num").textContent = sinceText(e.at);
+      d.innerHTML = '<span class="ms-num"></span><span class="ms-title"></span><span class="ms-sub"></span><span class="ms-next" hidden></span>';
+      d.querySelector(".ms-num").textContent = occ ? occ.label + " today" : sinceText(e.at);
       d.querySelector(".ms-title").textContent = e.title || "Milestone";
-      d.querySelector(".ms-sub").textContent = isAnniversary(e.at)
-        ? "Anniversary today"
-        : (n >= 0 ? "since " : "on ") + new Date(e.at).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+      d.querySelector(".ms-sub").textContent = (n >= 0 ? "since " : "on ") + shortDate(e.at, true);
+      if (nx && n >= 0) {
+        const t = d.querySelector(".ms-next");
+        t.hidden = false;
+        t.textContent = nx.label + " " + D.inText(nx.inDays);
+      }
       d.addEventListener("click", function () { openEntry(e); });
       strip.appendChild(d);
     });
+
+    // Coming up: the next few celebrations across all milestones
+    const coming = D.upcoming(ms, 400).slice(0, 3);
+    $("coming").hidden = !coming.length;
+    const list = $("coming-list");
+    list.innerHTML = "";
+    coming.forEach(function (o) {
+      const li = document.createElement("li");
+      li.innerHTML = '<span class="cm-when"></span><span class="cm-what"><strong></strong> <span></span></span>';
+      li.querySelector(".cm-when").textContent = o.inDays <= 31 ? D.inText(o.inDays) : shortDate(o.date, o.inDays > 300);
+      li.querySelector("strong").textContent = o.label;
+      li.querySelector(".cm-what span").textContent = "· " + (o.ms.title || "Milestone");
+      if (o.inDays <= 31) li.title = shortDate(o.date);
+      list.appendChild(li);
+    });
+
+    renderCelebration(todays);
+    renderSuggestion(ms);
   }
+
+  let celebrated = false;
+  function renderCelebration(todays) {
+    const box = $("celebrate");
+    box.hidden = !todays.length;
+    if (!todays.length) return;
+    const top = todays[0];
+    $("cel-title").textContent = top.label;
+    $("cel-what").textContent = top.ms.title || "Milestone";
+    const others = todays.slice(1).map(function (o) { return o.label + " · " + (o.ms.title || "Milestone"); });
+    $("cel-sub").textContent = "Since " + shortDate(top.ms.at, true) + ". Look how far you’ve come." + (others.length ? " Also today: " + others.join(", ") + "." : "");
+    if (!celebrated) {
+      celebrated = true;
+      const fresh = todays.filter(function (o) { return D.firstTimeToday(T.store, o); }).length > 0;
+      if (fresh) setTimeout(function () { D.confettiFrom(box, { count: 90, stagger: 0.5 }); }, 350);
+    }
+  }
+  $("cel-again").addEventListener("click", function () { D.confettiFrom($("celebrate"), { count: 90, stagger: 0.4 }); });
+  $("cel-write").addEventListener("click", function () {
+    const top = D.today(D.milestones(T.store))[0];
+    openEntry(null);
+    if (top) {
+      $("entry-text").value = top.label + " since " + (top.ms.title || "this milestone").replace(/^./, function (c) { return c.toLowerCase(); }) + ". ";
+      renderTagPills(["euphoria"]);
+    }
+  });
+
+  // Suggest marking the day hormones started, from the first logged dose.
+  function renderSuggestion(ms) {
+    const first = D.firstDose(T.store);
+    const show = !!first && !D.hrtMilestone(ms) && !T.store.get("days.hrtTipHidden", false);
+    $("ms-suggest").hidden = !show;
+    if (!show) return;
+    $("ms-suggest-text").textContent = "Your first logged dose was on " + shortDate(first.at, true) +
+      ". Want to mark the day you started hormones? You can change the date if you started earlier.";
+  }
+  $("ms-suggest-yes").addEventListener("click", function () {
+    const first = D.firstDose(T.store);
+    openEntry(null, { kind: "milestone" });
+    $("ms-title").value = "Started hormones";
+    if (first) $("entry-when").value = localInputValue(first.at);
+  });
+  $("ms-suggest-no").addEventListener("click", function () {
+    T.store.set("days.hrtTipHidden", true);
+    $("ms-suggest").hidden = true;
+  });
 
   // ---------------- Entry editor ----------------
   let editing = null;      // the entry being edited, or null for new
@@ -325,6 +393,8 @@ Tendril.ready(function () {
   function setKind(kind) {
     document.querySelectorAll('#entry-form input[name="kind"]').forEach(function (r) { r.checked = r.value === kind; });
     $("ms-title-field").hidden = kind !== "milestone";
+    $("ms-presets").hidden = kind !== "milestone";
+    $("ms-remind").hidden = !(kind === "milestone" && editing && editing.kind === "milestone");
     $("entry-text").placeholder = kind === "milestone" ? "Anything you want to remember about it" : "How are you feeling today?";
   }
 
@@ -334,7 +404,7 @@ Tendril.ready(function () {
     addedThisTime = [];
     removedThisTime = [];
     draftPhotos = e ? (e.photos || []).slice() : [];
-    $("entry-title").textContent = e ? (e.kind === "milestone" ? "Edit milestone" : "Edit entry") : "New entry";
+    $("entry-title").textContent = e ? (e.kind === "milestone" ? "Edit milestone" : "Edit entry") : (opts && opts.kind === "milestone" ? "New milestone" : "New entry");
     setKind(e ? e.kind || "journal" : (opts && opts.kind) || "journal");
     $("ms-title").value = e ? e.title || "" : "";
     $("entry-when").value = localInputValue(e ? e.at : new Date());
@@ -352,6 +422,23 @@ Tendril.ready(function () {
 
   document.querySelectorAll('#entry-form input[name="kind"]').forEach(function (r) {
     r.addEventListener("change", function () { setKind(r.value); });
+  });
+  $("ms-presets").addEventListener("click", function (ev) {
+    const b = ev.target.closest("button");
+    if (!b) return;
+    $("ms-title").value = b.textContent;
+    if (b.textContent === "Started hormones" && !editing) {
+      const first = D.firstDose(T.store);
+      if (first && new Date($("entry-when").value) > new Date(first.at)) {
+        $("entry-when").value = localInputValue(first.at);
+        T.toast("Set to your first logged dose. Change it if you started earlier");
+      }
+    }
+  });
+  $("ms-ics").addEventListener("click", function () {
+    if (!editing) return;
+    const name = (editing.title || "Milestone") + " anniversary";
+    T.download("milestone.ics", D.ics(editing, name), "text/calendar");
   });
 
   // Tapping a selected mood again clears it.
@@ -394,6 +481,7 @@ Tendril.ready(function () {
     $("entry-sheet").close();
     render();
     T.toast(editing ? "Saved" : (kind === "milestone" ? "Milestone added" : "Entry saved"));
+    if (!editing && kind === "milestone") setTimeout(function () { D.confettiFrom($("ms-strip"), { count: 50 }); }, 200);
   });
 
   // Closing without saving drops any photos taken during this edit.
@@ -669,6 +757,7 @@ Tendril.ready(function () {
     openCamera(function (id) { openEntry(null, { photoId: id }); });
   }
   $("new-entry").addEventListener("click", function () { openEntry(null); });
+  $("new-ms").addEventListener("click", function () { openEntry(null, { kind: "milestone" }); });
   $("new-photo").addEventListener("click", newPhotoEntry);
   $("empty-entry").addEventListener("click", function () { openEntry(null); });
   $("empty-photo").addEventListener("click", newPhotoEntry);

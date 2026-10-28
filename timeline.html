@@ -51,12 +51,36 @@
   <div class="tl-actions">
     <button class="btn btn-primary" type="button" id="new-entry">New entry</button>
     <button class="btn btn-pink" type="button" id="new-photo">Take a photo</button>
+    <button class="btn btn-soft" type="button" id="new-ms">Add a milestone</button>
     <button class="btn btn-soft" type="button" id="open-compare" hidden>Compare photos</button>
+  </div>
+
+  <section class="celebrate" id="celebrate" aria-labelledby="cel-title" hidden>
+    <p class="cel-eyebrow">Today is a big day</p>
+    <h2 class="cel-title" id="cel-title"></h2>
+    <p class="cel-what" id="cel-what"></p>
+    <p class="cel-sub" id="cel-sub"></p>
+    <div class="row">
+      <button class="btn btn-pink btn-small" type="button" id="cel-again">Celebrate again</button>
+      <button class="btn btn-soft btn-small" type="button" id="cel-write">Write about today</button>
+    </div>
+  </section>
+
+  <div class="ms-suggest" id="ms-suggest" hidden>
+    <p id="ms-suggest-text"></p>
+    <div class="row">
+      <button class="btn btn-primary btn-small" type="button" id="ms-suggest-yes">Mark it</button>
+      <button class="btn btn-soft btn-small" type="button" id="ms-suggest-no">Not now</button>
+    </div>
   </div>
 
   <section class="milestones" id="milestones" aria-labelledby="ms-h" hidden>
     <h2 id="ms-h" class="visually-hidden">Milestones</h2>
     <div class="ms-strip" id="ms-strip"></div>
+    <div class="coming" id="coming" hidden>
+      <h3 class="coming-h">Coming up</h3>
+      <ul class="coming-list" id="coming-list"></ul>
+    </div>
   </section>
 
   <div class="filters pills" role="group" aria-label="Show" id="filters">
@@ -97,6 +121,14 @@
       <span>Milestone</span>
       <input class="input" type="text" id="ms-title" maxlength="60" placeholder="Started hormones">
     </label>
+    <div class="ms-presets" id="ms-presets" hidden>
+      <button type="button" class="chip">Started hormones</button>
+      <button type="button" class="chip">Came out</button>
+      <button type="button" class="chip">Started using my name</button>
+      <button type="button" class="chip">Legal name change</button>
+      <button type="button" class="chip">Surgery</button>
+      <button type="button" class="chip">Started voice training</button>
+    </div>
     <label class="field">
       <span>When</span>
       <input class="input" type="datetime-local" id="entry-when" required>
@@ -135,6 +167,10 @@
         <button class="btn btn-soft" type="button" data-close>Cancel</button>
       </div>
       <button class="btn btn-soft btn-small" type="button" id="entry-delete" hidden>Delete entry</button>
+    </div>
+    <div class="ms-remind" id="ms-remind" hidden>
+      <button class="btn btn-soft btn-small" type="button" id="ms-ics">Yearly calendar reminder</button>
+      <p class="small muted">Adds a yearly event to your phone's calendar. Calendar apps aren't private like Tendril, so you can change the event's name to something only you understand.</p>
     </div>
   </form>
 </dialog>
@@ -221,6 +257,7 @@
 </footer>
 
 <script src="assets/js/common.js"></script>
+<script src="assets/js/days.js"></script>
 <script src="assets/js/timeline.js"></script>
 </body>
 </html>

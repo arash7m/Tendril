@@ -189,3 +189,45 @@ dialog.camera::backdrop, dialog.viewer::backdrop { background: #000; }
 .pick { flex: none; appearance: none; padding: 0; cursor: pointer; width: 54px; height: 72px; border-radius: 8px; overflow: hidden; border: 3px solid transparent; background: var(--surface-2); }
 .pick img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .pick.is-on { border-color: var(--secondary); }
+
+/* ---------- Anniversaries ---------- */
+.ms-next { font-size: 0.78rem; font-weight: 800; color: var(--pink-text); margin-top: 4px; }
+.ms-card.is-anniv .ms-num { color: var(--pink-text); }
+
+.coming { display: grid; gap: 6px; margin-top: 12px; }
+.coming-h { font-size: 0.78rem; font-family: var(--font-mono); font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.coming-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.coming-list li { display: flex; gap: 12px; align-items: baseline; background: var(--surface); border-radius: var(--r-sm); padding: 9px 14px; font-size: 0.92rem; }
+.cm-when { flex: none; min-width: 6.5em; font-weight: 800; color: var(--link); font-size: 0.85rem; }
+.cm-what { min-width: 0; overflow-wrap: anywhere; }
+.cm-what span { color: var(--muted); }
+
+.celebrate {
+  position: relative; overflow: hidden;
+  display: grid; gap: 6px; justify-items: start;
+  padding: 22px 22px 20px; border-radius: var(--r-lg);
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(255, 79, 163, 0.30), transparent 60%),
+    radial-gradient(120% 140% at 100% 100%, rgba(61, 169, 252, 0.28), transparent 60%),
+    var(--surface);
+  outline: 2px solid var(--secondary);
+  box-shadow: 0 0 40px rgba(255, 79, 163, 0.18);
+}
+.cel-eyebrow { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pink-text); }
+.cel-title { font-size: clamp(2.2rem, 9vw, 3.2rem); line-height: 1; color: var(--deep); }
+.cel-what { font-weight: 800; font-size: 1.15rem; overflow-wrap: anywhere; }
+.cel-sub { color: var(--muted); font-size: 0.92rem; max-width: 52ch; }
+.celebrate .row { margin-top: 8px; }
+
+.ms-suggest {
+  display: grid; gap: 10px; padding: 14px 16px; border-radius: var(--r-md);
+  background: var(--surface); border: 2px dashed var(--line);
+}
+.ms-suggest p { font-size: 0.95rem; }
+
+.ms-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-top: -6px; }
+.ms-presets .chip { padding: 7px 12px; appearance: none; border: 0; cursor: pointer; font: inherit; font-size: 0.8rem; font-weight: 700; background: var(--surface-2); color: var(--ink); }
+.ms-presets .chip:hover, .ms-presets .chip:focus-visible { background: var(--primary-light); }
+.ms-presets[hidden], .ms-remind[hidden] { display: none; }
+.ms-remind { display: grid; gap: 6px; border-top: 2px solid var(--line); padding-top: 12px; }
+.ms-remind .btn { justify-self: start; }
