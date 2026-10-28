@@ -64,6 +64,11 @@
         <canvas id="graph" aria-label="Pitch over time, with your target range shaded" role="img"></canvas>
       </div>
       <p class="session-range small muted" id="session-range" hidden></p>
+      <div class="player" id="player" hidden>
+        <audio id="player-audio" controls preload="metadata" hidden></audio>
+        <p class="small muted" id="player-none" hidden></p>
+        <button class="btn btn-soft btn-small" type="button" id="delete-session">Delete session</button>
+      </div>
       <p class="legend"><span class="sw sw-in"></span>Inside your target <span class="sw sw-out"></span>Outside it (faded) <span class="sw sw-band"></span>Your target zone</p>
 
       <div class="controls">
@@ -75,6 +80,10 @@
         <label class="btn btn-soft" for="file">Analyze a recording</label>
         <input type="file" id="file" accept="audio/*" class="visually-hidden">
       </div>
+      <label class="keep-audio" for="keep-audio">
+        <input type="checkbox" id="keep-audio" checked>
+        <span>Save the audio so I can listen back <span class="muted">(kept only on this device)</span></span>
+      </label>
       <p class="notice" id="notice" role="alert" hidden></p>
 
       <dl class="stats">

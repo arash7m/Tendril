@@ -21,6 +21,8 @@
 
   let target = T.store.get("voice.target", { preset: "lighter", low: 165, high: 255 });
   let sessionTarget = null; // set while viewing a past session
+  let keepAudio = T.store.get("voice.keepAudio", true);
+  let recorder = null, chunks = [];
   function activeTarget() { return sessionTarget || target; }
 
   // ---------------- Prompts ----------------
@@ -156,6 +158,17 @@
       prev = p;
     }
 
+    // Playhead while listening back
+    if (mode === "session" && playerUrl && !fixingDuration && player.currentTime > 0) {
+      const px = x(Math.min(player.currentTime, t1));
+      g.strokeStyle = cssVar("--deep");
+      g.lineWidth = 2;
+      g.beginPath();
+      g.moveTo(px, padT);
+      g.lineTo(px, padT + plotH);
+      g.stroke();
+    }
+
     // Endpoint dot while live
     if (mode === "live") {
       for (let i = points.length - 1; i >= 0 && i > points.length - 8; i--) {
@@ -255,6 +268,7 @@
     analyser.fftSize = 2048;
     source.connect(analyser);
     audio = { ctx: ctx, stream: stream, source: source, analyser: analyser, buf: new Float32Array(analyser.fftSize) };
+    startRecorder(stream);
 
     mode = "live";
     leaveSession();
@@ -286,8 +300,56 @@
     draw();
   }
 
+  function pickMime() {
+    if (!window.MediaRecorder || !MediaRecorder.isTypeSupported) return "";
+    const types = ["audio/webm;codecs=opus", "audio/mp4", "audio/webm", "audio/ogg;codecs=opus"];
+    for (let i = 0; i < types.length; i++) if (MediaRecorder.isTypeSupported(types[i])) return types[i];
+    return "";
+  }
+
+  function startRecorder(stream) {
+    recorder = null;
+    chunks = [];
+    if (!keepAudio || !window.MediaRecorder) return;
+    try {
+      const mime = pickMime();
+      const opts = { audioBitsPerSecond: 32000 };
+      if (mime) opts.mimeType = mime;
+      recorder = new MediaRecorder(stream, opts);
+      recorder.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+      recorder.start(1000); // hand over audio every second, so little is lost if the app closes
+    } catch (e) {
+      recorder = null;
+    }
+  }
+
+  /** Stop the recorder and store its audio under the session id (or discard it). */
+  function finishRecorder(entry) {
+    const rec = recorder, got = chunks;
+    recorder = null;
+    chunks = [];
+    if (!rec) return;
+    const store = function () {
+      if (!entry) return;
+      const blob = new Blob(got, { type: rec.mimeType || "audio/webm" });
+      if (!blob.size) return;
+      T.blobs.put(entry.id, blob).then(function () {
+        markAudio(entry.id);
+        if (openId === entry.id) loadPlayer(entry.id);
+      }).catch(function () { T.toast("The graph was saved, but the audio couldn’t be stored on this device"); });
+    };
+    if (rec.state !== "inactive") {
+      rec.onstop = store;
+      try { rec.stop(); } catch (e) { store(); }
+    } else {
+      store();
+    }
+  }
+
   function stop() {
     cancelAnimationFrame(rafId);
+    const entry = saveSession("Live practice");
+    finishRecorder(entry);
     if (audio) {
       audio.stream.getTracks().forEach(function (tr) { tr.stop(); });
       audio.ctx.close();
@@ -295,13 +357,18 @@
     }
     startBtn.hidden = false;
     stopBtn.hidden = true;
-    renderStats();
-    saveSession("Live practice");
-    mode = "recording-done";
-    graphLabel.textContent = "Your last session";
-    setReadout(null);
-    statusEl.textContent = "Stopped";
-    draw();
+    if (entry) {
+      openSession(entry, { scroll: false });
+      T.toast("Session saved");
+    } else {
+      mode = "recording-done";
+      graphLabel.textContent = "Not saved: too short";
+      setReadout(null);
+      statusEl.textContent = "Stopped";
+      renderStats();
+      draw();
+      T.toast("Too short to save. Talk for a few more seconds next time.");
+    }
   }
 
   // ---------------- Analyze an uploaded recording ----------------
@@ -342,7 +409,17 @@
       else showNotice("I couldn’t find enough voiced sound in that recording. Try one with clear speech and little background noise.");
       renderStats();
       draw();
-      saveSession("Recording");
+      const entry = saveSession("Recording");
+      if (entry) {
+        if (keepAudio && file.size < 30 * 1024 * 1024) {
+          T.blobs.put(entry.id, file).then(function () {
+            markAudio(entry.id);
+            if (openId === entry.id) loadPlayer(entry.id);
+          }).catch(function () { /* graph is still saved */ });
+        }
+        openSession(entry, { scroll: false });
+        T.toast("Recording saved");
+      }
     } catch (err) {
       showNotice("That file couldn’t be read as audio. Try an .m4a, .mp3 or .wav voice memo.");
       setReadout(null);
@@ -376,7 +453,7 @@
 
   function saveSession(kind) {
     const s = computeStats(points);
-    if (!s || s.voicedSec < 3) return;
+    if (!s || s.voicedSec < 1) return null;
     const history = T.store.get("voice.history", []);
     const entry = {
       id: T.uid(),
@@ -396,7 +473,16 @@
       if (withTrace.length) delete trimmed[withTrace[withTrace.length - 1]].trace;
       else trimmed = trimmed.slice(0, -1);
     }
-    openId = entry.id;
+    renderHistory();
+    return entry;
+  }
+
+  function markAudio(id) {
+    const history = T.store.get("voice.history", []);
+    const h = history.find(function (x) { return x.id === id; });
+    if (!h) return;
+    h.hasAudio = true;
+    T.store.set("voice.history", history);
     renderHistory();
   }
 
@@ -437,7 +523,7 @@
     });
   }
 
-  function openSession(h) {
+  function openSession(h, opts) {
     if (!h.trace) {
       T.toast("This session was saved before graphs were kept, so only its numbers exist");
       return;
@@ -460,12 +546,105 @@
     renderStats();
     draw();
     renderHistory();
-    document.querySelector(".monitor").scrollIntoView({ behavior: "smooth", block: "start" });
+    $("player").hidden = false;
+    loadPlayer(h.id);
+    if (!opts || opts.scroll !== false) document.querySelector(".monitor").scrollIntoView({ behavior: "smooth", block: "start" });
   }
+
+  // ---------------- Playback ----------------
+  const player = $("player-audio");
+  let playerUrl = null, playRaf = 0, fixingDuration = false;
+
+  function loadPlayer(id) {
+    unloadPlayer();
+    $("player-none").hidden = true;
+    T.blobs.get(id).then(function (blob) {
+      if (openId !== id) return;
+      if (!blob) {
+        player.hidden = true;
+        $("player-none").hidden = false;
+        $("player-none").textContent = keepAudio
+          ? "No audio was saved for this session, only its graph."
+          : "Audio saving is off, so only the graph was kept.";
+        return;
+      }
+      playerUrl = URL.createObjectURL(blob);
+      player.src = playerUrl;
+      player.hidden = false;
+      // Recordings made in Chrome don't state their length, so the player shows
+      // no seek bar. Jumping far ahead once makes the browser work it out.
+      player.addEventListener("loadedmetadata", function fixDuration() {
+        player.removeEventListener("loadedmetadata", fixDuration);
+        if (player.duration !== Infinity) return;
+        fixingDuration = true;
+        player.currentTime = 1e101;
+        player.addEventListener("timeupdate", function back() {
+          player.removeEventListener("timeupdate", back);
+          player.currentTime = 0;
+          fixingDuration = false;
+          draw();
+        });
+      });
+    }).catch(function () {
+      player.hidden = true;
+      $("player-none").hidden = false;
+      $("player-none").textContent = "Audio can’t be played in this browser.";
+    });
+  }
+
+  function unloadPlayer() {
+    cancelAnimationFrame(playRaf);
+    try { player.pause(); } catch (e) { /* ignore */ }
+    player.removeAttribute("src");
+    player.load();
+    player.hidden = true;
+    if (playerUrl) { URL.revokeObjectURL(playerUrl); playerUrl = null; }
+  }
+
+  function playheadLoop() {
+    draw();
+    if (!player.paused) playRaf = requestAnimationFrame(playheadLoop);
+  }
+  player.addEventListener("play", function () { cancelAnimationFrame(playRaf); playheadLoop(); });
+  player.addEventListener("seeked", draw);
+  player.addEventListener("pause", draw);
+  player.addEventListener("ended", draw);
+
+  const delBtn = $("delete-session");
+  delBtn.addEventListener("click", function () {
+    if (!delBtn.dataset.armed) {
+      delBtn.dataset.armed = "1";
+      delBtn.textContent = "Tap again to delete";
+      delBtn.classList.add("danger");
+      setTimeout(function () {
+        delete delBtn.dataset.armed;
+        delBtn.textContent = "Delete session";
+        delBtn.classList.remove("danger");
+      }, 3000);
+      return;
+    }
+    const id = openId;
+    T.store.set("voice.history", T.store.get("voice.history", []).filter(function (h) { return h.id !== id; }));
+    T.blobs.del(id).catch(function () { /* nothing stored */ });
+    delete delBtn.dataset.armed;
+    delBtn.textContent = "Delete session";
+    delBtn.classList.remove("danger");
+    leaveSession();
+    mode = "recording-done";
+    points = [];
+    graphLabel.textContent = "Session deleted";
+    timerEl.textContent = "0:00";
+    setReadout(null);
+    renderStats();
+    draw();
+    T.toast("Session deleted");
+  });
 
   function leaveSession() {
     sessionTarget = null;
     openId = null;
+    unloadPlayer();
+    $("player").hidden = true;
     $("session-range").hidden = true;
     renderHistory();
   }
@@ -544,9 +723,24 @@
   $("confirm-no").addEventListener("click", function () { confirmBox.hidden = true; clearBtn.hidden = false; });
   $("confirm-yes").addEventListener("click", function () {
     T.store.remove("voice.history");
+    T.blobs.clear().catch(function () { /* nothing stored */ });
+    if (openId) leaveSession();
     confirmBox.hidden = true;
     renderHistory();
   });
+
+  const keepBox = $("keep-audio");
+  keepBox.checked = keepAudio;
+  keepBox.addEventListener("change", function () {
+    keepAudio = keepBox.checked;
+    T.store.set("voice.keepAudio", keepAudio);
+  });
+
+  // Leaving the page or switching apps mid-session saves it instead of losing it.
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "hidden" && audio) stop();
+  });
+  window.addEventListener("pagehide", function () { if (audio) stop(); });
 
   window.addEventListener("resize", resizeCanvas);
   if (window.matchMedia) {

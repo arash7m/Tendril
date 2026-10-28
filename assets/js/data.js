@@ -50,8 +50,16 @@
 
   function renderStored() {
     $("storage-off").hidden = T.store.available();
-    renderList($("stored"), describe(currentData()), "Nothing saved yet.");
+    const rows = describe(currentData());
+    renderList($("stored"), rows, "Nothing saved yet.");
+    // Voice recordings live in IndexedDB; count them separately.
+    Promise.all([T.blobs.count(), T.blobs.totalBytes()]).then(function (r) {
+      if (!r[0]) return;
+      rows.push(["Voice recordings", r[0] + plural(r[0], " recording", " recordings") + ", " + mb(r[1])]);
+      renderList($("stored"), rows, "Nothing saved yet.");
+    }).catch(function () { /* none */ });
   }
+  function mb(bytes) { return bytes < 1048576 ? Math.max(1, Math.round(bytes / 1024)) + " KB" : (bytes / 1048576).toFixed(1) + " MB"; }
 
   // ---------------- Crypto helpers ----------------
   const enc = new TextEncoder(), dec = new TextDecoder();
@@ -174,6 +182,7 @@
   $("wipe-no").addEventListener("click", function () { $("wipe").hidden = false; $("wipe-confirm").hidden = true; });
   $("wipe-yes").addEventListener("click", function () {
     T.store.keys().forEach(function (k) { T.store.remove(k); });
+    T.blobs.clear().catch(function () { /* nothing stored */ });
     $("wipe").hidden = false;
     $("wipe-confirm").hidden = true;
     renderStored();

@@ -168,7 +168,49 @@
     });
   }
 
+  // ---------------- Larger files (voice recordings) ----------------
+  // localStorage is too small for audio, so recordings live in IndexedDB,
+  // still only on this device. Keys are voice session ids.
+  const blobs = (function () {
+    let dbp = null;
+    function db() {
+      if (dbp) return dbp;
+      dbp = new Promise(function (resolve, reject) {
+        if (!global.indexedDB) { reject(new Error("no-idb")); return; }
+        const req = indexedDB.open("tendril", 1);
+        req.onupgradeneeded = function () { req.result.createObjectStore("recordings"); };
+        req.onsuccess = function () { resolve(req.result); };
+        req.onerror = function () { reject(req.error); };
+      });
+      dbp.catch(function () { dbp = null; });
+      return dbp;
+    }
+    function run(mode, fn) {
+      return db().then(function (d) {
+        return new Promise(function (resolve, reject) {
+          const tx = d.transaction("recordings", mode);
+          const req = fn(tx.objectStore("recordings"));
+          tx.oncomplete = function () { resolve(req ? req.result : undefined); };
+          tx.onerror = tx.onabort = function () { reject(tx.error); };
+        });
+      });
+    }
+    return {
+      put: function (id, blob) { return run("readwrite", function (s) { return s.put(blob, id); }); },
+      get: function (id) { return run("readonly", function (s) { return s.get(id); }); },
+      del: function (id) { return run("readwrite", function (s) { return s.delete(id); }); },
+      clear: function () { return run("readwrite", function (s) { return s.clear(); }); },
+      count: function () { return run("readonly", function (s) { return s.count(); }); },
+      totalBytes: function () {
+        return run("readonly", function (s) { return s.getAll(); }).then(function (all) {
+          return (all || []).reduce(function (n, b) { return n + (b && b.size ? b.size : 0); }, 0);
+        });
+      }
+    };
+  })();
+
   global.Tendril = {
+    blobs: blobs,
     isStandalone: isStandalone, promptInstall: promptInstall,
     canPromptInstall: function () { return !!installPrompt; },
     store: store, quickExit: quickExit, uid: uid, download: download, toast: toast,
