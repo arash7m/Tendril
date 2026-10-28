@@ -1,0 +1,65 @@
+/* Voice games */
+
+.games .intro { max-width: 62ch; }
+
+.game-menu { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr)); }
+.game-range { grid-column: 1 / -1; }
+.game-card {
+  appearance: none; border: 0; cursor: pointer; text-align: left; font: inherit; color: var(--ink);
+  display: grid; grid-template-rows: 130px auto; overflow: hidden;
+  border-radius: var(--r-lg); background: var(--surface); box-shadow: var(--shadow);
+  transition: transform .15s ease;
+}
+.game-card:hover { transform: translateY(-3px); }
+.game-card:active { transform: translateY(0); }
+.gc-body { display: grid; gap: 6px; padding: 14px 18px 18px; }
+.gc-title { font-family: var(--font-display); font-weight: 600; font-size: 1.35rem; color: var(--deep); }
+.gc-desc { font-size: 0.92rem; color: var(--muted); }
+.gc-best { justify-self: start; font-size: 0.78rem; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: var(--tone-light); color: var(--ink); }
+.gc-best:empty { display: none; }
+
+/* Little animated covers */
+.gc-art { position: relative; display: block; overflow: hidden; background: linear-gradient(160deg, #141a46, #0b0f2a); }
+.gc-glide .gc-orb {
+  position: absolute; left: 22%; top: 50%; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--tone); box-shadow: 0 0 22px var(--tone);
+  animation: gc-bob 2.4s ease-in-out infinite;
+}
+.gc-glide .gc-gate { position: absolute; width: 26px; border-radius: 10px; background: #1A2050; border: 2px solid var(--tone); animation: gc-slide 3s linear infinite; }
+.gc-glide .gc-gate.a { top: -10px; height: 52px; left: 70%; }
+.gc-glide .gc-gate.b { bottom: -10px; height: 46px; left: 70%; }
+@keyframes gc-bob { 0%, 100% { transform: translateY(-26px); } 50% { transform: translateY(14px); } }
+@keyframes gc-slide { from { transform: translateX(120px); } to { transform: translateX(-260px); } }
+.gc-grow .gc-vine { position: absolute; left: 50%; bottom: 0; width: 6px; margin-left: -3px; border-radius: 3px; background: #3DDC97; animation: gc-grow 3.6s ease-in-out infinite; transform-origin: bottom; }
+.gc-grow .gc-leaf { position: absolute; width: 22px; height: 10px; border-radius: 50%; background: #3DDC97; animation: gc-pop 3.6s ease-in-out infinite; }
+.gc-grow .l1 { left: calc(50% - 24px); bottom: 38px; transform: rotate(25deg); }
+.gc-grow .l2 { left: calc(50% + 3px); bottom: 66px; transform: rotate(-25deg); animation-delay: .3s; }
+.gc-grow .gc-bloom { position: absolute; left: calc(50% - 9px); bottom: 98px; width: 18px; height: 18px; border-radius: 50%; background: var(--tone); box-shadow: 0 0 0 5px rgba(255, 224, 102, 0.6) inset; animation: gc-pop 3.6s ease-in-out infinite; animation-delay: .6s; }
+@keyframes gc-grow { 0% { height: 0; } 60%, 100% { height: 110px; } }
+@keyframes gc-pop { 0%, 30% { opacity: 0; scale: 0.3; } 60%, 100% { opacity: 1; scale: 1; } }
+.gc-echo { display: grid; place-items: center; color: var(--tone); }
+.gc-echo svg { width: 70%; height: auto; stroke-dasharray: 260; animation: gc-draw 3s ease-in-out infinite; filter: drop-shadow(0 0 8px var(--tone)); }
+@keyframes gc-draw { from { stroke-dashoffset: 260; } 60%, to { stroke-dashoffset: 0; } }
+
+/* Stage */
+.game-stage { display: grid; gap: 10px; scroll-margin-top: 110px; }
+.game-hud { display: flex; align-items: center; gap: 12px; }
+.hud-title { font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; color: var(--deep); margin-right: auto; }
+.hud-stat { font-weight: 800; font-variant-numeric: tabular-nums; color: var(--muted); }
+.hud-score { color: var(--pink-text); min-width: 4.5em; text-align: right; }
+.game-canvas-box { position: relative; border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow); }
+#game-canvas { display: block; width: 100%; height: min(68dvh, 560px); min-height: 340px; touch-action: none; }
+.game-overlay {
+  position: absolute; inset: 0;
+  display: grid; place-content: center; justify-items: center; gap: 12px;
+  padding: 24px; text-align: center;
+  background: rgba(7, 10, 31, 0.72);
+  backdrop-filter: blur(3px);
+}
+.game-overlay[hidden] { display: none; }
+.go-title { font-size: clamp(1.6rem, 6vw, 2.2rem); }
+.go-text { max-width: 36ch; color: var(--ink); opacity: 0.85; }
+.go-stars { font-size: 1.6rem; color: #ffe066; letter-spacing: 0.1em; }
+.go-actions { justify-content: center; }
+
+@media (prefers-reduced-motion: reduce) { .gc-art * { animation: none !important; } }

@@ -10,7 +10,8 @@ Everything runs in the browser and is stored on the user's own device. There is 
 |---|---|
 | `index.html` | Welcome page for first-time visitors; once anything is saved it becomes the hub (`assets/js/hub.js`): greeting, doses due with one-tap logging, next appointment, milestone, mood check-in, voice week, latest photo, labs, jar, all tools. Cards can be hidden and reordered; discreet mode covers sensitive cards until tapped |
 | `timeline.html` | Journal entries with mood and tags, milestones with day counts, private photo diary with in-app camera (pose outline, timer), photo viewer and before/after compare; voice sessions appear in the feed |
-| `voice.html` | Pitch trainer: live graph, target range, read-aloud prompts, recording analysis, session history with audio playback |
+| `voice.html` | Pitch trainer: live graph, target range, read-along panel (prompts, passages, your own text, scrolls while you speak) with a full-screen focus view, recording analysis, session history with audio playback |
+| `games.html` | Voice games using the pitch target: Glide (steer through gates), Grow (vine grows while in range, 45 s), Echo (copy intonation shapes, scored on shape) |
 | `resonance.html` | Resonance trainer: live brighter/darker meter from formants (LPC, `assets/js/formants.js`) measured on one vowel at a time (“ee” or “ah”, held or in words), target zones, guided exercises, session history. Mixed sentences aren't scored: F3 can't be tracked reliably across vowel changes. Sessions save audio for playback like the pitch page |
 | `doses.html` | Dose tracker: medications, dose log, next due, doses left, injection/patch site rotation on a body map, calendar reminders (.ics) |
 | `labs.html` | Lab results: markers with unit conversion (`assets/js/labs-core.js`), per-marker charts with the doctor's range, test history |
@@ -30,6 +31,8 @@ assets/css/*.css         one stylesheet per page
 assets/js/common.js      storage wrapper, quick exit, toast, download, date helpers
 assets/js/pitch.js       YIN pitch detection
 assets/js/bodymap.js     body map picker and site rotation
+assets/js/readalong.js   read-along text panel for the pitch page
+assets/js/voice-engine.js microphone + pitch readings for the games
 assets/js/trace.js       one continuous line for the voice graphs: follows the voice, rests on a floor in silence
 assets/js/<page>.js      one script per page
 ```
@@ -59,6 +62,8 @@ Everything is stored in the browser's localStorage under keys starting with `ten
 | `visits.list` | Appointments |
 | `hub.settings` | Greeting name, discreet mode, card order and hidden cards |
 | `summary.settings` | Doctor summary choices and questions |
+| `read.settings` | Read-along source, text size, scroll speed, your own text |
+| `games.best`, `games.plays` | Best score per game, list of games played |
 | `jar.notes`, `jar.seen` | Euphoria jar moments, when each was last shown |
 | `comingout.drafts` | Saved coming-out drafts |
 | `timeline.entries` | Journal entries and milestones (photo ids only) |

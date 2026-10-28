@@ -26,21 +26,6 @@ Tendril.ready(function () {
   function activeTarget() { return sessionTarget || target; }
 
   // ---------------- Prompts ----------------
-  const PROMPTS = [
-    { kind: "Warm-up", text: "Hum gently on “mmm” for a few seconds, then let it open into “mmm-ahh”." },
-    { kind: "Warm-up", text: "Do a slow siren: slide from low to high and back down, like a soft “wooo”." },
-    { kind: "Sentence", text: "Could you pass me the blue mug on the top shelf?" },
-    { kind: "Sentence", text: "I’m meeting a friend for coffee at half past four." },
-    { kind: "Sentence", text: "The bus was late again, so I walked along the river instead." },
-    { kind: "Sentence", text: "My favourite season is autumn, when the leaves turn gold." },
-    { kind: "Question", text: "Have you already seen the new exhibition downtown?" },
-    { kind: "Question", text: "Would you like tea, or would you rather have something cold?" },
-    { kind: "Counting", text: "Count slowly from one to ten, keeping each number light and easy." },
-    { kind: "Phone call", text: "Hi, I’d like to book a table for two this Friday at eight, please." },
-    { kind: "Phone call", text: "Hello, I’m calling about my order. Could you check its status for me?" },
-    { kind: "Free talk", text: "Describe what you had for breakfast and how you’d make it again." }
-  ];
-  let promptIndex = 0;
 
   // ---------------- State ----------------
   let points = [];          // { t: seconds, hz: number|null }
@@ -705,12 +690,6 @@ Tendril.ready(function () {
   function showNotice(msg) { notice.textContent = msg; notice.hidden = false; }
   function hideNotice() { notice.hidden = true; }
 
-  function showPrompt() {
-    const p = PROMPTS[promptIndex % PROMPTS.length];
-    $("prompt-kind").textContent = p.kind;
-    $("prompt-text").textContent = p.text;
-    $("prompt-count").textContent = (promptIndex % PROMPTS.length + 1) + " of " + PROMPTS.length;
-  }
 
   // ---------------- Wire up ----------------
   startBtn.addEventListener("click", start);
@@ -727,7 +706,6 @@ Tendril.ready(function () {
   });
   lowIn.addEventListener("change", onCustomInput);
   highIn.addEventListener("change", onCustomInput);
-  $("next-prompt").addEventListener("click", function () { promptIndex++; showPrompt(); });
 
   const clearBtn = $("clear-history"), confirmBox = $("confirm-clear");
   clearBtn.addEventListener("click", function () { confirmBox.hidden = false; clearBtn.hidden = true; });
@@ -753,6 +731,22 @@ Tendril.ready(function () {
   });
   window.addEventListener("pagehide", function () { if (audio) stop(); });
 
+  // ---------------- Read-along + focus view ----------------
+  window.TendrilReadAlong.init({ speaking: function () { return mode === "live" && heldHz != null; } });
+
+  function setFocus(on) {
+    document.documentElement.classList.toggle("voice-focus", on);
+    $("focus-btn").setAttribute("aria-pressed", on ? "true" : "false");
+    $("focus-btn").textContent = on ? "Exit focus" : "Focus view";
+    requestAnimationFrame(resizeCanvas);
+    if (on) window.scrollTo(0, 0);
+  }
+  $("focus-btn").addEventListener("click", function () { setFocus(!document.documentElement.classList.contains("voice-focus")); });
+  $("focus-exit").addEventListener("click", function () { setFocus(false); });
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape" && document.documentElement.classList.contains("voice-focus")) setFocus(false);
+  });
+
   window.addEventListener("resize", resizeCanvas);
   if (window.matchMedia) {
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
@@ -762,9 +756,7 @@ Tendril.ready(function () {
 
   // First view: an example trace so the graph shows what it does.
   points = buildExample();
-  promptIndex = Math.floor(Math.random() * PROMPTS.length);
   applyTarget(target, false);
-  showPrompt();
   renderHistory();
   renderStats();
   const ex = computeStats(points);

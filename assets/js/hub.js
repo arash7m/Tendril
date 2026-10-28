@@ -253,14 +253,15 @@ Tendril.ready(function () {
   function cardVoice(c) {
     const f = frame(c, "Voice", "voice.html");
     const pitch = T.store.get("voice.history", []), res = T.store.get("resonance.history", []);
-    if (!pitch.length && !res.length) { emptyLine(f.body, "Practice pitch and resonance with live feedback.", "voice.html", "Start practicing"); return f.card; }
+    const plays = T.store.get("games.plays", []);
+    if (!pitch.length && !res.length && !plays.length) { emptyLine(f.body, "Practice pitch and resonance with live feedback.", "voice.html", "Start practicing"); return f.card; }
     const week = el("div", "week-dots");
     const start = dayStart(new Date());
     start.setDate(start.getDate() - 6);
     let practiced = 0;
     for (let i = 0; i < 7; i++) {
       const d = new Date(start); d.setDate(start.getDate() + i);
-      const hit = pitch.concat(res).some(function (h) { return dayStart(h.at).getTime() === d.getTime(); });
+      const hit = pitch.concat(res, plays).some(function (h) { return dayStart(h.at).getTime() === d.getTime(); });
       if (hit) practiced++;
       const dot = el("span", "week-dot" + (hit ? " on" : ""));
       dot.title = d.toLocaleDateString(undefined, { weekday: "long" });

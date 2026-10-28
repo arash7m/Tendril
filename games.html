@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{if(localStorage.getItem("tendril:__lock"))document.documentElement.classList.add("is-locked")}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Voice games · Tendril</title>
+<meta name="description" content="Voice games that train pitch range, steadiness and intonation.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#070A1F">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tendril">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/tendril.css">
+
+<link rel="stylesheet" href="assets/css/voice.css">
+<link rel="stylesheet" href="assets/css/games.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Tendril home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 29c0-8 2-13 7-16 4-2.5 7-1 7 2s-3 4-5 2.5" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M15 14c-1-5 2-9 7-10-0.5 5-3 8.5-7 10z" fill="var(--secondary)"/></svg>
+      Tendril
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="timeline.html">Timeline</a>
+      <a class="navlink" href="voice.html" aria-current="page">Voice</a>
+      <a class="navlink" href="doses.html">Health</a>
+      <a class="navlink" href="jar.html">Jar</a>
+      <a class="navlink" href="names.html">Names</a>
+      <a class="navlink" href="guides.html">Guides</a>
+      <a class="navlink" href="data.html">Your data</a>
+    </nav>
+    <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
+  </div>
+</header>
+
+<main class="wrap voice games">
+  <section class="intro">
+    <p class="eyebrow">Voice practice</p>
+    <h1>Voice games</h1>
+    <p class="lede">Short games you play with your voice. They use your target range from the Pitch page, so every round is practice. Nothing is recorded; your microphone is only listened to while you play.</p>
+  </section>
+
+  <nav class="voice-tabs" aria-label="Voice practice">
+    <a href="voice.html">Pitch</a>
+    <a href="resonance.html">Resonance</a>
+    <a href="games.html" aria-current="page">Games</a>
+  </nav>
+
+  <section class="game-menu" id="game-menu" aria-label="Choose a game">
+    <button class="game-card" type="button" data-game="glide">
+      <span class="gc-art gc-glide" aria-hidden="true"><span class="gc-orb"></span><span class="gc-gate a"></span><span class="gc-gate b"></span></span>
+      <span class="gc-body">
+        <span class="gc-title">Glide</span>
+        <span class="gc-desc">Steer a little light through gates by raising and lowering your pitch. Every gap sits inside your range.</span>
+        <span class="gc-best" data-best="glide"></span>
+      </span>
+    </button>
+    <button class="game-card" type="button" data-game="grow">
+      <span class="gc-art gc-grow" aria-hidden="true"><span class="gc-vine"></span><span class="gc-leaf l1"></span><span class="gc-leaf l2"></span><span class="gc-bloom"></span></span>
+      <span class="gc-body">
+        <span class="gc-title">Grow</span>
+        <span class="gc-desc">Your vine grows while your voice stays in your target range. Reach the top before the time runs out.</span>
+        <span class="gc-best" data-best="grow"></span>
+      </span>
+    </button>
+    <button class="game-card" type="button" data-game="echo">
+      <span class="gc-art gc-echo" aria-hidden="true"><svg viewBox="0 0 120 60"><path d="M6 44 C 30 44, 40 14, 60 14 S 92 40, 114 22" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/></svg></span>
+      <span class="gc-body">
+        <span class="gc-title">Echo</span>
+        <span class="gc-desc">Copy the melody of a phrase: questions rise, statements fall. It trains the intonation that makes speech sound natural.</span>
+        <span class="gc-best" data-best="echo"></span>
+      </span>
+    </button>
+    <p class="small muted game-range" id="game-range"></p>
+  </section>
+
+  <section class="game-stage" id="game-stage" hidden aria-live="polite">
+    <div class="game-hud">
+      <button class="icon-btn" type="button" id="game-back" aria-label="Back to games">←</button>
+      <span class="hud-title" id="hud-title"></span>
+      <span class="hud-stat" id="hud-left"></span>
+      <span class="hud-stat hud-score" id="hud-score"></span>
+    </div>
+    <div class="game-canvas-box">
+      <canvas id="game-canvas" role="img" aria-label="Game"></canvas>
+      <div class="game-overlay" id="game-overlay">
+        <h2 class="go-title" id="go-title"></h2>
+        <p class="go-text" id="go-text"></p>
+        <div class="go-stars" id="go-stars" hidden></div>
+        <div class="row go-actions">
+          <button class="btn btn-primary" type="button" id="go-play">Start</button>
+          <button class="btn btn-soft" type="button" id="go-menu">Other games</button>
+        </div>
+      </div>
+    </div>
+    <p class="notice" id="game-notice" role="alert" hidden></p>
+  </section>
+
+  <aside class="care">
+    <h3>Play gently</h3>
+    <p>Games are easy to get carried away with. Keep your voice light and comfortable, take breaks, and stop if your throat feels tight or tired.</p>
+  </aside>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Games run entirely on this device. Only your scores are saved.</p>
+    <p>Press <kbd>Esc</kbd> twice to leave quickly.</p>
+  </div>
+</footer>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/pitch.js"></script>
+<script src="assets/js/voice-engine.js"></script>
+<script src="assets/js/games.js"></script>
+</body>
+</html>

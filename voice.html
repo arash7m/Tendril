@@ -52,6 +52,7 @@
   <nav class="voice-tabs" aria-label="Voice practice">
     <a href="voice.html" aria-current="page">Pitch</a>
     <a href="resonance.html">Resonance</a>
+    <a href="games.html">Games</a>
   </nav>
 
   <div class="layout">
@@ -63,6 +64,46 @@
         </div>
         <span class="status" id="status" data-state="idle" role="status">Ready</span>
       </div>
+
+      <section class="reader" aria-label="Text to read aloud">
+        <div class="reader-bar">
+          <label class="visually-hidden" for="reader-source">What to read</label>
+          <select class="input reader-select" id="reader-source">
+            <option value="prompts">Short prompts</option>
+            <optgroup label="Passages">
+              <option value="market">Saturday market</option>
+              <option value="clinic">Calling the clinic</option>
+              <option value="intro">Introducing yourself</option>
+              <option value="cafe">At the café</option>
+              <option value="lighthouse">The lighthouse keeper</option>
+            </optgroup>
+            <option value="own">Your own text</option>
+          </select>
+          <div class="reader-tools">
+            <button class="icon-btn" type="button" id="reader-smaller" aria-label="Smaller text">A−</button>
+            <button class="icon-btn" type="button" id="reader-bigger" aria-label="Bigger text">A+</button>
+            <button class="btn btn-soft btn-small" type="button" id="reader-speed" aria-pressed="false">Scroll: off</button>
+            <button class="btn btn-soft btn-small focus-btn" type="button" id="focus-btn" aria-pressed="false">Focus view</button>
+          </div>
+        </div>
+        <div class="reader-text" id="reader-text" tabindex="0"></div>
+        <div class="reader-edit-wrap" id="reader-edit-wrap" hidden>
+          <label class="visually-hidden" for="reader-edit">Your own text</label>
+          <textarea class="input reader-edit" id="reader-edit" rows="7" placeholder="Paste or type your text here" hidden></textarea>
+          <button class="btn btn-primary btn-small" type="button" id="reader-edit-done">Done</button>
+        </div>
+        <div class="reader-foot" id="reader-foot-prompt">
+          <span class="small muted" id="reader-count"></span>
+          <div class="row">
+            <button class="btn btn-soft btn-small" type="button" id="reader-prev">Back</button>
+            <button class="btn btn-soft btn-small" type="button" id="reader-next">Next prompt</button>
+          </div>
+        </div>
+        <div class="reader-foot" id="reader-foot-own" hidden>
+          <button class="btn btn-soft btn-small" type="button" id="reader-edit-btn">Edit text</button>
+          <button class="btn btn-soft btn-small" type="button" id="reader-top">Back to top</button>
+        </div>
+      </section>
 
       <div class="graph-head">
         <h2 class="graph-title" id="graph-label">Example session</h2>
@@ -86,6 +127,7 @@
           Start microphone
         </button>
         <button class="btn btn-pink" id="stop" type="button" hidden>Stop and save</button>
+        <button class="btn btn-soft focus-exit" type="button" id="focus-exit">Exit focus</button>
         <label class="btn btn-soft" for="file">Analyze a recording</label>
         <input type="file" id="file" accept="audio/*" class="visually-hidden">
       </div>
@@ -117,18 +159,6 @@
           <label for="high">to <input id="high" type="number" inputmode="numeric" min="65" max="450" step="5" value="255"> Hz</label>
         </div>
         <p class="small muted">These are typical speaking ranges and they overlap a lot. Pitch is only one part of how a voice comes across; resonance and intonation matter just as much.</p>
-      </section>
-
-      <section class="panel prompt" aria-labelledby="prompt-h">
-        <div class="prompt-head">
-          <h2 id="prompt-h">Read aloud</h2>
-          <span class="chip live" id="prompt-kind">Sentence</span>
-        </div>
-        <p class="prompt-text" id="prompt-text">Could you pass me the blue mug on the top shelf?</p>
-        <div class="prompt-foot">
-          <span class="small muted" id="prompt-count">1 of 12</span>
-          <button class="btn btn-soft btn-small" id="next-prompt" type="button">Next prompt</button>
-        </div>
       </section>
 
       <section class="care" aria-labelledby="care-h">
@@ -163,6 +193,7 @@
 <script src="assets/js/common.js"></script>
 <script src="assets/js/pitch.js"></script>
 <script src="assets/js/trace.js"></script>
+<script src="assets/js/readalong.js"></script>
 <script src="assets/js/voice.js"></script>
 </body>
 </html>

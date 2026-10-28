@@ -26,6 +26,8 @@ Tendril.ready(function () {
     if (labTests.length) out.push(["Lab results", labTests.length + plural(labTests.length, " test", " tests")]);
     const res = data["resonance.history"] || [];
     if (res.length) out.push(["Resonance practice", res.length + plural(res.length, " session", " sessions")]);
+    const gp = data["games.plays"] || [];
+    if (gp.length) out.push(["Voice games", gp.length + plural(gp.length, " game played", " games played")]);
     const jar = data["jar.notes"] || [];
     if (jar.length) out.push(["Euphoria jar", jar.length + plural(jar.length, " moment", " moments")]);
     const drafts = data["comingout.drafts"] || [];
