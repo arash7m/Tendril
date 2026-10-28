@@ -77,8 +77,8 @@
     const plotW = w - padL - padR, plotH = h - padT - padB;
 
     const ink = cssVar("--muted"), line = cssVar("--line");
-    const band = cssVar("--band"), primary = cssVar("--primary");
-    const pink = cssVar("--secondary"), surface = cssVar("--surface");
+    const band = cssVar("--tone-band"), tone = cssVar("--tone");
+    const surface = cssVar("--surface");
 
     g.clearRect(0, 0, w, h);
     g.fillStyle = surface;
@@ -129,7 +129,8 @@
       g.fillText(s + "s", x(s), h - padB + 6);
     }
 
-    // Pitch trace: colored by in/out of range, gaps where unvoiced
+    // Pitch trace in the target's color: solid inside the range,
+    // faded outside it, with gaps where you weren't speaking.
     g.lineWidth = 2.5;
     g.lineJoin = "round";
     g.lineCap = "round";
@@ -141,11 +142,13 @@
       const cy = y(Math.max(Y_MIN, Math.min(Y_MAX, p.hz)));
       if (prev && p.t - prev.t < 0.25) {
         const inRange = p.hz >= target.low && p.hz <= target.high;
-        g.strokeStyle = inRange ? primary : pink;
+        g.strokeStyle = tone;
+        g.globalAlpha = inRange ? 1 : 0.35;
         g.beginPath();
         g.moveTo(x(prev.t), y(Math.max(Y_MIN, Math.min(Y_MAX, prev.hz))));
         g.lineTo(x(p.t), cy);
         g.stroke();
+        g.globalAlpha = 1;
       }
       prev = p;
     }
@@ -154,7 +157,7 @@
     if (mode === "live") {
       for (let i = points.length - 1; i >= 0 && i > points.length - 8; i--) {
         if (points[i].hz != null) {
-          g.fillStyle = cssVar("--accent");
+          g.fillStyle = tone;
           g.strokeStyle = cssVar("--deep");
           g.lineWidth = 1.5;
           g.beginPath();
@@ -389,10 +392,24 @@
     document.querySelectorAll("[data-preset]").forEach(function (b) {
       b.setAttribute("aria-pressed", b.dataset.preset === target.preset ? "true" : "false");
     });
+    document.documentElement.dataset.tone = toneFor(target);
     $("target-readout").textContent = target.low + "–" + target.high + " Hz (" + P.noteName(target.low) + " to " + P.noteName(target.high) + ")";
     if (save) T.store.set("voice.target", target);
     renderStats();
     draw();
+  }
+
+  // Each preset has its own color; a custom range takes the color of the
+  // preset its middle is closest to.
+  function toneFor(t) {
+    if (t.preset !== "custom") return t.preset;
+    const mid = (t.low + t.high) / 2;
+    let best = "between", dist = Infinity;
+    Object.keys(PRESETS).forEach(function (k) {
+      const pm = (PRESETS[k].low + PRESETS[k].high) / 2;
+      if (Math.abs(pm - mid) < dist) { dist = Math.abs(pm - mid); best = k; }
+    });
+    return best;
   }
 
   function onCustomInput() {

@@ -1,5 +1,19 @@
 /* Voice practice page */
 
+/* Each target range has its own color: lighter = pink, in-between = lavender, deeper = teal. */
+:root, :root[data-tone="lighter"] {
+  --tone: var(--secondary); --tone-dark: var(--secondary-dark);
+  --tone-light: var(--secondary-light); --tone-band: var(--band-pink);
+}
+:root[data-tone="between"] {
+  --tone: var(--lav); --tone-dark: var(--lav-dark);
+  --tone-light: var(--lav-light); --tone-band: var(--band-lav);
+}
+:root[data-tone="deeper"] {
+  --tone: var(--primary); --tone-dark: var(--primary-dark);
+  --tone-light: var(--primary-light); --tone-band: var(--band);
+}
+
 .voice { padding-block: 28px 0; display: grid; gap: 24px; }
 
 .intro { display: grid; gap: 10px; max-width: 62ch; }
@@ -54,9 +68,9 @@
   background: var(--surface-2);
   color: var(--muted);
 }
-.status[data-state="in"] { background: var(--primary-light); color: var(--ink); }
+.status[data-state="in"] { background: var(--tone); color: #1a1426; }
 .status[data-state="low"],
-.status[data-state="high"] { background: var(--secondary-light); color: var(--ink); }
+.status[data-state="high"] { background: var(--tone-light); color: var(--ink); }
 
 .graph-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .graph-title { font-size: 1.05rem; min-width: 0; overflow-wrap: anywhere; }
@@ -71,9 +85,9 @@
 
 .legend { display: flex; align-items: center; gap: 6px 14px; flex-wrap: wrap; font-size: 0.82rem; color: var(--muted); }
 .sw { display: inline-block; width: 18px; height: 4px; border-radius: 4px; margin-right: -8px; vertical-align: middle; }
-.sw-in { background: var(--primary); }
-.sw-out { background: var(--secondary); }
-.sw-band { background: var(--band); height: 12px; border: 1px solid var(--line); }
+.sw-in { background: var(--tone); }
+.sw-out { background: var(--tone); opacity: 0.35; }
+.sw-band { background: var(--tone-band); height: 12px; border: 1px solid var(--line); }
 
 .controls { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; padding-top: 4px; }
 
@@ -129,7 +143,10 @@
   color: var(--ink);
   cursor: pointer;
 }
-.segmented button[aria-pressed="true"] { background: var(--primary); color: #04221f; box-shadow: 0 3px 0 var(--primary-dark); }
+.segmented button[data-preset="lighter"] { --b: var(--secondary); --bd: var(--secondary-dark); }
+.segmented button[data-preset="between"] { --b: var(--lav); --bd: var(--lav-dark); }
+.segmented button[data-preset="deeper"] { --b: var(--primary); --bd: var(--primary-dark); }
+.segmented button[aria-pressed="true"] { background: var(--b); color: #1a1426; box-shadow: 0 3px 0 var(--bd); }
 
 .custom { display: flex; gap: 10px; flex-wrap: wrap; font-weight: 700; font-size: 0.9rem; }
 .custom input {
