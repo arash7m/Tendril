@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{if(localStorage.getItem("tendril:__lock"))document.documentElement.classList.add("is-locked")}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Resonance practice · Tendril</title>
+<meta name="description" content="Practice voice resonance with a live brighter/darker meter and guided exercises. Everything stays on your device.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#070A1F">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tendril">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/tendril.css">
+<link rel="stylesheet" href="assets/css/voice.css">
+<link rel="stylesheet" href="assets/css/resonance.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Tendril home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 29c0-8 2-13 7-16 4-2.5 7-1 7 2s-3 4-5 2.5" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M15 14c-1-5 2-9 7-10-0.5 5-3 8.5-7 10z" fill="var(--secondary)"/></svg>
+      Tendril
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="timeline.html">Timeline</a>
+      <a class="navlink" href="voice.html" aria-current="page">Voice</a>
+      <a class="navlink" href="doses.html">Doses</a>
+      <a class="navlink" href="names.html">Names</a>
+      <a class="navlink" href="guides.html">Guides</a>
+      <a class="navlink" href="data.html">Your data</a>
+    </nav>
+    <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
+  </div>
+</header>
+
+<main class="wrap voice resonance">
+  <section class="intro">
+    <p class="eyebrow">Voice practice</p>
+    <h1>Shape your resonance</h1>
+    <p class="lede">Resonance is how bright or dark your voice sounds, set by the size and shape of the space in your throat and mouth. It changes how your voice comes across as much as pitch does, and it can be trained on its own.</p>
+  </section>
+
+  <nav class="voice-tabs" aria-label="Voice practice">
+    <a href="voice.html">Pitch</a>
+    <a href="resonance.html" aria-current="page">Resonance</a>
+  </nav>
+
+  <div class="layout">
+    <section class="panel monitor" aria-labelledby="graph-label">
+      <div class="readout">
+        <div class="readout-main res-readout">
+          <span class="hz" id="score">—</span>
+          <span class="res-word" id="res-word">Ready</span>
+        </div>
+        <span class="status" id="status" data-state="idle" role="status">Ready</span>
+      </div>
+
+      <div class="meter" aria-hidden="true">
+        <div class="meter-track">
+          <div class="meter-zone" id="meter-zone"></div>
+          <div class="meter-needle" id="meter-needle"></div>
+        </div>
+        <div class="meter-labels"><span>Darker</span><span>Brighter</span></div>
+      </div>
+
+      <div class="graph-head">
+        <h2 class="graph-title" id="graph-label">Example session</h2>
+        <span class="chip" id="example-chip">Example data</span>
+        <span class="timer" id="timer">0:12</span>
+      </div>
+      <div class="graph-box">
+        <canvas id="graph" aria-label="Brightness over time, with your target zone shaded" role="img"></canvas>
+      </div>
+
+      <fieldset class="field vowel-field">
+        <legend>What you’ll say <span class="hint">the meter compares against this sound</span></legend>
+        <div class="pills" id="vowel-pills">
+          <label><input type="radio" name="vowel" value="ee" checked><span>“Ee”</span></label>
+          <label><input type="radio" name="vowel" value="ah"><span>“Ah”</span></label>
+          <label><input type="radio" name="vowel" value="oo"><span>“Oo”</span></label>
+          <label><input type="radio" name="vowel" value="speech"><span>Talking</span></label>
+        </div>
+      </fieldset>
+
+      <div class="controls">
+        <button class="btn btn-primary" id="start" type="button">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          Start microphone
+        </button>
+        <button class="btn btn-pink" id="stop" type="button" hidden>Stop and save</button>
+        <button class="btn btn-soft btn-small" id="details-btn" type="button" aria-pressed="false">Show numbers</button>
+      </div>
+      <p class="res-details small muted" id="res-details" hidden>Pitch — · F1 — · F2 — · F3 —</p>
+      <p class="notice" id="notice" role="alert" hidden></p>
+
+      <dl class="stats">
+        <div><dt>Average</dt><dd id="stat-avg">—</dd></div>
+        <div><dt>Time in zone</dt><dd id="stat-in">—</dd></div>
+        <div><dt>Darkest</dt><dd id="stat-low">—</dd></div>
+        <div><dt>Brightest</dt><dd id="stat-high">—</dd></div>
+      </dl>
+    </section>
+
+    <aside class="side">
+      <section class="panel" aria-labelledby="target-h">
+        <h2 id="target-h">Target zone</h2>
+        <p class="small muted" id="target-readout"></p>
+        <div class="segmented" role="group" aria-label="Target zone">
+          <button type="button" data-preset="lighter" aria-pressed="true">Brighter</button>
+          <button type="button" data-preset="between" aria-pressed="false">In-between</button>
+          <button type="button" data-preset="deeper" aria-pressed="false">Darker</button>
+        </div>
+        <p class="small muted">The scale runs from typical adult male resonance (0) to typical adult female resonance (100), measured from your voice’s formants. Phone microphones and rooms vary, so treat it as a guide and trust your ears too.</p>
+      </section>
+
+      <section class="panel exercise" aria-labelledby="ex-h" id="exercise-panel">
+        <div class="prompt-head">
+          <h2 id="ex-h">Exercise</h2>
+          <span class="chip live" id="ex-dir"></span>
+        </div>
+        <h3 class="ex-title" id="ex-title"></h3>
+        <ol class="ex-steps" id="ex-steps"></ol>
+        <p class="ex-say" id="ex-say" hidden></p>
+        <div class="prompt-foot">
+          <span class="small muted" id="ex-count"></span>
+          <div class="row">
+            <button class="btn btn-soft btn-small" id="ex-prev" type="button" aria-label="Previous exercise">Back</button>
+            <button class="btn btn-soft btn-small" id="ex-next" type="button">Next exercise</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="care" aria-labelledby="care-h">
+        <h3 id="care-h">Go easy on your voice</h3>
+        <p>Resonance work should feel light, never squeezed. If your throat feels tight or sore, stop and rest. Short daily practice works better than long sessions, and a voice coach or speech therapist can help a lot.</p>
+      </section>
+    </aside>
+  </div>
+
+  <section class="panel history" aria-labelledby="history-h">
+    <div class="history-head">
+      <h2 id="history-h">Your sessions</h2>
+      <button class="btn btn-soft btn-small" id="clear-history" type="button" hidden>Clear history</button>
+      <div class="confirm" id="confirm-clear" hidden>
+        <span>Delete all resonance sessions on this device?</span>
+        <button class="btn btn-pink btn-small" id="confirm-yes" type="button">Delete</button>
+        <button class="btn btn-soft btn-small" id="confirm-no" type="button">Keep</button>
+      </div>
+    </div>
+    <p class="muted" id="history-empty">Finished sessions are saved here, on this device only. Tap one to see its graph again.</p>
+    <ol class="history-list" id="history"></ol>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Tendril stores everything in your browser on this device. Nothing is sent to a server.</p>
+    <p>Press <kbd>Esc</kbd> twice to leave quickly.</p>
+  </div>
+</footer>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/pitch.js"></script>
+<script src="assets/js/formants.js"></script>
+<script src="assets/js/resonance.js"></script>
+</body>
+</html>

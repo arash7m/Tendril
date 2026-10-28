@@ -10,7 +10,8 @@ Everything runs in the browser and is stored on the user's own device. There is 
 |---|---|
 | `index.html` | Home page and privacy explainer |
 | `timeline.html` | Journal entries with mood and tags, milestones with day counts, private photo diary with in-app camera (pose outline, timer), photo viewer and before/after compare; voice sessions appear in the feed |
-| `voice.html` | Pitch trainer: live graph, target range, read-aloud prompts, recording analysis, session history |
+| `voice.html` | Pitch trainer: live graph, target range, read-aloud prompts, recording analysis, session history with audio playback |
+| `resonance.html` | Resonance trainer: live brighter/darker meter from formants (LPC, `assets/js/formants.js`), target zones, vowel-aware scoring, guided exercises, session history |
 | `doses.html` | Dose tracker: medications, dose log, next due, doses left, injection/patch site rotation on a body map, calendar reminders (.ics) |
 | `names.html` | Name & pronoun sandbox: everyday sentences, read-aloud, private shortlist |
 | `guides.html` | Binding, tucking, appointment prep, name-change checklist |
@@ -47,6 +48,7 @@ Everything is stored in the browser's localStorage under keys starting with `ten
 | `doses.meds`, `doses.log` | Medications, logged doses |
 | `names.shortlist` | Saved names and pronouns |
 | `guides.checklist` | Ticked name-change items |
+| `resonance.target`, `resonance.vowel`, `resonance.history` | Resonance zone, chosen vowel, session summaries and traces |
 | `timeline.entries` | Journal entries and milestones (photo ids only) |
 
 Photos and voice recordings are stored in IndexedDB (database `tendril`, stores `photos` and `recordings`). Each photo is saved re-encoded through a canvas, which strips location and camera metadata, as a full image (`id`) and a thumbnail (`id:thumb`). Backups can include them.

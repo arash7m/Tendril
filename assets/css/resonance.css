@@ -1,0 +1,82 @@
+/* Resonance page (builds on voice.css) */
+
+/* Pitch / Resonance tabs, shared with the pitch page */
+.voice-tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--surface);
+  justify-self: start;
+}
+.voice-tabs a {
+  text-decoration: none;
+  font-weight: 800;
+  padding: 8px 22px;
+  border-radius: 999px;
+  color: var(--ink);
+}
+.voice-tabs a[aria-current="page"] { background: var(--primary); color: var(--on-primary); box-shadow: 0 3px 0 var(--primary-dark); }
+
+/* Readout */
+.res-readout { align-items: center; gap: 14px; }
+.res-word {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: var(--muted);
+  width: 6.5em;
+  white-space: nowrap;
+}
+
+/* Meter: a dark-to-bright bar with the target zone and a moving needle */
+.meter { display: grid; gap: 6px; }
+.meter-track {
+  position: relative;
+  height: 22px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--primary-dark), var(--lav-dark) 50%, var(--secondary-dark));
+  overflow: visible;
+}
+.meter-zone {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  border-radius: 8px;
+  border: 2px solid var(--ink);
+  background: rgba(255, 255, 255, 0.12);
+}
+.meter-needle {
+  position: absolute;
+  top: -7px;
+  width: 6px;
+  height: 36px;
+  margin-left: -3px;
+  border-radius: 3px;
+  background: var(--ink);
+  box-shadow: 0 0 0 2px var(--bg);
+  left: 50%;
+  transition: left 0.12s linear, opacity 0.2s ease;
+}
+.meter-needle.off { opacity: 0.25; }
+.meter-labels { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--muted); font-weight: 700; }
+
+.vowel-field { gap: 8px; }
+.res-details { font-family: var(--font-mono); margin-top: -6px; }
+
+/* Exercises */
+.exercise { display: grid; gap: 12px; }
+.ex-title { font-size: 1.2rem; }
+.ex-steps { margin: 0; padding-left: 1.3em; display: grid; gap: 8px; }
+.ex-steps li::marker { font-weight: 800; color: var(--pink-text); }
+.ex-say {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  color: var(--deep);
+  background: var(--surface-2);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+}
+.res-word[data-word="bright"] { color: var(--pink-text); }
+.res-word[data-word="mid"] { color: #B58CF0; }
+.res-word[data-word="dark"] { color: var(--link); }
