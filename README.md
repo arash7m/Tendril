@@ -9,6 +9,7 @@ Everything runs in the browser and is stored on the user's own device. There is 
 | Page | What it does |
 |---|---|
 | `index.html` | Home page and privacy explainer |
+| `timeline.html` | Journal entries with mood and tags, milestones with day counts, private photo diary with in-app camera (pose outline, timer), photo viewer and before/after compare; voice sessions appear in the feed |
 | `voice.html` | Pitch trainer: live graph, target range, read-aloud prompts, recording analysis, session history |
 | `doses.html` | Dose tracker: medications, dose log, next due, doses left, injection/patch site rotation on a body map, calendar reminders (.ics) |
 | `names.html` | Name & pronoun sandbox: everyday sentences, read-aloud, private shortlist |
@@ -46,6 +47,9 @@ Everything is stored in the browser's localStorage under keys starting with `ten
 | `doses.meds`, `doses.log` | Medications, logged doses |
 | `names.shortlist` | Saved names and pronouns |
 | `guides.checklist` | Ticked name-change items |
+| `timeline.entries` | Journal entries and milestones (photo ids only) |
+
+Photos and voice recordings are stored in IndexedDB (database `tendril`, stores `photos` and `recordings`). Each photo is saved re-encoded through a canvas, which strips location and camera metadata, as a full image (`id`) and a thumbnail (`id:thumb`). Backups can include them.
 
 Backups are JSON files. With a password they're encrypted with AES-GCM using a key derived by PBKDF2 (SHA-256, 250,000 iterations).
 

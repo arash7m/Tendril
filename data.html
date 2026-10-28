@@ -29,6 +29,7 @@
     </a>
     <nav class="nav" aria-label="Main">
       <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="timeline.html">Timeline</a>
       <a class="navlink" href="voice.html">Voice</a>
       <a class="navlink" href="doses.html">Doses</a>
       <a class="navlink" href="names.html">Names</a>
@@ -117,7 +118,10 @@
     <section class="panel" aria-labelledby="backup-h">
       <h2 id="backup-h">Make a backup</h2>
       <p class="muted">Downloads one small file with everything above. Keep it somewhere private, like a password-protected folder or your own cloud storage.</p>
-      <p class="small muted">Voice recordings aren’t included, to keep the file small. Your session graphs and numbers are.</p>
+      <label class="check-line" for="backup-media">
+        <input type="checkbox" id="backup-media" checked>
+        <span>Include photos and voice recordings <span class="muted">(makes the file bigger)</span></span>
+      </label>
       <label class="field">
         <span>Password <span class="hint">optional, but recommended</span></span>
         <input class="input" type="password" id="backup-pass" autocomplete="new-password" placeholder="Leave empty for no password">

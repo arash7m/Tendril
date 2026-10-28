@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{if(localStorage.getItem("tendril:__lock"))document.documentElement.classList.add("is-locked")}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Timeline · Tendril</title>
+<meta name="description" content="A private journal and photo diary of your transition. Everything stays on your device.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#070A1F">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tendril">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/tendril.css">
+<link rel="stylesheet" href="assets/css/timeline.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Tendril home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 29c0-8 2-13 7-16 4-2.5 7-1 7 2s-3 4-5 2.5" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M15 14c-1-5 2-9 7-10-0.5 5-3 8.5-7 10z" fill="var(--secondary)"/></svg>
+      Tendril
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="timeline.html" aria-current="page">Timeline</a>
+      <a class="navlink" href="voice.html">Voice</a>
+      <a class="navlink" href="doses.html">Doses</a>
+      <a class="navlink" href="names.html">Names</a>
+      <a class="navlink" href="guides.html">Guides</a>
+      <a class="navlink" href="data.html">Your data</a>
+    </nav>
+    <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
+  </div>
+</header>
+
+<main class="wrap page timeline">
+  <section class="page-intro">
+    <p class="eyebrow">Timeline</p>
+    <h1>Your story so far</h1>
+    <p class="lede">Write how you’re feeling, mark milestones, and take photos to see how you change over time. Photos taken here stay in Tendril and don’t go to your phone’s gallery.</p>
+  </section>
+
+  <div class="tl-actions">
+    <button class="btn btn-primary" type="button" id="new-entry">New entry</button>
+    <button class="btn btn-pink" type="button" id="new-photo">Take a photo</button>
+    <button class="btn btn-soft" type="button" id="open-compare" hidden>Compare photos</button>
+  </div>
+
+  <section class="milestones" id="milestones" aria-labelledby="ms-h" hidden>
+    <h2 id="ms-h" class="visually-hidden">Milestones</h2>
+    <div class="ms-strip" id="ms-strip"></div>
+  </section>
+
+  <div class="filters pills" role="group" aria-label="Show" id="filters">
+    <label><input type="radio" name="flt" value="all" checked><span>All</span></label>
+    <label><input type="radio" name="flt" value="journal"><span>Journal</span></label>
+    <label><input type="radio" name="flt" value="photos"><span>Photos</span></label>
+    <label><input type="radio" name="flt" value="milestone"><span>Milestones</span></label>
+    <label><input type="radio" name="flt" value="tag:euphoria"><span>Euphoria</span></label>
+    <label><input type="radio" name="flt" value="tag:dysphoria"><span>Dysphoria</span></label>
+    <label><input type="radio" name="flt" value="voice"><span>Voice</span></label>
+  </div>
+
+  <section class="feed" id="feed" aria-live="polite"></section>
+
+  <div class="empty" id="tl-empty" hidden>
+    <h3>Start your timeline</h3>
+    <p class="muted">Write a few lines about today, mark a milestone like the day you started hormones, or take a first photo. In a few months you’ll be glad you did.</p>
+    <div class="row">
+      <button class="btn btn-primary" type="button" id="empty-entry">Write your first entry</button>
+      <button class="btn btn-soft" type="button" id="empty-photo">Take a first photo</button>
+    </div>
+  </div>
+  <p class="muted small" id="filter-empty" hidden>Nothing here with this filter yet.</p>
+</main>
+
+<!-- Entry editor -->
+<dialog class="sheet" id="entry-sheet" aria-labelledby="entry-title">
+  <form class="sheet-body" id="entry-form" method="dialog">
+    <div class="sheet-head">
+      <h2 id="entry-title">New entry</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="pills" role="group" aria-label="Kind of entry">
+      <label><input type="radio" name="kind" value="journal" checked><span>Journal</span></label>
+      <label><input type="radio" name="kind" value="milestone"><span>Milestone</span></label>
+    </div>
+    <label class="field" id="ms-title-field" hidden>
+      <span>Milestone</span>
+      <input class="input" type="text" id="ms-title" maxlength="60" placeholder="Started hormones">
+    </label>
+    <label class="field">
+      <span>When</span>
+      <input class="input" type="datetime-local" id="entry-when" required>
+    </label>
+    <label class="field">
+      <span>Notes <span class="hint">optional</span></span>
+      <textarea class="input" id="entry-text" rows="5" maxlength="5000" placeholder="How are you feeling today?"></textarea>
+    </label>
+    <fieldset class="field">
+      <legend>Mood <span class="hint">optional</span></legend>
+      <div class="pills mood-pills" id="mood-pills">
+        <label><input type="radio" name="mood" value="1"><span>Rough</span></label>
+        <label><input type="radio" name="mood" value="2"><span>Low</span></label>
+        <label><input type="radio" name="mood" value="3"><span>Okay</span></label>
+        <label><input type="radio" name="mood" value="4"><span>Good</span></label>
+        <label><input type="radio" name="mood" value="5"><span>Great</span></label>
+      </div>
+    </fieldset>
+    <fieldset class="field">
+      <legend>Tags <span class="hint">optional</span></legend>
+      <div class="pills" id="tag-pills"></div>
+    </fieldset>
+    <div class="field">
+      <span>Photos</span>
+      <div class="draft-photos" id="draft-photos"></div>
+      <div class="row">
+        <button class="btn btn-soft btn-small" type="button" id="entry-camera">Take photo</button>
+        <label class="btn btn-soft btn-small" for="entry-gallery">Choose from gallery</label>
+        <input type="file" id="entry-gallery" accept="image/*" multiple class="visually-hidden">
+      </div>
+      <p class="small muted">Location and camera details are removed from photos you add.</p>
+    </div>
+    <div class="spread">
+      <div class="row">
+        <button class="btn btn-primary" type="submit" id="entry-save">Save</button>
+        <button class="btn btn-soft" type="button" data-close>Cancel</button>
+      </div>
+      <button class="btn btn-soft btn-small" type="button" id="entry-delete" hidden>Delete entry</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Camera -->
+<dialog class="camera" id="camera" aria-label="Camera">
+  <div class="cam-stage" id="cam-stage">
+    <video id="cam-video" playsinline muted autoplay></video>
+    <img id="cam-ghost" alt="" hidden>
+    <div class="cam-count" id="cam-count" hidden></div>
+    <p class="cam-msg" id="cam-msg" hidden></p>
+  </div>
+  <div class="cam-bar cam-top">
+    <button class="cam-btn" type="button" id="cam-close" aria-label="Close camera">×</button>
+    <button class="cam-chip" type="button" id="cam-ghost-btn" aria-pressed="true" hidden>Outline on</button>
+    <button class="cam-chip" type="button" id="cam-timer" aria-label="Self-timer">Timer off</button>
+  </div>
+  <div class="cam-bar cam-bottom">
+    <label class="cam-btn" for="cam-file" aria-label="Choose from gallery">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M7 15l3-3 3 3 2-2 3 3" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>
+    </label>
+    <input type="file" id="cam-file" accept="image/*" class="visually-hidden">
+    <button class="cam-shutter" type="button" id="cam-shoot" aria-label="Take photo"></button>
+    <button class="cam-btn" type="button" id="cam-flip" aria-label="Switch camera">
+      <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9a8 8 0 0 1 14-3l2 2M20 15a8 8 0 0 1-14 3l-2-2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M20 4v4h-4M4 20v-4h4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+</dialog>
+
+<!-- Photo viewer -->
+<dialog class="viewer" id="viewer" aria-label="Photo">
+  <div class="viewer-top">
+    <button class="cam-btn" type="button" data-close aria-label="Close">×</button>
+    <span class="viewer-date" id="viewer-date"></span>
+    <span class="viewer-count" id="viewer-count"></span>
+  </div>
+  <div class="viewer-stage">
+    <button class="viewer-nav prev" type="button" id="viewer-prev" aria-label="Earlier photo">‹</button>
+    <img id="viewer-img" alt="">
+    <button class="viewer-nav next" type="button" id="viewer-next" aria-label="Later photo">›</button>
+  </div>
+  <div class="viewer-bottom">
+    <button class="btn btn-primary btn-small" type="button" id="viewer-compare">Compare with another</button>
+    <button class="btn btn-soft btn-small" type="button" id="viewer-delete">Delete photo</button>
+  </div>
+</dialog>
+
+<!-- Compare -->
+<dialog class="sheet compare-sheet" id="compare" aria-labelledby="compare-title">
+  <div class="sheet-body">
+    <div class="sheet-head">
+      <h2 id="compare-title">Compare photos</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="pills" role="group" aria-label="Layout">
+      <label><input type="radio" name="cmp-mode" value="slider" checked><span>Slider</span></label>
+      <label><input type="radio" name="cmp-mode" value="side"><span>Side by side</span></label>
+    </div>
+    <div class="cmp-view" id="cmp-view">
+      <div class="cmp-slider" id="cmp-slider">
+        <img id="cmp-b2" alt="">
+        <img id="cmp-a2" alt="" class="cmp-top">
+        <div class="cmp-handle" id="cmp-handle"></div>
+        <span class="cmp-tag left" id="cmp-tag-a"></span>
+        <span class="cmp-tag right" id="cmp-tag-b"></span>
+        <input type="range" id="cmp-range" min="0" max="100" value="50" aria-label="Move between before and after">
+      </div>
+      <div class="cmp-side" id="cmp-side" hidden>
+        <figure><img id="cmp-a" alt=""><figcaption id="cmp-cap-a"></figcaption></figure>
+        <figure><img id="cmp-b" alt=""><figcaption id="cmp-cap-b"></figcaption></figure>
+      </div>
+      <p class="cmp-gap" id="cmp-gap"></p>
+    </div>
+    <div class="field"><span>Before</span><div class="cmp-pick" id="pick-a"></div></div>
+    <div class="field"><span>After</span><div class="cmp-pick" id="pick-b"></div></div>
+  </div>
+</dialog>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Your timeline and photos are stored only on this device. Turn on the <a href="data.html#lock-h">app lock</a> to encrypt them, and include them in a <a href="data.html">backup</a> so you don’t lose them.</p>
+    <p>Press <kbd>Esc</kbd> twice to leave quickly.</p>
+  </div>
+</footer>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/timeline.js"></script>
+</body>
+</html>

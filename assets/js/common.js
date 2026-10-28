@@ -118,28 +118,33 @@
     flush: function () { return writing; }
   };
 
-  // ---------------- Larger files (voice recordings) ----------------
-  // Recordings live in IndexedDB on this device. With the lock on they're
-  // encrypted with the same key as everything else.
-  const blobs = (function () {
-    let dbp = null;
-    function db() {
-      if (dbp) return dbp;
-      dbp = new Promise(function (resolve, reject) {
-        if (!global.indexedDB) { reject(new Error("no-idb")); return; }
-        const req = indexedDB.open("tendril", 1);
-        req.onupgradeneeded = function () { req.result.createObjectStore("recordings"); };
-        req.onsuccess = function () { resolve(req.result); };
-        req.onerror = function () { reject(req.error); };
-      });
-      dbp.catch(function () { dbp = null; });
-      return dbp;
-    }
+  // ---------------- Larger files (recordings, photos) ----------------
+  // Kept in IndexedDB on this device. With the lock on they're encrypted
+  // with the same key as everything else.
+  let dbp = null;
+  function idb() {
+    if (dbp) return dbp;
+    dbp = new Promise(function (resolve, reject) {
+      if (!global.indexedDB) { reject(new Error("no-idb")); return; }
+      const req = indexedDB.open("tendril", 2);
+      req.onupgradeneeded = function () {
+        const d = req.result;
+        ["recordings", "photos"].forEach(function (n) { if (!d.objectStoreNames.contains(n)) d.createObjectStore(n); });
+      };
+      req.onsuccess = function () { resolve(req.result); };
+      req.onerror = function () { reject(req.error); };
+      req.onblocked = function () { reject(new Error("blocked")); };
+    });
+    dbp.catch(function () { dbp = null; });
+    return dbp;
+  }
+
+  function makeBlobStore(name) {
     function run(mode, fn) {
-      return db().then(function (d) {
+      return idb().then(function (d) {
         return new Promise(function (resolve, reject) {
-          const tx = d.transaction("recordings", mode);
-          const req = fn(tx.objectStore("recordings"));
+          const tx = d.transaction(name, mode);
+          const req = fn(tx.objectStore(name));
           tx.oncomplete = function () { resolve(req ? req.result : undefined); };
           tx.onerror = tx.onabort = function () { reject(tx.error); };
         });
@@ -156,7 +161,7 @@
       return new Blob([await decryptBytes(key, value.iv, value.data)], { type: value.type });
     }
     function size(v) { return v ? (v.sealed ? v.data.byteLength : v.size || 0) : 0; }
-    return {
+    const api = {
       put: async function (id, blob) {
         const v = await seal(blob, vaultKey);
         return run("readwrite", function (s) { return s.put(v, id); });
@@ -167,15 +172,16 @@
       },
       del: function (id) { return run("readwrite", function (s) { return s.delete(id); }); },
       clear: function () { return run("readwrite", function (s) { return s.clear(); }); },
+      keys: function () { return run("readonly", function (s) { return s.getAllKeys(); }); },
       count: function () { return run("readonly", function (s) { return s.count(); }); },
       totalBytes: function () {
         return run("readonly", function (s) { return s.getAll(); }).then(function (all) {
           return (all || []).reduce(function (n, v) { return n + size(v); }, 0);
         });
       },
-      /** Re-encrypt every recording: fromKey/toKey may be null for "not encrypted". */
+      /** Re-encrypt everything: fromKey/toKey may be null for "not encrypted". */
       rekey: async function (fromKey, toKey) {
-        const keys = await run("readonly", function (s) { return s.getAllKeys(); }).catch(function () { return []; });
+        const keys = await api.keys().catch(function () { return []; });
         for (const id of keys || []) {
           const v = await run("readonly", function (s) { return s.get(id); });
           const plain = await unseal(v, fromKey);
@@ -184,7 +190,22 @@
         }
       }
     };
-  })();
+    return api;
+  }
+
+  const blobs = makeBlobStore("recordings");
+  const photos = makeBlobStore("photos");
+  const media = {
+    rekey: async function (from, to) { await blobs.rekey(from, to); await photos.rekey(from, to); },
+    clear: function () {
+      return Promise.all([blobs.clear(), photos.clear()]).catch(function () { /* nothing stored */ });
+    }
+  };
+
+  /** Ask the browser not to clear Tendril's storage when space runs low. */
+  function keepStorage() {
+    try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* ignore */ }
+  }
 
   // ---------------- App lock ----------------
   function lockMeta() {
@@ -237,7 +258,7 @@
       const key = await deriveKey(pin, salt);
       const data = {};
       store.keys().forEach(function (k) { data[k] = store.get(k, null); });
-      await blobs.rekey(null, key);
+      await media.rekey(null, key);
       lsSet(VAULT_KEY, await sealJSON(key, data));
       saveMeta({ v: 1, salt: b64(salt), iterations: ITERATIONS, grace: grace, length: pin.length });
       Object.keys(data).forEach(function (k) { lsDel(PREFIX + k); });
@@ -277,7 +298,7 @@
       await store.flush();
       const salt = crypto.getRandomValues(new Uint8Array(16));
       const key = await deriveKey(pin, salt);
-      await blobs.rekey(vaultKey, key);
+      await media.rekey(vaultKey, key);
       lsSet(VAULT_KEY, await sealJSON(key, vault));
       meta.salt = b64(salt);
       meta.length = pin.length;
@@ -297,7 +318,7 @@
     disable: async function () {
       if (!vault) throw new Error("locked");
       await store.flush();
-      await blobs.rekey(vaultKey, null);
+      await media.rekey(vaultKey, null);
       const data = vault;
       vault = null;
       vaultKey = null;
@@ -328,7 +349,7 @@
       forgetSession();
       vault = null;
       vaultKey = null;
-      await blobs.clear().catch(function () { /* nothing stored */ });
+      await media.clear();
     }
   };
 
@@ -631,7 +652,7 @@
   }
 
   global.Tendril = {
-    ready: ready, lock: lock, blobs: blobs,
+    ready: ready, lock: lock, blobs: blobs, photos: photos, keepStorage: keepStorage,
     isStandalone: isStandalone, promptInstall: promptInstall,
     canPromptInstall: function () { return !!installPrompt; },
     store: store, quickExit: quickExit, uid: uid, download: download, toast: toast,

@@ -18,6 +18,8 @@ Tendril.ready(function () {
     if (data["voice.target"]) out.push(["Voice target", data["voice.target"].low + "–" + data["voice.target"].high + " Hz"]);
     const short = data["names.shortlist"] || [];
     if (short.length) out.push(["Name shortlist", short.length + plural(short.length, " name", " names")]);
+    const entries = data["timeline.entries"] || [];
+    if (entries.length) out.push(["Timeline", entries.length + plural(entries.length, " entry", " entries")]);
     const checks = data["guides.checklist"] ? Object.keys(data["guides.checklist"]).length : 0;
     if (checks) out.push(["Name-change checklist", checks + " ticked"]);
     return out;
@@ -52,10 +54,11 @@ Tendril.ready(function () {
     $("storage-off").hidden = T.store.available();
     const rows = describe(currentData());
     renderList($("stored"), rows, "Nothing saved yet.");
-    // Voice recordings live in IndexedDB; count them separately.
-    Promise.all([T.blobs.count(), T.blobs.totalBytes()]).then(function (r) {
-      if (!r[0]) return;
-      rows.push(["Voice recordings", r[0] + plural(r[0], " recording", " recordings") + ", " + mb(r[1])]);
+    // Recordings and photos live in IndexedDB; count them separately.
+    Promise.all([T.blobs.count(), T.blobs.totalBytes(), T.photos.keys(), T.photos.totalBytes()]).then(function (r) {
+      const nPhotos = (r[2] || []).filter(function (k) { return !/:thumb$/.test(k); }).length;
+      if (nPhotos) rows.push(["Photos", nPhotos + plural(nPhotos, " photo", " photos") + ", " + mb(r[3])]);
+      if (r[0]) rows.push(["Voice recordings", r[0] + plural(r[0], " recording", " recordings") + ", " + mb(r[1])]);
       renderList($("stored"), rows, "Nothing saved yet.");
     }).catch(function () { /* none */ });
   }
@@ -66,8 +69,34 @@ Tendril.ready(function () {
   function b64(buf) {
     const bytes = new Uint8Array(buf);
     let s = "";
-    for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+    for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
     return btoa(s);
+  }
+
+  // Photos and recordings, decrypted if the lock is on, as base64 for the backup file.
+  async function collectMedia() {
+    const out = {};
+    for (const name of ["photos", "recordings"]) {
+      const storeApi = name === "photos" ? T.photos : T.blobs;
+      out[name] = {};
+      const keys = await storeApi.keys().catch(function () { return []; });
+      for (const id of keys) {
+        const blob = await storeApi.get(id).catch(function () { return null; });
+        if (blob) out[name][id] = { type: blob.type, data: b64(await blob.arrayBuffer()) };
+      }
+    }
+    return out;
+  }
+  async function writeMedia(media) {
+    for (const name of ["photos", "recordings"]) {
+      const storeApi = name === "photos" ? T.photos : T.blobs;
+      const items = media[name] || {};
+      if (!Object.keys(items).length) continue;
+      await storeApi.clear().catch(function () { /* empty */ });
+      for (const id of Object.keys(items)) {
+        await storeApi.put(id, new Blob([unb64(items[id].data)], { type: items[id].type }));
+      }
+    }
   }
   function unb64(str) {
     const s = atob(str);
@@ -87,7 +116,15 @@ Tendril.ready(function () {
   $("backup").addEventListener("click", async function () {
     const data = currentData();
     if (!Object.keys(data).length) { T.toast("Nothing to back up yet"); return; }
-    const payload = JSON.stringify({ exported: new Date().toISOString(), data: data });
+    const withMedia = $("backup-media").checked;
+    const btn = $("backup");
+    btn.disabled = true;
+    const label = btn.textContent;
+    btn.textContent = withMedia ? "Packing photos and recordings…" : "Preparing…";
+    const media = withMedia ? await collectMedia() : null;
+    btn.disabled = false;
+    btn.textContent = label;
+    const payload = JSON.stringify({ exported: new Date().toISOString(), data: data, media: media || undefined });
     const pass = $("backup-pass").value;
     let file;
     try {
@@ -106,16 +143,16 @@ Tendril.ready(function () {
       return;
     }
     const day = new Date().toISOString().slice(0, 10);
-    T.download("tendril-backup-" + day + ".json", JSON.stringify(file, null, pass ? 0 : 2), "application/json");
+    T.download("tendril-backup-" + day + ".json", JSON.stringify(file, null, pass || withMedia ? 0 : 2), "application/json");
     $("backup-pass").value = "";
     T.toast(pass ? "Encrypted backup downloaded" : "Backup downloaded");
   });
 
   // ---------------- Restore ----------------
-  let pendingFile = null, pendingData = null;
+  let pendingFile = null, pendingData = null, pendingMedia = null;
 
   function resetRestore() {
-    pendingFile = pendingData = null;
+    pendingFile = pendingData = pendingMedia = null;
     $("restore-pass-step").hidden = true;
     $("restore-confirm").hidden = true;
     $("restore-error").hidden = true;
@@ -129,7 +166,15 @@ Tendril.ready(function () {
     if (!keys.length) { restoreError("That backup is empty."); return; }
     pendingData = {};
     keys.forEach(function (k) { pendingData[k] = obj.data[k]; });
-    renderList($("restore-summary"), describe(pendingData), "No recognizable data.");
+    const rows = describe(pendingData);
+    pendingMedia = obj.media && typeof obj.media === "object" ? obj.media : null;
+    if (pendingMedia) {
+      const np = Object.keys(pendingMedia.photos || {}).filter(function (k) { return !/:thumb$/.test(k); }).length;
+      const nr = Object.keys(pendingMedia.recordings || {}).length;
+      if (np) rows.push(["Photos", np + plural(np, " photo", " photos")]);
+      if (nr) rows.push(["Voice recordings", nr + plural(nr, " recording", " recordings")]);
+    }
+    renderList($("restore-summary"), rows, "No recognizable data.");
     $("restore-date").textContent = obj.exported ? "Made on " + T.fmtDate(obj.exported, true) + "." : "";
     $("restore-pass-step").hidden = true;
     $("restore-confirm").hidden = false;
@@ -167,10 +212,18 @@ Tendril.ready(function () {
   $("unlock").addEventListener("click", unlock);
   $("restore-pass").addEventListener("keydown", function (ev) { if (ev.key === "Enter") unlock(); });
 
-  $("restore-go").addEventListener("click", function () {
+  $("restore-go").addEventListener("click", async function () {
     if (!pendingData) return;
+    const btn = $("restore-go");
+    btn.disabled = true;
+    btn.textContent = "Restoring…";
     T.store.keys().forEach(function (k) { T.store.remove(k); });
     Object.keys(pendingData).forEach(function (k) { T.store.set(k, pendingData[k]); });
+    try { if (pendingMedia) await writeMedia(pendingMedia); }
+    catch (e) { T.toast("Your data was restored, but some photos or recordings couldn’t be"); }
+    await T.store.flush();
+    btn.disabled = false;
+    btn.textContent = "Replace with backup";
     resetRestore();
     renderStored();
     T.toast("Backup restored");
