@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tendril Voice Practice</title>
+<meta name="description" content="Practice your speaking pitch with a live graph and a target range. Everything stays on your device.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fredoka:wght@500;600&family=Nunito+Sans:opsz,wght@6..12,400;6..12,700;6..12,800&display=swap">
+<link rel="stylesheet" href="assets/css/tendril.css">
+<link rel="stylesheet" href="assets/css/voice.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Tendril home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 29c0-8 2-13 7-16 4-2.5 7-1 7 2s-3 4-5 2.5" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M15 14c-1-5 2-9 7-10-0.5 5-3 8.5-7 10z" fill="var(--secondary)"/></svg>
+      Tendril
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="navlink nav-home" href="index.html">Home</a>
+      <a class="navlink" href="voice.html" aria-current="page">Voice</a>
+      <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap voice">
+  <section class="intro">
+    <p class="eyebrow">Voice practice</p>
+    <h1>Find your speaking pitch</h1>
+    <p class="lede">Speak, read a prompt, or hum, and watch your pitch move in real time against a target range you choose. The microphone audio is processed on this device and never uploaded.</p>
+  </section>
+
+  <div class="layout">
+    <section class="panel monitor" aria-labelledby="graph-label">
+      <div class="readout">
+        <div class="readout-main">
+          <span class="hz" id="hz" aria-live="off">—</span><span class="unit">Hz</span>
+          <span class="note" id="note"></span>
+        </div>
+        <span class="status" id="status" data-state="idle" role="status">Ready</span>
+      </div>
+
+      <div class="graph-head">
+        <h2 class="graph-title" id="graph-label">Example session</h2>
+        <span class="chip" id="example-chip">Example data</span>
+        <span class="timer" id="timer">0:12</span>
+      </div>
+      <div class="graph-box">
+        <canvas id="graph" aria-label="Pitch over time, with your target range shaded" role="img"></canvas>
+      </div>
+      <p class="legend"><span class="sw sw-in"></span>In your range <span class="sw sw-out"></span>Outside it <span class="sw sw-band"></span>Target band</p>
+
+      <div class="controls">
+        <button class="btn btn-primary" id="start" type="button">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          Start microphone
+        </button>
+        <button class="btn btn-pink" id="stop" type="button" hidden>Stop and save</button>
+        <label class="btn btn-soft" for="file">Analyze a recording</label>
+        <input type="file" id="file" accept="audio/*" class="visually-hidden">
+      </div>
+      <p class="notice" id="notice" role="alert" hidden></p>
+
+      <dl class="stats">
+        <div><dt>Average</dt><dd id="stat-avg">—</dd></div>
+        <div><dt>Time in range</dt><dd id="stat-in">—</dd></div>
+        <div><dt>Low end</dt><dd id="stat-low">—</dd></div>
+        <div><dt>High end</dt><dd id="stat-high">—</dd></div>
+      </dl>
+    </section>
+
+    <aside class="side">
+      <section class="panel" aria-labelledby="target-h">
+        <h2 id="target-h">Target range</h2>
+        <p class="small muted" id="target-readout">165–255 Hz</p>
+        <div class="segmented" role="group" aria-label="Range presets">
+          <button type="button" data-preset="lighter" aria-pressed="true">Lighter</button>
+          <button type="button" data-preset="between" aria-pressed="false">In-between</button>
+          <button type="button" data-preset="deeper" aria-pressed="false">Deeper</button>
+        </div>
+        <div class="custom">
+          <label for="low">From <input id="low" type="number" inputmode="numeric" min="60" max="400" step="5" value="165"> Hz</label>
+          <label for="high">to <input id="high" type="number" inputmode="numeric" min="65" max="450" step="5" value="255"> Hz</label>
+        </div>
+        <p class="small muted">These are typical speaking ranges and they overlap a lot. Pitch is only one part of how a voice comes across; resonance and intonation matter just as much.</p>
+      </section>
+
+      <section class="panel prompt" aria-labelledby="prompt-h">
+        <div class="prompt-head">
+          <h2 id="prompt-h">Read aloud</h2>
+          <span class="chip live" id="prompt-kind">Sentence</span>
+        </div>
+        <p class="prompt-text" id="prompt-text">Could you pass me the blue mug on the top shelf?</p>
+        <div class="prompt-foot">
+          <span class="small muted" id="prompt-count">1 of 12</span>
+          <button class="btn btn-soft btn-small" id="next-prompt" type="button">Next prompt</button>
+        </div>
+      </section>
+
+      <section class="care" aria-labelledby="care-h">
+        <h3 id="care-h">Go easy on your voice</h3>
+        <p>Practice in short sessions of 10 to 15 minutes and sip water. If your throat feels tight, scratchy or tired, stop and rest. Pushing pitch up by squeezing your throat can strain it; a voice coach or speech therapist can help you find a comfortable technique.</p>
+      </section>
+    </aside>
+  </div>
+
+  <section class="panel history" aria-labelledby="history-h">
+    <div class="history-head">
+      <h2 id="history-h">Your sessions</h2>
+      <button class="btn btn-soft btn-small" id="clear-history" type="button" hidden>Clear history</button>
+      <div class="confirm" id="confirm-clear" hidden>
+        <span>Delete all saved sessions on this device?</span>
+        <button class="btn btn-pink btn-small" id="confirm-yes" type="button">Delete</button>
+        <button class="btn btn-soft btn-small" id="confirm-no" type="button">Keep</button>
+      </div>
+    </div>
+    <p class="muted" id="history-empty">Sessions you finish are saved here, on this device only, so you can see how your average changes over weeks.</p>
+    <ol class="history-list" id="history"></ol>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Tendril stores everything in your browser on this device. Nothing is sent to a server.</p>
+    <p>Press <kbd>Esc</kbd> twice to leave quickly.</p>
+  </div>
+</footer>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/pitch.js"></script>
+<script src="assets/js/voice.js"></script>
+</body>
+</html>

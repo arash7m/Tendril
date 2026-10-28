@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tendril</title>
+<meta name="description" content="Small, private tools for trans people: voice practice, dose tracking and more. Everything stays on your device.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fredoka:wght@500;600&family=Nunito+Sans:opsz,wght@6..12,400;6..12,700;6..12,800&display=swap">
+<link rel="stylesheet" href="assets/css/tendril.css">
+<style>
+  .home { padding-block: 40px 0; display: grid; gap: 48px; }
+  .hero { display: grid; gap: 16px; max-width: 40rem; }
+  .hero .lede { font-size: 1.15rem; color: var(--muted); max-width: 34rem; }
+  .hero .actions { display: flex; gap: 12px; flex-wrap: wrap; padding-top: 6px; }
+  .hero h1 .grow {
+    background: linear-gradient(135deg, var(--primary), var(--accent-dark));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .tools { display: grid; gap: 16px; }
+  .tool-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 640px) { .tool-grid { grid-template-columns: minmax(0, 1fr); } }
+  .tool {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 14px 16px;
+    align-items: start;
+    padding: 20px;
+    border-radius: var(--r-lg);
+    background: var(--surface);
+    border: 2px solid var(--line);
+    text-decoration: none;
+    color: var(--ink);
+  }
+  a.tool { box-shadow: var(--shadow); border-color: transparent; transition: transform .15s ease; }
+  a.tool:hover { transform: translateY(-2px); }
+  .tool .icon {
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #04221f;
+  }
+  .tool.soon .icon { background: var(--surface-2); color: var(--muted); }
+  .tool .body { display: grid; gap: 6px; }
+  .tool .top { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .tool p { color: var(--muted); font-size: 0.95rem; }
+
+  .privacy {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 24px;
+    background: var(--primary-light);
+    border-radius: var(--r-xl);
+    padding: clamp(20px, 4vw, 36px);
+  }
+  @media (max-width: 720px) { .privacy { grid-template-columns: minmax(0, 1fr); } }
+  .privacy ul { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
+  .privacy .intro { display: grid; gap: 10px; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Tendril home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 29c0-8 2-13 7-16 4-2.5 7-1 7 2s-3 4-5 2.5" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M15 14c-1-5 2-9 7-10-0.5 5-3 8.5-7 10z" fill="var(--secondary)"/></svg>
+      Tendril
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="navlink nav-home" href="index.html" aria-current="page">Home</a>
+      <a class="navlink" href="voice.html">Voice</a>
+      <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap home">
+  <section class="hero">
+    <p class="eyebrow">For trans and gender-diverse people</p>
+    <h1>Small tools for the way you <span class="grow">grow</span>.</h1>
+    <p class="lede">Practice your voice, keep track of your doses, and find your way through the paperwork. No account, no tracking, and nothing leaves your device.</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="voice.html">Try voice practice</a>
+      <a class="btn btn-soft" href="#privacy">How your data is kept</a>
+    </div>
+  </section>
+
+  <section class="tools" aria-labelledby="tools-h">
+    <h2 id="tools-h">Tools</h2>
+    <div class="tool-grid">
+      <a class="tool" href="voice.html">
+        <span class="icon"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M3 12h2M7 8v8M11 5v14M15 9v6M19 11v2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+        <div class="body">
+          <div class="top"><h3>Voice practice</h3><span class="chip live">Ready</span></div>
+          <p>See your pitch live against a target range, read practice prompts, and track your average over time.</p>
+        </div>
+      </a>
+      <div class="tool soon">
+        <span class="icon"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M4 10h16M9 3v4M15 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <div class="body">
+          <div class="top"><h3>Dose tracker</h3><span class="chip soon">Coming soon</span></div>
+          <p>Log injections, pills, patches and gel, rotate injection sites on a body map, and get refill reminders.</p>
+        </div>
+      </div>
+      <div class="tool soon">
+        <span class="icon"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M5 18c1.5-4 4-6 7-6s5.5 2 7 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="12" cy="7.5" r="3.5" stroke="currentColor" stroke-width="2" fill="none"/></svg></span>
+        <div class="body">
+          <div class="top"><h3>Name &amp; pronoun sandbox</h3><span class="chip soon">Coming soon</span></div>
+          <p>Try a name and pronouns in everyday sentences and see how they feel, privately.</p>
+        </div>
+      </div>
+      <div class="tool soon">
+        <span class="icon"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M5 4h10l4 4v12H5z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><path d="M9 12h6M9 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+        <div class="body">
+          <div class="top"><h3>Guides</h3><span class="chip soon">Coming soon</span></div>
+          <p>Name and gender marker changes, safe binding and tucking, and questions to bring to appointments.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="privacy" id="privacy" aria-labelledby="privacy-h">
+    <div class="intro">
+      <h2 id="privacy-h">Your data stays with you</h2>
+      <p>Not everyone is out yet, and some people live where being trans isn’t safe. Tendril is built so nobody else can see what you do here.</p>
+    </div>
+    <ul>
+      <li>Everything you save is stored in this browser, on this device. There are no accounts and no server copies.</li>
+      <li>Voice practice analyzes your microphone on your device. Audio is never recorded or uploaded.</li>
+      <li>No analytics, ads or trackers.</li>
+      <li>The <strong>Quick exit</strong> button, or pressing <kbd>Esc</kbd> twice, jumps to a weather search and removes this page from your back button.</li>
+    </ul>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Tendril is a community project and isn’t medical advice. Talk to your doctor about anything to do with your hormones or health.</p>
+  </div>
+</footer>
+
+<script src="assets/js/common.js"></script>
+</body>
+</html>
