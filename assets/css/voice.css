@@ -3,15 +3,15 @@
 /* Each target range has its own color: lighter = pink, in-between = lavender, deeper = teal. */
 :root, :root[data-tone="lighter"] {
   --tone: var(--secondary); --tone-dark: var(--secondary-dark);
-  --tone-light: var(--secondary-light); --tone-band: var(--band-pink);
+  --tone-light: var(--secondary-light); --tone-band: var(--band-pink); --on-tone: var(--on-secondary);
 }
 :root[data-tone="between"] {
   --tone: var(--lav); --tone-dark: var(--lav-dark);
-  --tone-light: var(--lav-light); --tone-band: var(--band-lav);
+  --tone-light: var(--lav-light); --tone-band: var(--band-lav); --on-tone: var(--on-accent);
 }
 :root[data-tone="deeper"] {
   --tone: var(--primary); --tone-dark: var(--primary-dark);
-  --tone-light: var(--primary-light); --tone-band: var(--band);
+  --tone-light: var(--primary-light); --tone-band: var(--band); --on-tone: var(--on-primary);
 }
 
 .voice { padding-block: 28px 0; display: grid; gap: 24px; }
@@ -77,7 +77,7 @@
   background: var(--surface-2);
   color: var(--muted);
 }
-.status[data-state="in"] { background: var(--tone); color: #1a1426; }
+.status[data-state="in"] { background: var(--tone); color: var(--on-tone); }
 .status[data-state="low"],
 .status[data-state="high"] { background: var(--tone-light); color: var(--ink); }
 
@@ -146,10 +146,10 @@
   color: var(--ink);
   cursor: pointer;
 }
-.segmented button[data-preset="lighter"] { --b: var(--secondary); --bd: var(--secondary-dark); }
-.segmented button[data-preset="between"] { --b: var(--lav); --bd: var(--lav-dark); }
-.segmented button[data-preset="deeper"] { --b: var(--primary); --bd: var(--primary-dark); }
-.segmented button[aria-pressed="true"] { background: var(--b); color: #1a1426; box-shadow: 0 3px 0 var(--bd); }
+.segmented button[data-preset="lighter"] { --b: var(--secondary); --bd: var(--secondary-dark); --bo: var(--on-secondary); }
+.segmented button[data-preset="between"] { --b: var(--lav); --bd: var(--lav-dark); --bo: var(--on-accent); }
+.segmented button[data-preset="deeper"] { --b: var(--primary); --bd: var(--primary-dark); --bo: var(--on-primary); }
+.segmented button[aria-pressed="true"] { background: var(--b); color: var(--bo); box-shadow: 0 3px 0 var(--bd); }
 
 .custom { display: flex; gap: 10px; flex-wrap: wrap; font-weight: 700; font-size: 0.9rem; }
 .custom input {

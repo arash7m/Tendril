@@ -28,8 +28,8 @@
   color: var(--ink);
   text-align: center;
 }
-.med-card[data-state="today"] .due-chip { background: var(--accent); color: #2a2200; }
-.med-card[data-state="late"] .due-chip { background: var(--secondary); color: #2b0613; }
+.med-card[data-state="today"] .due-chip { background: var(--warn); color: var(--on-warn); }
+.med-card[data-state="late"] .due-chip { background: var(--secondary); color: var(--on-secondary); }
 .med-card[data-state="soon"] .due-chip { background: var(--primary-light); }
 
 .med-facts {

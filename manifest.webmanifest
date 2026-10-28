@@ -7,8 +7,8 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#f4fbfa",
-  "theme_color": "#f4fbfa",
+  "background_color": "#070A1F",
+  "theme_color": "#070A1F",
   "lang": "en",
   "categories": ["health", "lifestyle", "utilities"],
   "icons": [
