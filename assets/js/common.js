@@ -578,19 +578,48 @@
   // ---------------- Section tabs keep your place ----------------
   // Tapping a tab (Pitch / Resonance, Doses / Labs, Story / Body…) opens another page.
   // Remember where the tab bar was on screen and put it back there, instead of jumping to the top.
+  function ssSet(k, v) { try { global.sessionStorage.setItem(k, v); } catch (e) { /* unavailable */ } }
+  function ssTake(k) { try { const v = global.sessionStorage.getItem(k); global.sessionStorage.removeItem(k); return v; } catch (e) { return null; } }
+
   function wireTabs() {
     document.querySelectorAll(".voice-tabs a").forEach(function (a) {
       a.addEventListener("click", function () {
         const bar = a.closest(".voice-tabs");
-        try {
-          global.sessionStorage.setItem("tendril:tabPos", JSON.stringify({
-            to: new URL(a.href, location.href).pathname, top: bar.getBoundingClientRect().top, at: Date.now()
-          }));
-        } catch (e) { /* storage unavailable: the page just opens at the top */ }
+        ssSet("tendril:tabPos", JSON.stringify({ to: new URL(a.href, location.href).pathname, top: bar.getBoundingClientRect().top, at: Date.now() }));
       });
     });
+    // Main menu: remember how far it was scrolled sideways.
+    const nav = document.querySelector(".nav");
+    if (nav) {
+      const remember = function () { ssSet("tendril:navX", String(Math.round(nav.scrollLeft))); };
+      nav.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", remember); });
+      nav.addEventListener("scroll", remember, { passive: true });
+    }
+    whenOpened(restorePlaces);
+  }
+
+  function whenOpened(fn) {
+    if (document.prerendering) document.addEventListener("prerenderingchange", fn, { once: true });
+    else fn();
+  }
+
+  // Keep the main menu where it was, and make sure the current page's tab is in view.
+  function placeNav() {
+    const nav = document.querySelector(".nav");
+    if (!nav) return;
+    const x = parseInt(ssTake("tendril:navX"), 10);
+    if (isFinite(x)) nav.scrollLeft = x;
+    const cur = nav.querySelector('[aria-current="page"]');
+    if (cur) {
+      const r = cur.getBoundingClientRect(), n = nav.getBoundingClientRect();
+      if (r.left < n.left + 4 || r.right > n.right - 4) nav.scrollLeft += (r.left - n.left) - (n.width - r.width) / 2;
+    }
+  }
+
+  function restorePlaces() {
+    placeNav();
     let saved = null;
-    try { saved = JSON.parse(global.sessionStorage.getItem("tendril:tabPos") || "null"); global.sessionStorage.removeItem("tendril:tabPos"); } catch (e) { saved = null; }
+    try { saved = JSON.parse(ssTake("tendril:tabPos") || "null"); } catch (e) { saved = null; }
     if (!saved || saved.to !== location.pathname || Date.now() - saved.at > 10000) return;
     const bar = document.querySelector(".voice-tabs");
     if (!bar) return;
@@ -606,8 +635,32 @@
     ready(function () { setTimeout(place, 30); });
   }
 
-  if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", wireQuickExit); document.addEventListener("DOMContentLoaded", wireTabs); }
-  else { wireQuickExit(); wireTabs(); }
+  // Load the menu pages quietly in the background, so tapping a tab opens it at once
+  // (no loading bar). Browsers without support just navigate normally.
+  function preloadTabs() {
+    if (!/^https?:/.test(location.protocol) || document.querySelector('script[type="speculationrules"]')) return;
+    if (!(global.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules"))) return;
+    const rules = { prerender: [
+      { source: "document", where: { selector_matches: ".nav a.navlink:not([aria-current])" }, eagerness: "eager" },
+      { source: "document", where: { selector_matches: ".voice-tabs a:not([aria-current]), .tool-link, .hard-fab" }, eagerness: "moderate" }
+    ] };
+    const s = document.createElement("script");
+    s.type = "speculationrules";
+    s.textContent = JSON.stringify(rules);
+    document.head.appendChild(s);
+  }
+
+  // A skipped page fade (e.g. the page was hidden) isn't an error worth reporting.
+  global.addEventListener("pagereveal", function (e) {
+    const vt = e.viewTransition;
+    if (vt) [vt.ready, vt.finished, vt.updateCallbackDone].forEach(function (pr) { if (pr) pr.catch(function () {}); });
+  });
+
+  // Position the menu straight away (common.js runs at the end of the page, before it's drawn).
+  whenOpened(placeNav);
+
+  if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", wireQuickExit); document.addEventListener("DOMContentLoaded", wireTabs); document.addEventListener("DOMContentLoaded", preloadTabs); }
+  else { wireQuickExit(); wireTabs(); preloadTabs(); }
 
   let toastTimer = 0;
   function toast(msg) {
@@ -689,5 +742,7 @@
     relDays: relDays, fmtDate: fmtDate
   };
 
-  boot();
+  // A page loaded ahead of time (see preloadTabs) waits until it's opened before unlocking and rendering.
+  if (document.prerendering) document.addEventListener("prerenderingchange", function () { boot(); }, { once: true });
+  else boot();
 })(window);

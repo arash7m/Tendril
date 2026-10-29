@@ -154,6 +154,8 @@ body::before {
 .nav::-webkit-scrollbar { display: none; }
 .nav a.navlink {
   flex: none;
+  min-width: 6.4em;
+  text-align: center;
   text-decoration: none;
   font-weight: 700;
   font-size: 0.92rem;
@@ -161,8 +163,10 @@ body::before {
   border-radius: 999px;
   color: var(--ink);
   white-space: nowrap;
+  transition: background-color .25s ease, transform .15s ease;
 }
-.nav a.navlink:hover { background: var(--surface-2); }
+@media (hover: hover) { .nav a.navlink:hover { background: var(--surface-2); } }
+.nav a.navlink:active { transform: scale(0.95); background: var(--surface-2); }
 .nav a.navlink[aria-current="page"] { background: var(--primary-light); }
 
 /* ---------- Buttons ---------- */
@@ -442,3 +446,20 @@ input.input[type="date"], input.input[type="datetime-local"], input.input[type="
 }
 input.input[type="date"]::-webkit-date-and-time-value, input.input[type="datetime-local"]::-webkit-date-and-time-value { text-align: left; min-height: 1.4em; }
 .field { min-width: 0; }
+
+/* ---------- Soft touch ---------- */
+/* No grey/blue squares when tapping; a gentle press instead. */
+html { -webkit-tap-highlight-color: transparent; }
+:focus:not(:focus-visible) { outline: none; }
+a, button, .btn, .voice-tabs a, .pills span, .chip { -webkit-tap-highlight-color: transparent; }
+.btn { transition: transform .15s ease, background-color .25s ease, box-shadow .25s ease, color .25s ease; }
+.btn:not(.btn-primary):not(.btn-pink):active { transform: scale(0.97); }
+.voice-tabs a { transition: background-color .25s ease, color .25s ease, transform .15s ease; }
+.voice-tabs a:active { transform: scale(0.96); }
+
+/* Pages fade into each other instead of flashing (browsers that support it). */
+@view-transition { navigation: auto; }
+.site-header { view-transition-name: site-header; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .22s; animation-timing-function: ease; }
+::view-transition-group(site-header) { animation: none; }
+@media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
