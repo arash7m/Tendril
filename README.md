@@ -18,7 +18,7 @@ Everything runs in the browser and is stored on the user's own device. There is 
 | `doses.html` | Dose tracker: medications, dose log, next due, doses left, injection/patch site rotation on a body map, calendar reminders (.ics) |
 | `labs.html` | Lab results: markers with unit conversion (`assets/js/labs-core.js`), per-marker charts with the doctor's range, test history |
 | `visits.html` | Appointments and blood tests with countdowns and calendar export (`assets/js/visits-core.js`) |
-| `summary.html` | Doctor summary: medications with doses taken, latest labs, mood, chosen journal notes, voice, questions; print/PDF or copy as text |
+| `summary.html` | Doctor summary: medications with doses taken, latest labs, mood, chosen journal notes, voice, body measurements (optional, weight only if tracked), questions; print/PDF or copy as text |
 | `hardday.html` | Hard day mode: breathing circle, 5-4-3-2-1 grounding, good reminders (jar, milestones, kind words incl. your own), trusted people with call/text and message ideas, regional support lines, gentle care checklist, write it out (let it go or keep in timeline). Linked from a floating heart on the hub, a low mood check-in, All tools and the jar |
 | `jar.html` | Euphoria jar: save moments, pick one at random (includes timeline entries tagged euphoria) |
 | `comingout.html` | Coming-out helper: builds an editable letter, talking points or short text from a few choices; saved drafts |
@@ -65,6 +65,7 @@ Everything is stored in the browser's localStorage under keys starting with `ten
 | `labs.tests`, `labs.ranges`, `labs.units` | Blood tests, target ranges from the doctor, last unit used per marker |
 | `visits.list` | Appointments |
 | `hub.settings` | Greeting name, discreet mode, card order and hidden cards |
+| `backup.last`, `backup.firstUse`, `backup.snooze` | When the last backup was made, first real use, and “Not now” on the home reminder (monthly; two-week snooze) |
 | `summary.settings` | Doctor summary choices and questions |
 | `read.settings` | Read-along source, text size, scroll speed, your own text |
 | `warmup.log`, `warmup.len` | Warm-up summaries (per-step scores, no audio), chosen length |

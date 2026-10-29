@@ -400,8 +400,44 @@ Tendril.ready(function () {
 
   const BUILD = { next: cardNext, visit: cardVisit, checkin: cardCheckin, milestone: cardMilestone, photos: cardPhotos, voice: cardVoice, jar: cardJar, labs: cardLabs, links: cardLinks };
 
+  // ---------------- Backup reminder ----------------
+  // Shows once there's something worth keeping, if the last backup was over a month ago
+  // (or never, after a week of use). "Not now" waits two weeks.
+  const DAY = 86400000;
+  function worthKeeping() {
+    const e = T.store.get("timeline.entries", []), p = e.reduce(function (a, x) { return a + (x.photos || []).length; }, 0);
+    const n = e.length + p * 3 + T.store.get("doses.log", []).filter(function (l) { return !l.example; }).length +
+      T.store.get("jar.notes", []).length + T.store.get("voice.history", []).length + T.store.get("labs.tests", []).filter(function (t) { return !t.example; }).length +
+      T.store.get("body.entries", []).length + T.store.get("warmup.log", []).length;
+    return n >= 5;
+  }
+  function renderBackupNudge() {
+    const box = $("backup-nudge");
+    if (!box) return;
+    let show = false;
+    if (worthKeeping()) {
+      const now = Date.now();
+      let first = T.store.get("backup.firstUse", null);
+      if (!first) { first = new Date().toISOString(); T.store.set("backup.firstUse", first); }
+      const last = T.store.get("backup.last", null), snooze = T.store.get("backup.snooze", null);
+      const due = last ? now - new Date(last).getTime() > 30 * DAY : now - new Date(first).getTime() > 7 * DAY;
+      show = due && !(snooze && now < new Date(snooze).getTime());
+      if (show) {
+        const days = last ? Math.round((now - new Date(last).getTime()) / DAY) : 0;
+        $("backup-nudge-title").textContent = last ? "Your last backup was " + days + " days ago" : "You haven’t made a backup yet";
+      }
+    }
+    box.hidden = !show;
+  }
+  if ($("backup-later")) $("backup-later").addEventListener("click", function () {
+    T.store.set("backup.snooze", new Date(Date.now() + 14 * DAY).toISOString());
+    $("backup-nudge").hidden = true;
+    T.toast("Okay, I’ll remind you in two weeks");
+  });
+
   function render() {
     renderGreeting();
+    renderBackupNudge();
     const grid = $("hub-grid");
     grid.innerHTML = "";
     const hidden = settings.hidden || [];

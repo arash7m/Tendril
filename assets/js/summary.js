@@ -109,6 +109,43 @@ Tendril.ready(function () {
     return { pitch: v, res: r };
   }
 
+  // Body measurements (stored in cm and kg); shown in the units the person chose on the Body page.
+  function bodyData(start) {
+    const set = Object.assign({ unit: "cm", wunit: "kg", track: [] }, T.store.get("body.settings", {}));
+    const NAMES = [["chest", "Chest / bust"], ["underbust", "Underbust"], ["waist", "Waist"], ["hips", "Hips"], ["shoulders", "Shoulders"], ["thigh", "Thigh"], ["arm", "Upper arm"], ["neck", "Neck"], ["weight", "Weight"]];
+    const all = T.store.get("body.entries", []).slice().sort(function (a, b) { return a.date < b.date ? -1 : 1; });
+    const startDay = isoDay(start);
+    const rows = [];
+    let weight = false;
+    NAMES.forEach(function (n) {
+      const key = n[0], isW = key === "weight";
+      if (isW && set.track.indexOf("weight") < 0) return; // only if they chose to track weight
+      const pts = all.filter(function (e) { return e.values && e.values[key] != null; });
+      const inPeriod = pts.filter(function (e) { return e.date >= startDay; });
+      if (!inPeriod.length) return;
+      const unit = isW ? set.wunit : set.unit;
+      const conv = function (v) { return isW ? (unit === "lb" ? v / 0.45359237 : v) : (unit === "in" ? v / 2.54 : v); };
+      const show = function (v) { return Number(conv(v).toFixed(1)).toLocaleString() + " " + unit; };
+      // Compare with the last measurement before the period if there is one, otherwise the first in it.
+      const before = pts.filter(function (e) { return e.date < startDay; }).pop();
+      const first = before || (inPeriod.length > 1 ? inPeriod[0] : null);
+      const last = inPeriod[inPeriod.length - 1];
+      let change = "—";
+      if (first) {
+        const d = conv(last.values[key]) - conv(first.values[key]);
+        change = (d > 0.049 ? "+" : d < -0.049 ? "−" : "±") + Number(Math.abs(d).toFixed(1)).toLocaleString() + " " + unit;
+      }
+      if (isW) weight = true;
+      rows.push({
+        name: n[1],
+        first: first ? show(first.values[key]) + ", " + day(first.date + "T12:00") : null,
+        last: show(last.values[key]) + ", " + day(last.date + "T12:00"),
+        change: change
+      });
+    });
+    return { rows: rows, weight: weight };
+  }
+
   function questionsList() {
     return $("questions").value.split("\n").map(function (q) { return q.trim(); }).filter(Boolean);
   }
@@ -278,6 +315,19 @@ Tendril.ready(function () {
         const p = el("p", null, v.res.length + " resonance sessions.");
         sec.appendChild(p);
         text.push(p.textContent);
+      }
+      text.push("");
+    }
+
+    if (on("body")) {
+      const sec = section("Body measurements");
+      const b = bodyData(start);
+      if (!b.rows.length) empty(sec, "No body measurements recorded in this period.");
+      else {
+        table(sec, ["Measurement", "Earlier", "Latest", "Change"], b.rows.map(function (r) {
+          return [r.name, r.first ? r.first : "—", r.last, r.change];
+        }));
+        sec.appendChild(el("p", "doc-note", "Measured at home by the patient with a tape measure" + (b.weight ? " (weight on home scales)" : "") + "."));
       }
       text.push("");
     }

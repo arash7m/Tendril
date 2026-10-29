@@ -161,8 +161,30 @@ Tendril.ready(function () {
     const day = new Date().toISOString().slice(0, 10);
     T.download("tendril-backup-" + day + ".json", JSON.stringify(file, null, pass || withMedia ? 0 : 2), "application/json");
     $("backup-pass").value = "";
+    T.store.set("backup.last", new Date().toISOString());
+    T.store.remove("backup.snooze");
+    showLastBackup();
     T.toast(pass ? "Encrypted backup downloaded" : "Backup downloaded");
   });
+
+  function showLastBackup() {
+    const last = T.store.get("backup.last", null), el = $("last-backup");
+    if (!el) return;
+    if (!last) { el.textContent = "You haven’t made a backup yet."; el.dataset.state = "never"; return; }
+    const days = Math.round((Date.now() - new Date(last).getTime()) / 86400000);
+    el.textContent = "Last backup: " + (days < 1 ? "today" : days === 1 ? "yesterday" : days + " days ago") + " (" + new Date(last).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" }) + ")";
+    el.dataset.state = days > 30 ? "old" : "ok";
+  }
+  showLastBackup();
+  // Opened from the home screen's backup reminder
+  if (location.hash === "#backup") {
+    history.replaceState(null, "", location.pathname);
+    setTimeout(function () {
+      $("backup-panel").scrollIntoView({ behavior: "smooth", block: "start" });
+      $("backup-panel").classList.add("flash");
+      setTimeout(function () { $("backup-panel").classList.remove("flash"); }, 1800);
+    }, 150);
+  }
 
   // ---------------- Restore ----------------
   let pendingFile = null, pendingData = null, pendingMedia = null;

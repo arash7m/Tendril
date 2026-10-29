@@ -34,3 +34,9 @@
 .lock-more[open] summary { margin-bottom: 12px; }
 #lock-off, #lock-on { display: grid; gap: 14px; }
 #lock-off[hidden], #lock-on[hidden] { display: none; }
+
+/* Backup: when the last one was, and a soft highlight when opened from the reminder */
+.backup-panel { scroll-margin-top: 120px; transition: box-shadow .4s ease; }
+.backup-panel.flash { box-shadow: 0 0 0 3px var(--lav), 0 0 30px rgba(155, 93, 229, 0.35); }
+.last-backup { font-weight: 800; font-size: 0.92rem; color: var(--link); margin-top: -4px; }
+.last-backup[data-state="never"], .last-backup[data-state="old"] { color: #FFB3D6; }
