@@ -112,10 +112,14 @@ The site is static, so GitHub Pages works as-is: **Settings → Pages → Deploy
 
 All paths are relative, so the app works at any address: a `github.io` subpath, an organisation's own `github.io` address, or a custom domain. Browsers keep data per address, so moving to a new one starts with empty storage there. Make a backup first and restore it at the new address.
 
+## License
+
+AGPL-3.0 (see [LICENSE](../LICENSE)). Contributions are accepted under the same license.
+
 ## Privacy rules for contributors
 
 - Never send user data anywhere. No fetch/XHR to third parties, no analytics.
 - Store data only through `Tendril.store` (localStorage, prefixed `tendril:`).
-- Audio is analyzed in memory and never recorded or uploaded.
+- Audio is analyzed in memory and never uploaded. Recordings are kept only if the person chooses to, on their device.
 - Every page includes `common.js` (which also handles the Esc-twice quick exit).
 - Health content is information, not dosing advice.

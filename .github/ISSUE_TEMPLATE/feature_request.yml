@@ -1,0 +1,22 @@
+name: Idea or request
+description: Suggest something that would make Tendril more useful.
+labels: ["idea"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Issues are public.** Please don't share personal or health details; describe the idea in general terms.
+
+        Tendril keeps everything on the device, with no server or accounts, so ideas that need those may not fit.
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: How would it help you or others?
+    validations:
+      required: true

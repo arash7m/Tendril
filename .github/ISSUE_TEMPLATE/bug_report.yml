@@ -1,0 +1,53 @@
+name: Something isn't working
+description: Tell us about a bug or something that looks wrong.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping make Tendril better.
+
+        **Issues are public.** Please don't include your name, health details, dose amounts, photos, lab results or anything else personal. Describe the problem with made-up examples instead.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, and what went wrong?
+      placeholder: On the Jar page, I tapped "Add a moment", and the date field was wider than the screen.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: dropdown
+    id: page
+    attributes:
+      label: Which part of the app?
+      options:
+        - Home
+        - Timeline / Body
+        - Voice (warm-up, pitch, resonance, games)
+        - Health (doses, labs, appointments, summary)
+        - Jar
+        - Hard day mode
+        - Names / Guides / Coming out
+        - Your data (backup, lock)
+        - Installing or updating the app
+        - Somewhere else
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Phone or computer, and browser
+      placeholder: Android 15, Chrome, installed app
+    validations:
+      required: true
+  - type: textarea
+    id: shots
+    attributes:
+      label: Screenshots (optional)
+      description: Only if they don't show anything personal. Example data is fine.

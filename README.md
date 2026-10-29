@@ -8,6 +8,13 @@
 </p>
 
 <p align="center">
+  <a href="LICENSE"><img alt="License: AGPL-3.0" src="https://img.shields.io/badge/license-AGPL--3.0-9B5DE5"></a>
+  <img alt="Installable web app, works offline" src="https://img.shields.io/badge/app-installable%20%C2%B7%20offline-3DA9FC">
+  <a href="PRIVACY.md"><img alt="No tracking, no account" src="https://img.shields.io/badge/tracking-none-FF4FA3"></a>
+  <a href="PRIVACY.md"><img alt="Data stays on your device" src="https://img.shields.io/badge/data-stays%20on%20your%20device-070A1F"></a>
+</p>
+
+<p align="center">
   <a href="https://arash7m.github.io/Tendril/"><b>Open Tendril</b></a>
   &nbsp;·&nbsp;
   <a href="#install-it-on-your-phone">Install it on your phone</a>
@@ -16,6 +23,14 @@
 </p>
 
 ---
+
+## Demo
+
+<p align="center">
+  <img src="docs/screenshots/demo.gif" alt="Tendril in use: the home screen, starting the daily voice warm-up and following the siren line, adding a moment to the euphoria jar with confetti, and the breathing circle in hard day mode" width="300">
+</p>
+
+<p align="center"><sub>The home screen, the daily voice warm-up, a new moment in the euphoria jar, and breathing in hard day mode. Recorded with made-up sample data.</sub></p>
 
 ## What's inside
 
@@ -112,6 +127,8 @@ Tendril was made for people whose information is sensitive.
 - **Discreet mode** covers sensitive cards on the home screen until you tap them.
 - **Backups are yours:** download a file (optionally password-encrypted) and restore it any time. A gentle monthly reminder helps you keep one.
 
+[PRIVACY.md](PRIVACY.md) lists exactly what's kept, where, and the few things that ever touch the internet.
+
 ## Install it on your phone
 
 Tendril is a web app that installs like a normal app and works offline.
@@ -121,9 +138,27 @@ Tendril is a web app that installs like a normal app and works offline.
 
 When there's an update, the app shows an **Update** button.
 
+## Known limitations
+
+- **One device:** your data lives on the phone or computer where you use Tendril, with no sync. To move it, make a backup and restore it on the new device.
+- **A forgotten PIN can't be recovered:** the data is encrypted with it. Keep a backup.
+- **English only,** for now.
+- **Resonance is measured on one vowel at a time** (“ee” or “ah”). Mixed sentences can't be scored reliably yet.
+- **Voice readings depend on your microphone and surroundings:** a quiet room and the phone's own microphone work best.
+
 ## Good to know
 
 Tendril is a community project and isn't medical advice. Health content is general information. Talk to your doctor about anything to do with hormones or health. The guides should be reviewed by trans community members and a clinician.
+
+## Security
+
+What protects your data, what it can't protect against, and how to report a problem privately: [SECURITY.md](SECURITY.md).
+
+## License
+
+Tendril is free software under the [GNU Affero General Public License v3.0](LICENSE). You may use, change and share it. If you share a changed version, or run one for others, you must offer its source code under the same license, so every copy of Tendril stays open and checkable.
+
+Copyright © 2026 Arash Mashhadi.
 
 ---
 
