@@ -82,7 +82,13 @@ mark.pr { color: var(--link); }
   border-radius: 50%;
   display: grid;
   place-items: center;
+  padding: 0;
   background: var(--surface-2);
   color: var(--ink);
 }
+.speak svg { display: block; transform: translateX(1px); }
 .speak:hover { background: var(--primary-light); }
+
+.big-input::placeholder { font-size: 1.1rem; }
+.sent-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.sent-h { font-size: 1.1rem; }

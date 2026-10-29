@@ -113,5 +113,5 @@ The site is static, so GitHub Pages works as-is: **Settings → Pages → Deploy
 - Never send user data anywhere. No fetch/XHR to third parties, no analytics.
 - Store data only through `Tendril.store` (localStorage, prefixed `tendril:`).
 - Audio is analyzed in memory and never recorded or uploaded.
-- Every page includes the quick-exit button and `common.js`.
+- Every page includes `common.js` (which also handles the Esc-twice quick exit).
 - Health content is information, not dosing advice.

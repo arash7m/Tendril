@@ -38,7 +38,7 @@
   background-clip: text;
   color: transparent;
 }
-.hub-tools { display: flex; gap: 8px; align-self: start; }
+.hub-tools { display: flex; gap: 8px; align-self: center; }
 .hub-icon {
   appearance: none; border: 0; cursor: pointer;
   width: 42px; height: 42px; border-radius: 50%;
@@ -149,8 +149,8 @@
 .lab-v { font-family: var(--font-mono); font-size: 0.9rem; font-variant-numeric: tabular-nums; }
 
 /* All tools */
-.tool-links { display: flex; flex-wrap: wrap; gap: 8px; }
-.tool-link { text-decoration: none; font-weight: 800; font-size: 0.88rem; color: var(--ink) !important; background: var(--surface-2); padding: 8px 14px; border-radius: 999px; }
+.tool-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 112px), 1fr)); gap: 8px; }
+.tool-link { text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: none; font-weight: 800; font-size: 0.88rem; color: var(--ink) !important; background: var(--surface-2); padding: 8px 14px; border-radius: 999px; }
 .tool-link:hover { background: var(--primary-light); }
 
 /* Discreet mode */
@@ -201,11 +201,12 @@ html:not(.hub-mode) .about-body { padding-top: 0; }
   transition: transform .2s ease, box-shadow .2s ease, gap .35s ease;
 }
 .hard-fab:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(7, 10, 31, 0.6), 0 0 30px rgba(255, 79, 163, 0.5); }
-.hard-fab:active { transform: scale(0.96); }
+.hard-fab { -webkit-tap-highlight-color: transparent; outline: none; }
+.hard-fab:active { transform: scale(0.96); background: #fff; color: #FF4FA3; box-shadow: 0 8px 24px rgba(7, 10, 31, 0.6), 0 0 0 3px #FF4FA3; }
 .hard-fab-label { max-width: 0; overflow: hidden; white-space: nowrap; font-weight: 800; font-size: 0.92rem; transition: max-width .35s ease; }
 .hard-fab.show-label { gap: 8px; }
 .hard-fab.show-label .hard-fab-label { max-width: 7em; }
-.hard-fab:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.hard-fab:focus-visible { box-shadow: 0 0 0 3px #fff, 0 0 22px rgba(255, 79, 163, 0.35); }
 @media (prefers-reduced-motion: reduce) { .hard-fab, .hard-fab-label { transition: none; } }
 @media print { .hard-fab { display: none; } }
 .hc-soft { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 10px 12px; border-radius: var(--r-sm); background: rgba(155, 93, 229, 0.16); font-size: 0.9rem; }

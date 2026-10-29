@@ -37,7 +37,6 @@
       <a class="navlink" href="guides.html">Guides</a>
       <a class="navlink" href="data.html">Your data</a>
     </nav>
-    <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
   </div>
 </header>
 
@@ -75,7 +74,6 @@
 
       <div class="row">
         <button class="btn btn-pink" type="button" id="save">Add to shortlist</button>
-        <button class="btn btn-soft" type="button" id="shuffle">New sentences</button>
       </div>
 
       <div class="shortlist" aria-labelledby="short-h">
@@ -94,7 +92,13 @@
         <p class="hello-line">Hi, I’m <span class="hl" id="hello-name">Robin</span>.</p>
         <p class="hello-sub" id="hello-pron">My pronouns are they/them.</p>
       </div>
-      <h2 id="sent-h" class="visually-hidden">Sentences</h2>
+      <div class="sent-head">
+        <h2 id="sent-h" class="sent-h">Sentences</h2>
+        <button class="btn btn-soft btn-small" type="button" id="shuffle">
+          <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.7M20 4v4.7h-4.7M20 12a8 8 0 0 1-13.7 5.6L4 15.3M4 20v-4.7h4.7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          New sentences
+        </button>
+      </div>
       <ol class="sentence-list" id="sentences"></ol>
       <p class="small muted" id="speak-note">Tap the speaker to hear a sentence read aloud by your device’s voice.</p>
     </section>

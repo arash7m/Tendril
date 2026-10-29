@@ -115,8 +115,8 @@ body::before {
 }
 .header-inner {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-areas: "brand nav exit";
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: "brand nav";
   align-items: center;
   gap: 8px 16px;
   padding-block: 10px;
@@ -126,8 +126,8 @@ body::before {
 .header-inner .quick-exit { grid-area: exit; }
 @media (max-width: 760px) {
   .header-inner {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: "brand exit" "nav nav";
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "brand" "nav";
     padding-block: 10px 6px;
   }
 }
@@ -178,6 +178,7 @@ body::before {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  text-align: center;
   text-decoration: none;
   transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
   -webkit-tap-highlight-color: transparent;
@@ -385,7 +386,7 @@ kbd {
   * { transition: none !important; animation: none !important; }
 }
 
-.update-bar { display: flex; align-items: center; gap: 12px; padding: 8px 8px 8px 18px; }
+.update-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 12px 12px 20px; border-radius: 18px; width: min(520px, calc(100vw - 32px)); }
 
 /* ---------- App lock ---------- */
 html.is-locked body > *:not(#lock):not(.toast) { visibility: hidden; }
@@ -430,3 +431,14 @@ html.is-locked body > *:not(#lock):not(.toast) { visibility: hidden; }
   .voice-tabs { display: flex; justify-self: stretch; }
   .voice-tabs a { flex: 1 1 auto; text-align: center; padding: 8px 8px; font-size: 0.88rem; }
 }
+
+/* Date and time inputs: same size as other fields on phones */
+input.input[type="date"], input.input[type="datetime-local"], input.input[type="time"], input.input[type="month"] {
+  display: block; max-width: 100%; min-width: 0; min-height: 46px; line-height: 1.4; text-align: left;
+}
+@supports (-webkit-touch-callout: none) {
+  /* iPhone: drop the native chrome that makes date fields taller and wider */
+  input.input[type="date"], input.input[type="datetime-local"], input.input[type="time"] { -webkit-appearance: none; }
+}
+input.input[type="date"]::-webkit-date-and-time-value, input.input[type="datetime-local"]::-webkit-date-and-time-value { text-align: left; min-height: 1.4em; }
+.field { min-width: 0; }

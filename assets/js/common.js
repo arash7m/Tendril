@@ -425,7 +425,6 @@
           '</div>' +
           '<div class="lock-foot">' +
             '<button type="button" class="lock-link" data-act="forgot">Forgot PIN?</button>' +
-            '<a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-lock-exit>Quick exit</a>' +
           '</div>' +
           '<div class="lock-forgot" hidden>' +
             '<p>A forgotten PIN can’t be recovered, because your data is encrypted with it. You can erase Tendril on this device and start fresh. If you made a backup, you can restore it afterwards.</p>' +
@@ -576,8 +575,39 @@
     });
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", wireQuickExit);
-  else wireQuickExit();
+  // ---------------- Section tabs keep your place ----------------
+  // Tapping a tab (Pitch / Resonance, Doses / Labs, Story / Body…) opens another page.
+  // Remember where the tab bar was on screen and put it back there, instead of jumping to the top.
+  function wireTabs() {
+    document.querySelectorAll(".voice-tabs a").forEach(function (a) {
+      a.addEventListener("click", function () {
+        const bar = a.closest(".voice-tabs");
+        try {
+          global.sessionStorage.setItem("tendril:tabPos", JSON.stringify({
+            to: new URL(a.href, location.href).pathname, top: bar.getBoundingClientRect().top, at: Date.now()
+          }));
+        } catch (e) { /* storage unavailable: the page just opens at the top */ }
+      });
+    });
+    let saved = null;
+    try { saved = JSON.parse(global.sessionStorage.getItem("tendril:tabPos") || "null"); global.sessionStorage.removeItem("tendril:tabPos"); } catch (e) { saved = null; }
+    if (!saved || saved.to !== location.pathname || Date.now() - saved.at > 10000) return;
+    const bar = document.querySelector(".voice-tabs");
+    if (!bar) return;
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    const place = function () {
+      const y = global.scrollY + bar.getBoundingClientRect().top - saved.top;
+      if (y > 0) global.scrollTo(0, y);
+    };
+    place();
+    // Page content can arrive a moment later (after unlocking, or once scripts render), so try again.
+    global.requestAnimationFrame(place);
+    setTimeout(place, 120);
+    ready(function () { setTimeout(place, 30); });
+  }
+
+  if (document.readyState === "loading") { document.addEventListener("DOMContentLoaded", wireQuickExit); document.addEventListener("DOMContentLoaded", wireTabs); }
+  else { wireQuickExit(); wireTabs(); }
 
   let toastTimer = 0;
   function toast(msg) {
