@@ -388,7 +388,7 @@ Tendril.ready(function () {
   function cardLinks(c) {
     const f = frame(c, "All tools", null);
     const tools = [
-      ["timeline.html", "Timeline"], ["voice.html", "Voice"], ["doses.html", "Doses"], ["labs.html", "Labs"],
+      ["timeline.html", "Timeline"], ["body.html", "Body"], ["voice.html", "Voice"], ["doses.html", "Doses"], ["labs.html", "Labs"],
       ["visits.html", "Appointments"], ["jar.html", "Jar"], ["names.html", "Names"], ["guides.html", "Guides"],
       ["comingout.html", "Coming out"], ["hardday.html", "Hard day"], ["data.html", "Your data"]
     ];

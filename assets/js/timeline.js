@@ -125,11 +125,15 @@ Tendril.ready(function () {
   function voiceItems() {
     return T.store.get("voice.history", []).map(function (h) { return { voice: true, at: h.at, h: h }; });
   }
+  function bodyItems() {
+    return T.store.get("body.entries", []).map(function (b) { return { body: true, at: new Date(b.date + "T12:00").toISOString(), b: b }; });
+  }
 
   function matches(item) {
     if (filter === "all") return true;
     if (filter === "voice") return !!item.voice;
-    if (item.voice) return false;
+    if (filter === "body") return !!item.body;
+    if (item.voice || item.body) return false;
     if (filter === "journal") return item.kind !== "milestone";
     if (filter === "milestone") return item.kind === "milestone";
     if (filter === "photos") return (item.photos || []).length > 0;
@@ -140,11 +144,11 @@ Tendril.ready(function () {
   function render() {
     const feed = $("feed");
     feed.innerHTML = "";
-    const items = sorted().concat(filter === "all" || filter === "voice" ? voiceItems() : [])
+    const items = sorted().concat(filter === "all" || filter === "voice" ? voiceItems() : [], filter === "all" || filter === "body" ? bodyItems() : [])
       .sort(function (a, b) { return new Date(b.at) - new Date(a.at); })
       .filter(matches);
 
-    const hasAny = entries.length > 0 || voiceItems().length > 0;
+    const hasAny = entries.length > 0 || voiceItems().length > 0 || bodyItems().length > 0;
     $("tl-empty").hidden = hasAny;
     $("filter-empty").hidden = !hasAny || items.length > 0;
     $("open-compare").hidden = allPhotos().length < 2;
@@ -166,7 +170,7 @@ Tendril.ready(function () {
         sec.appendChild(group);
         feed.appendChild(sec);
       }
-      group.appendChild(item.voice ? voiceCard(item.h) : entryCard(item));
+      group.appendChild(item.voice ? voiceCard(item.h) : item.body ? bodyCard(item.b) : entryCard(item));
     });
     renderMilestones();
   }
@@ -246,6 +250,20 @@ Tendril.ready(function () {
     li.innerHTML = '<a href="voice.html"><span class="tl-when"></span><span class="tl-vline"><strong>Voice practice</strong> <span></span></span></a>';
     li.querySelector(".tl-when").textContent = timeText(h.at);
     li.querySelector(".tl-vline span").textContent = h.avg + " Hz average · " + h.inRange + "% in range";
+    return li;
+  }
+
+  const BODY_NAMES = { chest: "Chest", underbust: "Underbust", waist: "Waist", hips: "Hips", shoulders: "Shoulders", thigh: "Thigh", arm: "Upper arm", neck: "Neck" };
+  function bodyCard(b) {
+    const set = T.store.get("body.settings", {}) || {};
+    const inch = set.unit === "in";
+    const li = document.createElement("li");
+    li.className = "tl-card tl-voice tl-body";
+    li.innerHTML = '<a href="body.html"><span class="tl-when"></span><span class="tl-vline"><strong>Measurements</strong> <span></span></span></a>';
+    li.querySelector(".tl-when").textContent = new Date(b.date + "T12:00").toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" });
+    // Weight is left out of the feed on purpose.
+    li.querySelector(".tl-vline span").textContent = Object.keys(BODY_NAMES).filter(function (k) { return b.values[k] != null; })
+      .map(function (k) { const v = inch ? b.values[k] / 2.54 : b.values[k]; return BODY_NAMES[k] + " " + Number(v.toFixed(1)).toLocaleString() + (inch ? " in" : " cm"); }).join(" · ") || "Saved";
     return li;
   }
 

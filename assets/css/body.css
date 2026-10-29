@@ -1,0 +1,25 @@
+/* Body measurements (builds on labs.css for cards, charts and lists) */
+
+.body-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.unit-toggle { display: inline-flex; gap: 3px; padding: 3px; border-radius: 999px; background: var(--surface-2); }
+.unit-toggle button {
+  appearance: none; border: 0; background: transparent; cursor: pointer; font: inherit; font-weight: 800; font-size: 0.85rem;
+  padding: 6px 14px; border-radius: 999px; color: var(--ink);
+}
+.unit-toggle button[aria-pressed="true"] { background: var(--lav); color: #fff; }
+.body-nudge { color: var(--muted); margin-top: -8px; }
+
+.body-card .bc-change { font-weight: 800; color: var(--link); }
+.mc-none { color: var(--muted); }
+.ratio-card { background: linear-gradient(150deg, rgba(155, 93, 229, 0.18), rgba(61, 169, 252, 0.08)), var(--surface); }
+
+.m-fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 10px; }
+.m-field { display: grid; gap: 4px; }
+.m-name { font-weight: 800; font-size: 0.88rem; }
+.m-input { display: flex; align-items: center; gap: 8px; }
+.m-input .input { flex: 1; min-width: 0; }
+.m-chart { width: 100%; height: 220px; }
+
+.how-to summary { cursor: pointer; font-weight: 800; font-size: 1.05rem; }
+.how-to[open] summary { margin-bottom: 10px; }
+.how-list { margin: 0; padding-left: 1.1em; display: grid; gap: 8px; }

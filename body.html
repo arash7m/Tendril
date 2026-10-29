@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>try{if(localStorage.getItem("tendril:__lock"))document.documentElement.classList.add("is-locked")}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Body measurements · Tendril</title>
+<meta name="description" content="Track body measurements over time with simple charts. Everything stays on your device.">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#070A1F">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tendril">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/tendril.css">
+<link rel="stylesheet" href="assets/css/labs.css">
+<link rel="stylesheet" href="assets/css/body.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="index.html" aria-label="Tendril home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M9 29c0-8 2-13 7-16 4-2.5 7-1 7 2s-3 4-5 2.5" fill="none" stroke="var(--primary)" stroke-width="3" stroke-linecap="round"/><path d="M15 14c-1-5 2-9 7-10-0.5 5-3 8.5-7 10z" fill="var(--secondary)"/></svg>
+      Tendril
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="navlink" href="index.html">Home</a>
+      <a class="navlink" href="timeline.html" aria-current="page">Timeline</a>
+      <a class="navlink" href="voice.html">Voice</a>
+      <a class="navlink" href="doses.html">Health</a>
+      <a class="navlink" href="jar.html">Jar</a>
+      <a class="navlink" href="names.html">Names</a>
+      <a class="navlink" href="guides.html">Guides</a>
+      <a class="navlink" href="data.html">Your data</a>
+    </nav>
+    <a class="btn quick-exit" href="https://www.google.com/search?q=weather+today" data-quick-exit title="Leave this site quickly (or press Esc twice)">Quick exit</a>
+  </div>
+</header>
+
+<main class="wrap page body-page">
+  <section class="page-intro">
+    <p class="eyebrow">Timeline</p>
+    <h1>Body measurements</h1>
+    <p class="lede">See how your shape changes over time. A tape measure often notices changes before the mirror does.</p>
+  </section>
+
+  <nav class="voice-tabs" aria-label="Timeline">
+    <a href="timeline.html">Story</a>
+    <a href="body.html" aria-current="page">Body</a>
+  </nav>
+
+  <div class="body-bar">
+    <button class="btn btn-primary" type="button" id="add-entry">Add measurements</button>
+    <div class="unit-toggle" role="group" aria-label="Units">
+      <button type="button" data-unit="cm" aria-pressed="true">cm</button>
+      <button type="button" data-unit="in" aria-pressed="false">in</button>
+    </div>
+    <button class="btn btn-soft btn-small" type="button" id="choose-btn">Choose what to track</button>
+  </div>
+  <p class="body-nudge small" id="body-nudge" hidden></p>
+
+  <section class="marker-grid" id="body-grid" aria-label="Your measurements"></section>
+
+  <div class="empty" id="body-empty" hidden>
+    <h3>No measurements yet</h3>
+    <p class="muted">Grab a soft tape measure and add your first set. Measuring about once a month, at the same time of day, makes the changes easy to see.</p>
+    <div class="row">
+      <button class="btn btn-primary" type="button" id="add-first">Add your first measurements</button>
+    </div>
+  </div>
+
+  <section class="panel" id="history-panel" aria-labelledby="history-h" hidden>
+    <h2 id="history-h">All measurements</h2>
+    <ol class="test-list" id="history-list"></ol>
+  </section>
+
+  <details class="panel how-to">
+    <summary>How to measure</summary>
+    <ul class="how-list">
+      <li><strong>Same conditions each time.</strong> Morning works well, before eating, in light clothing or none. Stand relaxed and breathe out normally.</li>
+      <li><strong>Keep the tape level</strong> all the way around and snug, not tight. A mirror helps, or ask someone you trust.</li>
+      <li><strong>Chest / bust:</strong> around the fullest part of your chest.</li>
+      <li><strong>Underbust:</strong> just under your chest, where a bra band would sit.</li>
+      <li><strong>Waist:</strong> the narrowest part of your torso, usually a little above your belly button.</li>
+      <li><strong>Hips:</strong> the widest part of your hips and bum, feet together.</li>
+      <li><strong>Shoulders:</strong> all the way around, over the widest part of your shoulders.</li>
+      <li><strong>Thigh and upper arm:</strong> the widest part, on the same side each time.</li>
+      <li><strong>Neck:</strong> around the middle of your neck.</li>
+    </ul>
+  </details>
+
+  <aside class="callout">
+    <h3>Be kind with the numbers</h3>
+    <p>Bodies change slowly and not in straight lines. Water, hormones, food and time of day all move these numbers a little. Look at the trend over months, not a single day. If tracking ever starts to feel bad, it’s fine to stop or hide a measurement.</p>
+  </aside>
+</main>
+
+<!-- Add or edit -->
+<dialog class="sheet" id="entry-sheet" aria-labelledby="entry-title">
+  <form class="sheet-body" id="entry-form" method="dialog">
+    <div class="sheet-head">
+      <h2 id="entry-title">Add measurements</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <label class="field">
+      <span>Date</span>
+      <input class="input" type="date" id="entry-date" required>
+    </label>
+    <div class="m-fields" id="m-fields"></div>
+    <p class="small muted">Leave any you didn’t measure empty.</p>
+    <label class="field">
+      <span>Note <span class="hint">optional</span></span>
+      <input class="input" type="text" id="entry-note" maxlength="200" placeholder="New tape measure, measured in the evening…">
+    </label>
+    <div class="spread">
+      <div class="row">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <button class="btn btn-soft" type="button" data-close>Cancel</button>
+      </div>
+      <button class="btn btn-soft btn-small" type="button" id="entry-delete" hidden>Delete</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- One measurement over time -->
+<dialog class="sheet" id="m-sheet" aria-labelledby="m-title">
+  <div class="sheet-body">
+    <div class="sheet-head">
+      <h2 id="m-title"></h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <p class="muted" id="m-summary"></p>
+    <canvas class="m-chart" id="m-chart" role="img" aria-label="Chart over time"></canvas>
+    <table class="marker-table">
+      <thead><tr><th>Date</th><th>Value</th><th>Change</th></tr></thead>
+      <tbody id="m-rows"></tbody>
+    </table>
+  </div>
+</dialog>
+
+<!-- Choose what to track -->
+<dialog class="sheet" id="choose-sheet" aria-labelledby="choose-title">
+  <div class="sheet-body">
+    <div class="sheet-head">
+      <h2 id="choose-title">What to track</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Close">×</button>
+    </div>
+    <div class="checks" id="choose-list"></div>
+    <p class="small muted" id="weight-note">Weight is off by default. Turn it on only if tracking it feels okay for you.</p>
+    <div class="row">
+      <span class="small muted">Weight in</span>
+      <div class="unit-toggle" role="group" aria-label="Weight unit">
+        <button type="button" data-wunit="kg" aria-pressed="true">kg</button>
+        <button type="button" data-wunit="lb" aria-pressed="false">lb</button>
+      </div>
+    </div>
+    <button class="btn btn-primary" type="button" data-close>Done</button>
+  </div>
+</dialog>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>Tendril stores everything in your browser on this device. Nothing is sent to a server.</p>
+    <p>Press <kbd>Esc</kbd> twice to leave quickly.</p>
+  </div>
+</footer>
+
+<script src="assets/js/common.js"></script>
+<script src="assets/js/labs-core.js"></script>
+<script src="assets/js/body.js"></script>
+</body>
+</html>

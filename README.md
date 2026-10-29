@@ -11,6 +11,7 @@ Everything runs in the browser and is stored on the user's own device. There is 
 | `index.html` | Welcome page for first-time visitors; once anything is saved it becomes the hub (`assets/js/hub.js`): greeting, doses due with one-tap logging, next appointment, milestone, mood check-in, voice week, latest photo, labs, jar, all tools. Cards can be hidden and reordered; discreet mode covers sensitive cards until tapped |
 | `timeline.html` | Journal entries with mood and tags, milestones with day counts and anniversaries (1/3/6/9/18 months, 100/500/1,000 days, every year; a celebration with confetti on the day, a "Coming up" list, yearly calendar reminders, a suggestion to mark the first logged dose as starting hormones), private photo diary with in-app camera (pose outline, timer), photo viewer and before/after compare; voice sessions appear in the feed |
 | `warmup.html` | Daily voice warm-up (first Voice tab): relax, hums, slides, resonance “ee”, speaking in range; full (~5 min) or short (~2 min); streak and 4-week calendar; the hub's Voice card links to it |
+| `body.html` | Body measurements (Timeline › Body): chest, underbust, waist, hips, shoulders, thigh, upper arm, neck, optional weight (off by default); cm/in, kg/lb; cards with sparklines, waist ÷ hips, per-measurement chart and history; entries also appear in the timeline feed (without weight) |
 | `voice.html` | Pitch trainer: live graph, target range, read-along panel (prompts, passages, your own text, scrolls while you speak) with a full-screen focus view, recording analysis, session history with audio playback |
 | `games.html` | Voice games using the pitch target: Glide (steer through gates), Grow (vine grows while in range, 45 s), Echo (copy intonation shapes, scored on shape) |
 | `resonance.html` | Resonance trainer: live brighter/darker meter from formants (LPC, `assets/js/formants.js`) measured on one vowel at a time (“ee” or “ah”, held or in words), target zones, guided exercises, session history. Mixed sentences aren't scored: F3 can't be tracked reliably across vowel changes. Sessions save audio for playback like the pitch page |
@@ -71,6 +72,7 @@ Everything is stored in the browser's localStorage under keys starting with `ten
 | `hardday.people`, `hardday.words`, `hardday.care`, `hardday.region`, `hardday.breath`, `hardday.buzz` | Trusted people, your own kind words, today's care checklist, support-line region, breathing pattern, vibration |
 | `jar.notes`, `jar.seen` | Euphoria jar moments, when each was last shown |
 | `comingout.drafts` | Saved coming-out drafts |
+| `body.entries`, `body.settings` | Measurement sets (stored in cm and kg), units and what to track |
 | `timeline.entries` | Journal entries and milestones (photo ids only) |
 | `days.celebrated`, `days.hrtTipHidden` | Which anniversaries already got confetti today; whether the "started hormones" suggestion was dismissed |
 

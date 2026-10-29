@@ -48,6 +48,11 @@
     <p class="lede">Write how you’re feeling, mark milestones, and take photos to see how you change over time. Photos taken here stay in Tendril and don’t go to your phone’s gallery.</p>
   </section>
 
+  <nav class="voice-tabs" aria-label="Timeline">
+    <a href="timeline.html" aria-current="page">Story</a>
+    <a href="body.html">Body</a>
+  </nav>
+
   <div class="tl-actions">
     <button class="btn btn-primary" type="button" id="new-entry">New entry</button>
     <button class="btn btn-pink" type="button" id="new-photo">Take a photo</button>
@@ -91,6 +96,7 @@
     <label><input type="radio" name="flt" value="tag:euphoria"><span>Euphoria</span></label>
     <label><input type="radio" name="flt" value="tag:dysphoria"><span>Dysphoria</span></label>
     <label><input type="radio" name="flt" value="voice"><span>Voice</span></label>
+    <label><input type="radio" name="flt" value="body"><span>Body</span></label>
   </div>
 
   <section class="feed" id="feed" aria-live="polite"></section>
