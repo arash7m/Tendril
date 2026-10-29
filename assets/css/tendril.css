@@ -463,3 +463,10 @@ a, button, .btn, .voice-tabs a, .pills span, .chip { -webkit-tap-highlight-color
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .22s; animation-timing-function: ease; }
 ::view-transition-group(site-header) { animation: none; }
 @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
+
+/* The page background reaches every edge (no light strip by the phone's navigation bar). */
+html { background: var(--bg); }
+/* Inside the installed app's container, pages fade in softly. */
+html.in-frame body { animation: tendril-page-in .2s ease backwards; }
+@keyframes tendril-page-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { html.in-frame body { animation: none; } }

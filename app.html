@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tendril</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#070A1F">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tendril">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<link rel="icon" href="assets/icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<!--
+  The installed app's container. Pages open inside the frame below, so moving
+  between them never makes the phone show its page-loading bar. The container
+  paints the status bar and navigation bar areas in the app's background colour.
+-->
+<style>
+  html, body { margin: 0; height: 100%; background: #070A1F; overflow: hidden; }
+  #frame {
+    position: fixed; display: block; border: 0; background: #070A1F;
+    top: env(safe-area-inset-top, 0px); bottom: env(safe-area-inset-bottom, 0px);
+    left: env(safe-area-inset-left, 0px); right: env(safe-area-inset-right, 0px);
+    width: calc(100% - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+    height: calc(100% - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  }
+</style>
+</head>
+<body>
+<iframe id="frame" title="Tendril" allow="microphone; camera; clipboard-read; clipboard-write; autoplay; fullscreen; screen-wake-lock"></iframe>
+<script>
+(function () {
+  "use strict";
+  var frame = document.getElementById("frame");
+  // Which page to open: the one in the address (#voice.html), or home.
+  var start = decodeURIComponent(location.hash.slice(1));
+  if (!/^[a-z0-9-]+\.html([?#][^<>"']*)?$/i.test(start) || /^app\.html/.test(start)) start = "index.html";
+  frame.src = start;
+  // Remember the current page, so reopening the app comes back to it.
+  frame.addEventListener("load", function () {
+    try {
+      var l = frame.contentWindow.location;
+      var page = l.pathname.split("/").pop() || "index.html";
+      history.replaceState(null, "", "#" + page + l.search);
+      document.title = frame.contentDocument.title || "Tendril";
+    } catch (e) { /* not ours */ }
+  });
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(function () {});
+})();
+</script>
+</body>
+</html>

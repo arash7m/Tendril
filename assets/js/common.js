@@ -556,9 +556,10 @@
   // so the Back button doesn't return here. Pressing Escape twice also works.
   const EXIT_URL = "https://www.google.com/search?q=weather+today";
 
+  const inFrame = (function () { try { return global.top !== global && global.top.location.origin === location.origin; } catch (e) { return false; } })();
   function quickExit() {
     if (vault) { forgetSession(); }
-    try { global.location.replace(EXIT_URL); }
+    try { (inFrame ? global.top : global).location.replace(EXIT_URL); }
     catch (e) { global.open(EXIT_URL, "_blank"); }
   }
 
@@ -638,7 +639,7 @@
   // Load the menu pages quietly in the background, so tapping a tab opens it at once
   // (no loading bar). Browsers without support just navigate normally.
   function preloadTabs() {
-    if (!/^https?:/.test(location.protocol) || document.querySelector('script[type="speculationrules"]')) return;
+    if (inFrame || !/^https?:/.test(location.protocol) || document.querySelector('script[type="speculationrules"]')) return;
     if (!(global.HTMLScriptElement && HTMLScriptElement.supports && HTMLScriptElement.supports("speculationrules"))) return;
     const rules = { prerender: [
       { source: "document", where: { selector_matches: ".nav a.navlink:not([aria-current])" }, eagerness: "eager" },
@@ -680,6 +681,7 @@
 
   // ---------------- App install + offline ----------------
   const isStandalone = function () {
+    if (inFrame) return true; // inside the installed app's container (app.html)
     return (global.matchMedia && global.matchMedia("(display-mode: standalone)").matches) || global.navigator.standalone === true;
   };
   let installPrompt = null;

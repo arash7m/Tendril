@@ -95,6 +95,7 @@ Optional PIN lock (set up on the Your data page). When it's on:
 Tendril is a Progressive Web App. People can install it from the browser ("Add to Home Screen" on iPhone, "Install app" on Android and desktop). Once installed it opens full screen and works with no connection.
 
 - `manifest.webmanifest` describes the app (name, icons, colors).
+- The installed app opens `app.html`, a small container that shows each page in a full-screen frame. Moving between pages then happens inside the frame, so the phone never shows its page-loading bar, and the container paints the status bar and navigation bar areas in the background colour. Each page's first inline script sends a standalone launch to `app.html#page.html`; inside the frame, pages get the `in-frame` class and fade in. In a normal browser tab nothing changes.
 - `sw.js` is the service worker that caches every file for offline use.
 - Fonts are self-hosted in `assets/fonts/` (SIL Open Font License), so the app never contacts Google or any other server.
 

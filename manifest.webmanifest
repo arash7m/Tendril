@@ -3,7 +3,7 @@
   "short_name": "Tendril",
   "description": "Small, private tools: voice practice, dose tracking, names and guides. Everything stays on your device.",
   "id": "./",
-  "start_url": "./index.html",
+  "start_url": "./app.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",

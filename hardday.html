@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<script>try{if(localStorage.getItem("tendril:__lock"))document.documentElement.classList.add("is-locked")}catch(e){}</script>
+<script>try{var d=document.documentElement;if(window.top===window&&(matchMedia("(display-mode: standalone)").matches||navigator.standalone)){location.replace("app.html#"+(location.pathname.split("/").pop()||"index.html")+location.search+location.hash)}else if(window.top!==window){d.classList.add("in-frame")}if(localStorage.getItem("tendril:__lock"))d.classList.add("is-locked")}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hard day · Tendril</title>
 <meta name="description" content="A calm space for hard days: breathing, grounding, good reminders and people to reach.">
