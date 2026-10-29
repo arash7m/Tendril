@@ -1,0 +1,121 @@
+# Tendril: developer notes
+
+How the app is built, where data lives, and how to work on it. For what the app does, see the [README](../README.md).
+
+Everything runs in the browser and is stored on the user's own device. There is no server, no account, and no analytics.
+
+## What's here
+
+| Page | What it does |
+|---|---|
+| `index.html` | Welcome page for first-time visitors; once anything is saved it becomes the hub (`assets/js/hub.js`): greeting, doses due with one-tap logging, next appointment, milestone, mood check-in, voice week, latest photo, labs, jar, all tools. Cards can be hidden and reordered; discreet mode covers sensitive cards until tapped |
+| `timeline.html` | Journal entries with mood and tags, milestones with day counts and anniversaries (1/3/6/9/18 months, 100/500/1,000 days, every year; a celebration with confetti on the day, a "Coming up" list, yearly calendar reminders, a suggestion to mark the first logged dose as starting hormones), private photo diary with in-app camera (pose outline, timer), photo viewer and before/after compare; voice sessions appear in the feed |
+| `warmup.html` | Daily voice warm-up (first Voice tab): relax, hums, slides, resonance “ee”, speaking in range; full (~5 min) or short (~2 min); streak and 4-week calendar; the hub's Voice card links to it |
+| `body.html` | Body measurements (Timeline › Body): chest, underbust, waist, hips, shoulders, thigh, upper arm, neck, optional weight (off by default); cm/in, kg/lb; cards with sparklines, waist ÷ hips, per-measurement chart and history; entries also appear in the timeline feed (without weight) |
+| `voice.html` | Pitch trainer: live graph, target range, read-along panel (prompts, passages, your own text, scrolls while you speak) with a full-screen focus view, recording analysis, session history with audio playback |
+| `games.html` | Voice games using the pitch target: Glide (steer through gates), Grow (vine grows while in range, 45 s), Echo (copy intonation shapes, scored on shape) |
+| `resonance.html` | Resonance trainer: live brighter/darker meter from formants (LPC, `assets/js/formants.js`) measured on one vowel at a time (“ee” or “ah”, held or in words), target zones, guided exercises, session history. Mixed sentences aren't scored: F3 can't be tracked reliably across vowel changes. Sessions save audio for playback like the pitch page |
+| `doses.html` | Dose tracker: medications, dose log, next due, doses left, injection/patch site rotation on a body map, calendar reminders (.ics) |
+| `labs.html` | Lab results: markers with unit conversion (`assets/js/labs-core.js`), per-marker charts with the doctor's range, test history |
+| `visits.html` | Appointments and blood tests with countdowns and calendar export (`assets/js/visits-core.js`) |
+| `summary.html` | Doctor summary: medications with doses taken, latest labs, mood, chosen journal notes, voice, body measurements (optional, weight only if tracked), questions; print/PDF or copy as text |
+| `hardday.html` | Hard day mode: breathing circle, 5-4-3-2-1 grounding, good reminders (jar, milestones, kind words incl. your own), trusted people with call/text and message ideas, regional support lines, gentle care checklist, write it out (let it go or keep in timeline). Linked from a floating heart on the hub, a low mood check-in, All tools and the jar |
+| `jar.html` | Euphoria jar: save moments, pick one at random (includes timeline entries tagged euphoria) |
+| `comingout.html` | Coming-out helper: builds an editable letter, talking points or short text from a few choices; saved drafts |
+| `names.html` | Name & pronoun sandbox: everyday sentences, read-aloud, private shortlist |
+| `guides.html` | Binding, tucking, appointment prep, name-change checklist |
+| `data.html` | Backup (optionally password-encrypted), restore, delete everything |
+
+## Structure
+
+```
+assets/css/tendril.css   shared tokens, header, buttons, forms, sheets (light + dark)
+assets/css/*.css         one stylesheet per page
+assets/js/common.js      storage wrapper, quick exit, toast, download, date helpers
+assets/js/pitch.js       YIN pitch detection
+assets/js/bodymap.js     body map picker and site rotation
+assets/js/readalong.js   read-along text panel for the pitch page
+assets/js/voice-engine.js microphone + pitch (optionally resonance) readings for the games and warm-up
+assets/js/days.js        milestone anniversaries, confetti, yearly .ics
+assets/js/trace.js       one continuous line for the voice graphs: follows the voice, rests on a floor in silence
+assets/js/<page>.js      one script per page
+```
+
+Every page shares the same header markup. If you add a page, copy the header from an existing page and add a link to the nav in all pages.
+
+Plain HTML, CSS and JavaScript with no build step. To run it locally:
+
+```
+python3 -m http.server 8000
+```
+
+then open http://localhost:8000. Browsers only allow microphone access over HTTPS or on localhost.
+
+## Where data lives
+
+Everything is stored in the browser's localStorage under keys starting with `tendril:`:
+
+| Key | Contents |
+|---|---|
+| `voice.target`, `voice.history` | Target range, session summaries |
+| `doses.meds`, `doses.log` | Medications, logged doses |
+| `names.shortlist` | Saved names and pronouns |
+| `guides.checklist` | Ticked name-change items |
+| `resonance.target`, `resonance.vowel`, `resonance.history` | Resonance zone, chosen vowel, session summaries and traces |
+| `labs.tests`, `labs.ranges`, `labs.units` | Blood tests, target ranges from the doctor, last unit used per marker |
+| `visits.list` | Appointments |
+| `hub.settings` | Greeting name, discreet mode, card order and hidden cards |
+| `backup.last`, `backup.firstUse`, `backup.snooze` | When the last backup was made, first real use, and “Not now” on the home reminder (monthly; two-week snooze) |
+| `summary.settings` | Doctor summary choices and questions |
+| `read.settings` | Read-along source, text size, scroll speed, your own text |
+| `warmup.log`, `warmup.len` | Warm-up summaries (per-step scores, no audio), chosen length |
+| `games.best`, `games.plays` | Best score per game, list of games played |
+| `hardday.people`, `hardday.words`, `hardday.care`, `hardday.region`, `hardday.breath`, `hardday.buzz` | Trusted people, your own kind words, today's care checklist, support-line region, breathing pattern, vibration |
+| `jar.notes`, `jar.seen` | Euphoria jar moments, when each was last shown |
+| `comingout.drafts` | Saved coming-out drafts |
+| `body.entries`, `body.settings` | Measurement sets (stored in cm and kg), units and what to track |
+| `timeline.entries` | Journal entries and milestones (photo ids only) |
+| `days.celebrated`, `days.hrtTipHidden` | Which anniversaries already got confetti today; whether the "started hormones" suggestion was dismissed |
+
+Photos and voice recordings are stored in IndexedDB (database `tendril`, stores `photos` and `recordings`). Each photo is saved re-encoded through a canvas, which strips location and camera metadata, as a full image (`id`) and a thumbnail (`id:thumb`). Backups can include them.
+
+Backups are JSON files. With a password they're encrypted with AES-GCM using a key derived by PBKDF2 (SHA-256, 250,000 iterations).
+
+## App lock
+
+Optional PIN lock (set up on the Your data page). When it's on:
+
+- All app data is kept as one AES-GCM encrypted entry (`tendril:__vault`); nothing readable stays in localStorage. Settings live in `tendril:__lock`.
+- The key is derived from the PIN with PBKDF2 (SHA-256, 600,000 iterations). Recordings in IndexedDB are encrypted with the same key.
+- After unlocking, the key is kept in sessionStorage so moving between pages doesn't ask again. Leaving the app starts a timer (right away, 1 or 5 minutes); coming back after it ran out locks.
+- Page scripts start through `Tendril.ready(fn)`, which waits until data is readable. New pages must do the same.
+- Five wrong PINs add a growing wait. A forgotten PIN can't be recovered; the lock screen offers to erase everything.
+
+## App and offline
+
+Tendril is a Progressive Web App. People can install it from the browser ("Add to Home Screen" on iPhone, "Install app" on Android and desktop). Once installed it opens full screen and works with no connection.
+
+- `manifest.webmanifest` describes the app (name, icons, colors).
+- The installed app opens `app.html`, a small container that shows each page in a full-screen frame. Moving between pages then happens inside the frame, so the phone never shows its page-loading bar, and the container paints the status bar and navigation bar areas in the background colour. Each page's first inline script sends a standalone launch to `app.html#page.html`; inside the frame, pages get the `in-frame` class and fade in. In a normal browser tab nothing changes.
+- `sw.js` is the service worker that caches every file for offline use.
+- Fonts are self-hosted in `assets/fonts/` (SIL Open Font License), so the app never contacts Google or any other server.
+
+**After changing any file, run `python3 tools/build-sw.py`** before committing. It refreshes the file list and version in `sw.js`, so installed apps pick up the update and show an "Update" button.
+
+## Content review
+
+The guides (binding, tucking, appointments) are general safety information and should be reviewed by trans community members and a clinician before launch.
+
+## Hosting
+
+The site is static, so GitHub Pages works as-is: **Settings → Pages → Deploy from a branch → `main` / root**.
+
+All paths are relative, so the app works at any address: a `github.io` subpath, an organisation's own `github.io` address, or a custom domain. Browsers keep data per address, so moving to a new one starts with empty storage there. Make a backup first and restore it at the new address.
+
+## Privacy rules for contributors
+
+- Never send user data anywhere. No fetch/XHR to third parties, no analytics.
+- Store data only through `Tendril.store` (localStorage, prefixed `tendril:`).
+- Audio is analyzed in memory and never recorded or uploaded.
+- Every page includes `common.js` (which also handles the Esc-twice quick exit).
+- Health content is information, not dosing advice.

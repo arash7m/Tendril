@@ -13,7 +13,7 @@ SKIP = {"sw.js"}
 def app_files():
     out = []
     for root, dirs, files in os.walk(ROOT):
-        dirs[:] = [d for d in dirs if not d.startswith(".") and d != "tools"]
+        dirs[:] = [d for d in dirs if not d.startswith(".") and d not in ("tools", "docs")]
         for f in files:
             rel = os.path.relpath(os.path.join(root, f), ROOT).replace(os.sep, "/")
             if rel.endswith(EXTS) and rel not in SKIP:
