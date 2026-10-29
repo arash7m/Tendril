@@ -110,6 +110,8 @@ The guides (binding, tucking, appointments) are general safety information and s
 
 The site is static, so GitHub Pages works as-is: **Settings → Pages → Deploy from a branch → `main` / root**.
 
+All paths are relative, so the app works at any address: a `github.io` subpath, an organisation's own `github.io` address, or a custom domain. Browsers keep data per address, so moving to a new one starts with empty storage there. Make a backup first and restore it at the new address.
+
 ## Privacy rules for contributors
 
 - Never send user data anywhere. No fetch/XHR to third parties, no analytics.
