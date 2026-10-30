@@ -85,7 +85,7 @@ Appointments and blood tests get countdowns and calendar export too.
     <td valign="top"><b>Home</b><br><sub>Everything at a glance: doses due, your voice streak, milestones and a mood check-in. Discreet mode hides sensitive cards until tapped.</sub></td>
     <td valign="top"><b>Timeline</b><br><sub>A private journal and photo diary. Milestones with anniversaries and a little celebration on the day, plus before/after photo compare.</sub></td>
     <td valign="top"><b>Euphoria jar</b><br><sub>Save compliments, small wins and moments you felt like yourself, and pull one out on a hard day.</sub></td>
-    <td valign="top"><b>Names</b><br><sub>Try a name and pronouns in everyday sentences, hear them read aloud, and keep a shortlist.</sub></td>
+    <td valign="top"><b>Names</b><br><sub>Try a name and pronouns in everyday sentences, hear them read aloud, keep a shortlist, and browse the most popular names from the year you were born.</sub></td>
   </tr>
 </table>
 

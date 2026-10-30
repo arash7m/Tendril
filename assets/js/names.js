@@ -209,7 +209,76 @@ Tendril.ready(function () {
     $(id).addEventListener("input", render);
   });
 
+  // ---------------- Names from your birth year ----------------
+  const BN = window.TendrilBirthNames;
+  const yn = Object.assign({ year: 1995, sex: null, more: false }, T.store.get("names.year", {}));
+  function ynSex() {
+    // Until chosen, follow the pronouns picked above.
+    return yn.sex || (setKey === "she" ? "f" : setKey === "he" ? "m" : "b");
+  }
+  function renderYear() {
+    if (!BN) { $("year-names").hidden = true; return; }
+    const sel = $("yn-year");
+    if (!sel.options.length) {
+      for (let y = BN.to; y >= BN.from; y--) {
+        const o = document.createElement("option");
+        o.value = y; o.textContent = y;
+        sel.appendChild(o);
+      }
+    }
+    const year = Math.min(BN.to, Math.max(BN.from, yn.year));
+    sel.value = year;
+    const sex = ynSex();
+    document.querySelectorAll("#yn-sex button").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.sex === sex ? "true" : "false"); });
+    const rows = BN.years[year][sex];
+    const shown = yn.more ? rows : rows.slice(0, 10);
+    const saved = getList().map(function (i) { return i.name.toLowerCase(); });
+    const current = $("name").value.trim().toLowerCase();
+    const top = rows.length ? (sex === "b" ? rows[0][2] : rows[0][1]) : 1;
+    const list = $("yn-list");
+    list.innerHTML = "";
+    shown.forEach(function (r, i) {
+      const name = BN.names[r[0]];
+      const li = document.createElement("li");
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "yn-item" + (name.toLowerCase() === current ? " is-on" : "");
+      b.setAttribute("aria-label", "Try " + name);
+      b.innerHTML = '<span class="yn-rank"></span><span class="yn-name"></span><span class="yn-meta"></span><span class="yn-bar"><i></i></span>';
+      b.querySelector(".yn-rank").textContent = i + 1;
+      b.querySelector(".yn-name").textContent = name + (saved.indexOf(name.toLowerCase()) >= 0 ? " ★" : "");
+      if (sex === "b") {
+        b.querySelector(".yn-meta").textContent = r[1] + "% girls · " + (100 - r[1]) + "% boys";
+        b.querySelector(".yn-bar i").style.width = Math.max(4, Math.round(100 * r[2] / top)) + "%";
+      } else {
+        const oneIn = Math.round(100000 / r[1]);
+        b.querySelector(".yn-meta").textContent = "1 in " + oneIn.toLocaleString() + (sex === "f" ? " girls" : " boys");
+        b.querySelector(".yn-bar i").style.width = Math.max(4, Math.round(100 * r[1] / top)) + "%";
+      }
+      b.addEventListener("click", function () {
+        $("name").value = name;
+        render();
+        renderYear();
+        document.querySelector(".try").scrollIntoView({ behavior: "smooth", block: "start" });
+        T.toast("Trying " + name);
+      });
+      li.appendChild(b);
+      list.appendChild(li);
+    });
+    $("yn-more").hidden = rows.length <= 10;
+    $("yn-more").textContent = yn.more ? "Show fewer" : "Show all " + rows.length;
+  }
+  function saveYear() { T.store.set("names.year", { year: yn.year, sex: yn.sex, more: yn.more }); }
+  $("yn-year").addEventListener("change", function () { yn.year = parseInt($("yn-year").value, 10); saveYear(); renderYear(); });
+  document.querySelectorAll("#yn-sex button").forEach(function (b) {
+    b.addEventListener("click", function () { yn.sex = b.dataset.sex; saveYear(); renderYear(); });
+  });
+  $("yn-more").addEventListener("click", function () { yn.more = !yn.more; saveYear(); renderYear(); });
+  $("pronoun-pills").addEventListener("change", function () { if (!yn.sex) renderYear(); });
+  $("save").addEventListener("click", function () { setTimeout(renderYear, 0); });
+
   renderPills();
   renderShortlist();
   render();
+  renderYear();
 });

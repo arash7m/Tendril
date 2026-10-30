@@ -103,6 +103,30 @@
       <p class="small muted" id="speak-note">Tap the speaker to hear a sentence read aloud by your device’s voice.</p>
     </section>
   </div>
+
+  <section class="panel year-names" id="year-names" aria-labelledby="yn-h">
+    <div class="yn-head">
+      <h2 id="yn-h">Names from your birth year</h2>
+      <p class="muted">A tip from the community: look at the most popular names from the year you were born. A name people your age often have helps it feel familiar and fit in, if that’s what you’d like. Tap a name to try it on.</p>
+    </div>
+    <div class="yn-controls">
+      <label class="field yn-year-field">
+        <span>Year you were born</span>
+        <select class="input" id="yn-year"></select>
+      </label>
+      <div class="field">
+        <span>Names given to</span>
+        <div class="seg" role="group" aria-label="Names given to" id="yn-sex">
+          <button type="button" data-sex="f" aria-pressed="false">Girls</button>
+          <button type="button" data-sex="m" aria-pressed="false">Boys</button>
+          <button type="button" data-sex="b" aria-pressed="false">Both</button>
+        </div>
+      </div>
+    </div>
+    <ol class="yn-list" id="yn-list"></ol>
+    <button class="btn btn-soft btn-small yn-more" type="button" id="yn-more">Show more</button>
+    <p class="small muted yn-source">These are names given to babies born in the United States, from US Social Security records (1940–2017). Naming trends differ from country to country; your country’s statistics office (like ISTAT in Italy, the ONS in the UK or Statistics Canada) publishes its own lists.</p>
+  </section>
 </main>
 
 <footer class="site-footer">
@@ -113,6 +137,7 @@
 </footer>
 
 <script src="assets/js/common.js"></script>
+<script src="assets/js/birth-names-data.js"></script>
 <script src="assets/js/names.js"></script>
 </body>
 </html>

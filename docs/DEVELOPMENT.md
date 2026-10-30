@@ -22,7 +22,7 @@ Everything runs in the browser and is stored on the user's own device. There is 
 | `hardday.html` | Hard day mode: breathing circle, 5-4-3-2-1 grounding, good reminders (jar, milestones, kind words incl. your own), trusted people with call/text and message ideas, regional support lines, gentle care checklist, write it out (let it go or keep in timeline). Linked from a floating heart on the hub, a low mood check-in, All tools and the jar |
 | `jar.html` | Euphoria jar: save moments, pick one at random (includes timeline entries tagged euphoria) |
 | `comingout.html` | Coming-out helper: builds an editable letter, talking points or short text from a few choices; saved drafts |
-| `names.html` | Name & pronoun sandbox: everyday sentences, read-aloud, private shortlist |
+| `names.html` | Name & pronoun sandbox: everyday sentences, read-aloud, private shortlist, and the most popular names from your birth year (US Social Security data 1940–2017, bundled in `assets/js/birth-names-data.js`) |
 | `guides.html` | Binding, tucking, appointment prep, name-change checklist |
 | `data.html` | Backup (optionally password-encrypted), restore, delete everything |
 
@@ -59,7 +59,7 @@ Everything is stored in the browser's localStorage under keys starting with `ten
 |---|---|
 | `voice.target`, `voice.history` | Target range, session summaries |
 | `doses.meds`, `doses.log` | Medications, logged doses |
-| `names.shortlist` | Saved names and pronouns |
+| `names.shortlist`, `names.year` | Saved names and pronouns; birth year and list chosen for “Names from your birth year” |
 | `guides.checklist` | Ticked name-change items |
 | `resonance.target`, `resonance.vowel`, `resonance.history` | Resonance zone, chosen vowel, session summaries and traces |
 | `labs.tests`, `labs.ranges`, `labs.units` | Blood tests, target ranges from the doctor, last unit used per marker |
@@ -111,6 +111,10 @@ The guides (binding, tucking, appointments) are general safety information and s
 The site is static, so GitHub Pages works as-is: **Settings → Pages → Deploy from a branch → `main` / root**.
 
 All paths are relative, so the app works at any address: a `github.io` subpath, an organisation's own `github.io` address, or a custom domain. Browsers keep data per address, so moving to a new one starts with empty storage there. Make a backup first and restore it at the new address.
+
+## Data credits
+
+- Popular names by birth year: US Social Security Administration national baby name data (public domain), prepared in the [babynames](https://github.com/hadley/babynames) package by Hadley Wickham (CC0).
 
 ## License
 
